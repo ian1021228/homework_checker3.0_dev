@@ -80,7 +80,9 @@ import {
 import { setupSidebar } from './sidebar.js';
 import { toggleOverviewFullscreen, copyOverviewDailyReport, renderOverviewPage } from './overview.js';
 import { saveOfficersAndDutySettings, setCustomDutyForDate, renderOfficersPage, addNewOfficer, resetDefaultOfficers } from './officers.js';
-import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAttendancePage, openAttendanceDatePicker, closeAttendanceDatePicker, changeAttendanceCalendarMonth } from './attendance.js';
+import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAttendancePage, openAttendanceDatePicker, closeAttendanceDatePicker, changeAttendanceCalendarMonth, getActiveAttendanceDate } from './attendance.js';
+import { initTimeWheel } from './timeWheel.js';
+import { openAttendanceStatsModal, initAttendanceStatsEvents } from './attendanceStats.js';
 import { createNewAffair, renderAffairsPage } from './affairs.js';
 
 import { setupButtonEvents } from './events.js';
@@ -422,15 +424,22 @@ function setupNewFeaturesEvents() {
     const markAllBtn = document.getElementById('attendance-mark-all-present-btn');
     if (markAllBtn) {
         markAllBtn.addEventListener('click', () => {
-            const d = document.getElementById('attendance-date-input')?.value;
+            const d = getActiveAttendanceDate();
             markAllPresent(d);
+        });
+    }
+
+    const attStatsBtn = document.getElementById('attendance-stats-modal-btn');
+    if (attStatsBtn) {
+        attStatsBtn.addEventListener('click', () => {
+            openAttendanceStatsModal();
         });
     }
 
     const copyAttLineBtn = document.getElementById('attendance-copy-line-btn');
     if (copyAttLineBtn) {
         copyAttLineBtn.addEventListener('click', () => {
-            const d = document.getElementById('attendance-date-input')?.value;
+            const d = getActiveAttendanceDate();
             copyAttendanceLineReport(d);
         });
     }
@@ -438,7 +447,7 @@ function setupNewFeaturesEvents() {
     const exportAttCsvBtn = document.getElementById('attendance-export-csv-btn');
     if (exportAttCsvBtn) {
         exportAttCsvBtn.addEventListener('click', () => {
-            const d = document.getElementById('attendance-date-input')?.value;
+            const d = getActiveAttendanceDate();
             exportAttendanceCsv(d);
         });
     }
@@ -483,6 +492,10 @@ function setupNewFeaturesEvents() {
             closeModal(affairModal);
         });
     }
+
+    // 初始化時間滾輪與出席統計模組
+    initTimeWheel();
+    initAttendanceStatsEvents();
 }
 
 // 啟動主程式

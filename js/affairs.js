@@ -5,7 +5,7 @@
 
 import { state } from './state.js';
 import { saveData } from './storage.js';
-import { generateId, showToast, safeCopyToClipboard, openModal, closeModal } from './utils.js';
+import { generateId, showToast, safeCopyToClipboard, openModal, closeModal, showConfirmDialog } from './utils.js';
 
 export function renderAffairsPage() {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
@@ -135,8 +135,12 @@ export function createNewAffair(data) {
 /**
  * 刪除回條
  */
-export function deleteAffair(affairId) {
-    if (!confirm('確定要刪除此問卷回條嗎？已繳回之簽章紀錄將一併移除！')) return;
+export async function deleteAffair(affairId) {
+    const ok = await showConfirmDialog('刪除問卷回條', '確定要刪除此問卷回條嗎？已繳回之簽章紀錄將一併移除！', {
+        okText: '確定刪除',
+        okClass: 'bg-rose-500 text-white font-bold py-2.5 px-6 text-sm rounded-xl shadow-md hover:bg-rose-600 transition-colors'
+    });
+    if (!ok) return;
 
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;

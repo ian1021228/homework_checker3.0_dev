@@ -5,7 +5,7 @@
 
 import { state } from './state.js';
 import { saveData } from './storage.js';
-import { showToast, openModal, closeModal } from './utils.js';
+import { showToast, openModal, closeModal, showConfirmDialog } from './utils.js';
 
 export const DEFAULT_OFFICER_ROLES = [
     { key: 'president', title: '班長', icon: 'fa-crown', color: 'text-amber-600 bg-amber-50 border-amber-200' },
@@ -282,11 +282,15 @@ export function deleteOfficer(roleKey) {
 /**
  * 回復預設 15 項常用幹部
  */
-export function resetDefaultOfficers() {
+export async function resetDefaultOfficers() {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
-    if (!confirm('確定要將幹部名冊回復為系統預設的 15 項正規幹部嗎？')) return;
+    const ok = await showConfirmDialog('回復預設幹部', '確定要將幹部名冊回復為系統預設的 15 項正規幹部嗎？', {
+        okText: '確定回復',
+        okClass: 'bg-indigo-600 text-white font-bold py-2.5 px-6 text-sm rounded-xl shadow-md hover:bg-indigo-700 transition-colors'
+    });
+    if (!ok) return;
 
     currentClass.officerRoles = JSON.parse(JSON.stringify(DEFAULT_OFFICER_ROLES));
     saveData();

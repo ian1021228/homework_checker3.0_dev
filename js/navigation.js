@@ -473,3 +473,12 @@ export function showWelcomeStep2() {
     document.getElementById('welcome-step-2')?.classList.remove('hidden');
     window.dispatchEvent(new CustomEvent('welcome-step-2-opened'));
 }
+
+if (typeof window !== 'undefined') {
+    window.showAttendancePage = showAttendancePage;
+    window.showMainPage = showMainPage;
+    window.showOverviewPage = showOverviewPage;
+    window.showOfficersPage = showOfficersPage;
+    window.showAffairsPage = showAffairsPage;
+    window.showExamScoresPage = showExamScoresPage;
+}

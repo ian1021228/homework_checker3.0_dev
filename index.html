@@ -1566,8 +1566,8 @@
                              <span>管理班級</span>
                          </button>
 
-                         <!-- 6. 快速登入授權 (手機端掃碼或產生認證碼，單一閃電圖示) -->
-                         <button id="main-qr-scan-btn" class="glass-card border border-emerald-300/80 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 font-black py-2.5 sm:py-3 px-3.5 sm:px-4 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他電腦快速登入">
+                         <!-- 6. 快速登入授權 (已整合至側邊欄抽屜選單，作業列表此處隱藏) -->
+                         <button id="main-qr-scan-btn" class="hidden glass-card border border-emerald-300/80 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 font-black py-2.5 sm:py-3 px-3.5 sm:px-4 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他電腦快速登入">
                              <i class="fa-solid fa-bolt text-amber-500"></i>
                              <span>快速授權</span>
                          </button>
@@ -2099,20 +2099,23 @@
                     <h1 class="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-2">
                         <i class="fa-solid fa-user-check text-emerald-600"></i> 簽到及遲到點名
                     </h1>
-                    <p id="attendance-date-display" class="text-xs sm:text-sm font-bold text-slate-500 mt-1">點擊座號一鍵循環切換出席狀態 · 到校時間可直接修改</p>
+                    <p id="attendance-date-display" class="text-xs sm:text-sm font-bold text-slate-500 mt-1">點擊座號一鍵循環切換出席狀態 · 點擊時間開啟時間滾輪</p>
                 </div>
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
-                <input type="date" id="attendance-date-input" class="hidden">
+                <input type="hidden" id="attendance-date-input">
                 <button type="button" id="open-attendance-date-picker-btn" class="bg-slate-800 text-white font-bold py-2.5 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-md hover:bg-slate-900 transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2 cursor-pointer">
                     <i class="fa-regular fa-calendar text-slate-400"></i>
                     <span id="attendance-date-btn-text">選擇日期</span>
                 </button>
-                <button type="button" id="attendance-mark-all-present-btn" class="py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95">
-                    <i class="fa-solid fa-check-double"></i> <span>全員出席</span>
+                <button type="button" id="attendance-mark-all-present-btn" class="py-2.5 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95" title="一鍵標記全班出席">
+                    <i class="fa-solid fa-check"></i> <span>全員出席</span>
                 </button>
-                <button type="button" id="attendance-copy-line-btn" class="py-2.5 px-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-black text-sm shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95">
-                    <i class="fa-solid fa-clipboard-list"></i> <span>複製出勤通報</span>
+                <button type="button" id="attendance-stats-modal-btn" class="py-2.5 px-4 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95" title="查看學生出席情況與遲到排名">
+                    <i class="fa-solid fa-chart-pie"></i> <span>出席狀況</span>
+                </button>
+                <button type="button" id="attendance-copy-line-btn" class="py-2.5 px-4 rounded-2xl bg-teal-600 hover:bg-teal-700 text-white font-black text-sm shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95" title="複製出席通報至剪貼簿">
+                    <i class="fa-solid fa-clipboard-list"></i> <span>複製出席通報</span>
                 </button>
                 <button type="button" id="attendance-export-csv-btn" class="py-2.5 px-3 rounded-2xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold text-sm shadow-xs cursor-pointer" title="匯出 CSV">
                     <i class="fa-solid fa-file-csv"></i>
@@ -2120,7 +2123,7 @@
             </div>
         </header>
 
-        <!-- 出勤統計條 -->
+        <!-- 出席統計條 -->
         <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
             <div class="glass-card rounded-2xl p-3.5 border border-emerald-200 bg-emerald-50/50 flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
@@ -3196,7 +3199,7 @@
         </div>
     </div>
 
-    <!-- 簽到出勤專屬月曆 Modal (與聯絡簿月曆視覺規格一致) -->
+    <!-- 簽到出席專屬月曆 Modal (與聯絡簿月曆視覺規格一致) -->
     <div id="attendance-date-picker-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[160]">
         <div id="att-date-picker-content" class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm transform scale-95 border border-slate-100">
             <div class="flex items-center justify-between mb-5">
@@ -3210,6 +3213,231 @@
             <div id="att-calendar-grid" class="grid grid-cols-7 gap-1"></div>
             <div class="flex justify-end mt-6 pt-4 border-t border-slate-100">
                 <button type="button" id="close-att-date-picker-btn" class="bg-slate-100 text-slate-600 font-bold py-2.5 px-6 text-sm rounded-xl hover:bg-slate-200 transition-colors cursor-pointer">關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 24小時制時間滾輪選擇 Modal (Time Wheel Picker Modal) -->
+    <div id="time-wheel-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[170] transition-all duration-200">
+        <div id="time-wheel-content" class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-xs sm:max-w-sm border border-slate-100 transform scale-95 transition-transform flex flex-col items-center">
+            <!-- 標題列 -->
+            <div class="w-full flex items-center justify-between pb-3 border-b border-slate-100 mb-4">
+                <h3 id="time-wheel-title" class="text-base font-black text-slate-800 flex items-center gap-2">
+                    <i class="fa-regular fa-clock text-indigo-600"></i>
+                    <span id="time-wheel-title-text">選擇時間 (24小時制)</span>
+                </h3>
+                <button type="button" id="time-wheel-close-btn" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- 24小時制超大數位時間即時預覽看板 -->
+            <div class="mb-4 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-50 via-purple-50 to-indigo-50 border border-indigo-200 px-6 py-2.5 rounded-2xl shadow-inner">
+                <span id="time-wheel-preview-hour" class="text-3xl font-black font-mono text-indigo-700">08</span>
+                <span class="text-2xl font-black text-indigo-400 animate-pulse">:</span>
+                <span id="time-wheel-preview-min" class="text-3xl font-black font-mono text-indigo-700">00</span>
+                <span class="text-xs font-bold text-indigo-500 bg-indigo-100/70 px-2 py-0.5 rounded-md ml-1 font-mono">24H</span>
+            </div>
+
+            <!-- 雙欄滾輪容器 (Hours 00-23 / Minutes 00-59) -->
+            <div class="relative w-full h-48 bg-slate-50/80 rounded-2xl border border-slate-200 overflow-hidden flex items-center justify-center select-none shadow-inner">
+                <!-- 中央聚焦指示框 (Highlight Lens) -->
+                <div class="absolute inset-x-2 top-1/2 -translate-y-1/2 h-10 bg-indigo-500/10 border-y-2 border-indigo-500/40 rounded-xl pointer-events-none z-10 shadow-xs"></div>
+                
+                <!-- 欄位標籤提示 (小時 / 分鐘) -->
+                <div class="absolute top-1 inset-x-0 flex justify-around text-[10px] font-bold text-slate-400 pointer-events-none z-20">
+                    <span class="w-1/2 text-center">時 (00-23)</span>
+                    <span class="w-1/2 text-center">分 (00-59)</span>
+                </div>
+
+                <!-- 小時滾輪 (00 ~ 23) -->
+                <div class="w-1/2 h-full relative z-0">
+                    <div id="wheel-hours-container" class="h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar text-center py-[76px]">
+                        <!-- JS 動態生成 -->
+                    </div>
+                </div>
+
+                <!-- 分鐘滾輪 (00 ~ 59) -->
+                <div class="w-1/2 h-full relative z-0">
+                    <div id="wheel-minutes-container" class="h-full overflow-y-scroll snap-y snap-mandatory no-scrollbar text-center py-[76px]">
+                        <!-- JS 動態生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 常用到校時間快捷標籤 (Presets) -->
+            <div class="w-full mt-3 flex flex-wrap items-center justify-center gap-1.5">
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="now">
+                    <i class="fa-solid fa-bolt text-amber-500 text-[10px]"></i> 現在
+                </button>
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-mono font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="07:30">07:30</button>
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-mono font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="07:45">07:45</button>
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-mono font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="08:00">08:00</button>
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-mono font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="08:15">08:15</button>
+                <button type="button" class="btn-time-preset px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-[11px] font-mono font-bold text-slate-600 transition-colors cursor-pointer border border-slate-200" data-time="08:30">08:30</button>
+            </div>
+
+            <!-- 底部操作按鈕 -->
+            <div class="w-full flex items-center justify-between gap-3 mt-4 pt-3 border-t border-slate-100">
+                <button type="button" id="time-wheel-clear-btn" class="px-3 py-2 rounded-xl text-xs font-bold text-rose-500 hover:bg-rose-50 transition-colors cursor-pointer">
+                    清除時間
+                </button>
+                <div class="flex items-center gap-2">
+                    <button type="button" id="time-wheel-cancel-btn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
+                        取消
+                    </button>
+                    <button type="button" id="time-wheel-confirm-btn" class="px-5 py-2 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-600/30 transition-all cursor-pointer active:scale-95 flex items-center gap-1.5">
+                        <i class="fa-solid fa-check"></i> 確定
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 全班出席狀況與遲到排行統計 Modal (Attendance Stats & Tardy Ranking Modal) -->
+    <div id="attendance-stats-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 hidden modal z-[160] transition-all duration-200">
+        <div class="bg-white rounded-3xl shadow-2xl p-5 sm:p-7 w-full max-w-4xl max-h-[90vh] flex flex-col border border-slate-100 transform scale-95 transition-transform overflow-hidden">
+            <!-- 彈窗頂部列：左側標題，右側時間範圍選擇 (依指示位於右上方) -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-xs">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-black text-slate-900">班級出席狀況與遲到排名</h2>
+                        <p class="text-xs font-bold text-slate-400">統計全班出席率、個別學生出席明細與遲到次數排行</p>
+                    </div>
+                </div>
+
+                <!-- 右上方時間範圍選擇器 -->
+                <div class="flex items-center gap-2 self-end sm:self-center">
+                    <span class="text-xs font-black text-slate-600 whitespace-nowrap flex items-center gap-1">
+                        <i class="fa-regular fa-calendar-days text-indigo-600"></i> 時間範圍：
+                    </span>
+                    <select id="attendance-stats-range-select" class="bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-bold rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-pointer">
+                        <option value="today">今日</option>
+                        <option value="this-week">本週</option>
+                        <option value="this-month" selected>本月</option>
+                        <option value="this-semester">本學期 (近6個月)</option>
+                        <option value="all">全學期紀錄</option>
+                        <option value="custom">自訂區間...</option>
+                    </select>
+                    <button type="button" id="close-attendance-stats-modal-btn" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer ml-1" title="關閉">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 自訂時間範圍輸入列 (當選擇自訂時展開) -->
+            <div id="att-stats-custom-range-box" class="hidden p-3 bg-slate-50 border border-slate-200 rounded-2xl mt-3 flex flex-wrap items-center gap-3 shrink-0">
+                <span class="text-xs font-bold text-slate-600">自訂起訖：</span>
+                <input type="date" id="att-stats-start-date" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-mono font-bold text-slate-800">
+                <span class="text-slate-400 font-bold">~</span>
+                <input type="date" id="att-stats-end-date" class="bg-white border border-slate-300 rounded-xl px-2.5 py-1 text-xs font-mono font-bold text-slate-800">
+                <button type="button" id="att-stats-apply-custom-btn" class="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer">
+                    套用區間
+                </button>
+            </div>
+
+            <!-- 彈窗主體滾動區域 -->
+            <div class="overflow-y-auto custom-scrollbar flex-1 py-4 space-y-6">
+                <!-- 1. 核心統計卡片 -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="p-3.5 bg-emerald-50/70 border border-emerald-200 rounded-2xl">
+                        <div class="text-xs font-bold text-emerald-700">全班出席率</div>
+                        <div id="att-stats-rate" class="text-2xl font-black font-mono text-emerald-800 mt-1">100%</div>
+                    </div>
+                    <div class="p-3.5 bg-indigo-50/70 border border-indigo-200 rounded-2xl">
+                        <div class="text-xs font-bold text-indigo-700">統計點名日數</div>
+                        <div id="att-stats-days" class="text-2xl font-black font-mono text-indigo-800 mt-1">0 天</div>
+                    </div>
+                    <div class="p-3.5 bg-amber-50/70 border border-amber-200 rounded-2xl">
+                        <div class="text-xs font-bold text-amber-700">累計遲到人次</div>
+                        <div id="att-stats-total-tardy" class="text-2xl font-black font-mono text-amber-800 mt-1">0 人次</div>
+                    </div>
+                    <div class="p-3.5 bg-rose-50/70 border border-rose-200 rounded-2xl">
+                        <div class="text-xs font-bold text-rose-700">累計請假人次</div>
+                        <div id="att-stats-total-leaves" class="text-2xl font-black font-mono text-rose-800 mt-1">0 人次</div>
+                    </div>
+                </div>
+
+                <!-- 2. 遲到排行榜專區 (遲到排名) -->
+                <div>
+                    <div class="flex items-center justify-between mb-2.5">
+                        <h3 class="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-clock-rotate-left text-amber-500"></i>
+                            <span>遲到次數排行榜 (關注名單)</span>
+                        </h3>
+                        <span class="text-[11px] font-bold text-slate-400">依遲到次數排序 · 點擊次數查看每次到校時間</span>
+                    </div>
+                    <div id="att-stats-tardy-ranking" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                        <!-- 由 JS 動態渲染遲到排名卡片 -->
+                    </div>
+                </div>
+
+                <!-- 3. 個別學生出席情況詳細列表 -->
+                <div>
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
+                        <h3 class="text-sm font-black text-slate-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-users text-indigo-600"></i>
+                            <span>全體學生出席狀況清單</span>
+                        </h3>
+                        <input type="text" id="att-stats-search-input" placeholder="搜尋座號或姓名..." class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 w-full sm:w-48">
+                    </div>
+
+                    <div class="overflow-x-auto rounded-2xl border border-slate-200 shadow-2xs">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-[11px] font-black text-slate-500 border-b border-slate-200">
+                                    <th class="py-2.5 px-3">座號</th>
+                                    <th class="py-2.5 px-3">姓名</th>
+                                    <th class="py-2.5 px-3">出席率</th>
+                                    <th class="py-2.5 px-3 text-center">正常出席</th>
+                                    <th class="py-2.5 px-3 text-center">遲到次數</th>
+                                    <th class="py-2.5 px-3 text-center">請假明細</th>
+                                </tr>
+                            </thead>
+                            <tbody id="att-stats-student-table-body" class="divide-y divide-slate-100 text-xs font-medium">
+                                <!-- 由 JS 動態填充 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 個別學生遲到詳細明細 Modal -->
+    <div id="att-student-tardy-detail-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[180] transition-all duration-200">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm border border-slate-100 transform scale-95 transition-transform flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100 mb-3">
+                <h3 id="att-student-tardy-detail-title" class="text-sm font-black text-slate-800">遲到明細</h3>
+                <button type="button" id="close-att-student-tardy-detail-btn" class="w-8 h-8 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors cursor-pointer">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <ul id="att-student-tardy-detail-list" class="space-y-1 max-h-64 overflow-y-auto custom-scrollbar pr-1"></ul>
+        </div>
+    </div>
+
+    <!-- 網站內自訂輸入詢問彈窗 (Custom Prompt Modal - 嚴格取代瀏覽器內建 prompt) -->
+    <div id="custom-prompt-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-[210] transition-all duration-200">
+        <div class="bg-white rounded-3xl shadow-2xl p-6 w-full max-w-sm border border-slate-100 transform scale-95 transition-transform">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shrink-0">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </div>
+                <h3 id="custom-prompt-title" class="text-base font-black text-slate-800">請輸入</h3>
+            </div>
+            <p id="custom-prompt-message" class="text-sm font-medium text-slate-600 leading-relaxed mb-3 whitespace-pre-line"></p>
+            <input type="text" id="custom-prompt-input" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 focus:bg-white text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-500 mb-5" />
+            <div class="flex items-center justify-end gap-2.5">
+                <button type="button" id="custom-prompt-cancel-btn" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors cursor-pointer">
+                    取消
+                </button>
+                <button type="button" id="custom-prompt-ok-btn" class="px-5 py-2 rounded-xl text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 shadow-md transition-all cursor-pointer">
+                    確定
+                </button>
             </div>
         </div>
     </div>
@@ -3599,15 +3827,23 @@
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
-                                <span><b>簽到出勤與到校時間編輯</b>：提供與聯絡簿視覺完全一致的專屬月份日曆彈窗（含出勤圓點與月份切換）；學生卡片支援直接修改到校時間與快速登記時間；支援一鍵全員出席、LINE 通報與 CSV 匯出。</span>
+                                <span><b>簽到出席與 24H 時間滾輪</b>：學生到校時間支援全新「24 小時制時間滾輪（Time Wheel Picker）」，徹底解決瀏覽器原生時間被截斷蓋掉之問題；提供平滑滾動、居中對齊、實時數位預覽與學校常用時間快捷鍵；全員出席按鈕全面採用俐落單勾圖標。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
-                                <span><b>免帳號家長電子簽閱與回條權限修復</b>：徹底解決免帳號家長直查送出回條與簽名時之 `Missing or insufficient permissions` 錯誤，資料無縫存儲於公開開放之個人節點，並即時回傳教師端匯總。</span>
+                                <span><b>全班出席狀況與遲到排名看板</b>：簽到頁面新增「出席狀況」功能，可於右上方自由切換時間範圍（今日、本週、本月、本學期、全學期、自訂區間），精準統計全班出席率、個別學生出席與請假明細，並自動生成「遲到次數排行榜」關注名單與到校時間歷程。</span>
                             </li>
                             <li class="flex items-start gap-2">
                                 <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
-                                <span><b>成績系統導覽與側邊欄精準高亮修復</b>：全面納入路由歷程（<code>#scores</code>）與頁面狀態生命週期；修復切換至全螢幕成績系統時，側邊欄誤亮聯絡簿以及網址殘留 <code>#contact-book</code> 之同步異常，側邊欄抽屜精確高亮「成績」項目。</span>
+                                <span><b>全面禁用瀏覽器內建彈窗與日曆</b>：全面封鎖瀏覽器原生 alert、confirm、prompt 與內建日曆，全系統詢問確認與時間日期選擇一律採用網站內建之專屬優雅彈窗，操作流暢且介面完全統一。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
+                                <span><b>「出勤」名詞全面統整為「出席」</b>：教師端簽到頁面、通報文案、CSV 匯出檔頭、家長端與學生端狀態徽章，全面統一詞彙為「出席」，用詞更貼切親師日常用語。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-500 shrink-0 mt-0.5"></i>
+                                <span><b>作業列表工具列簡潔淨化</b>：作業列表頁面頂端主工具列與手機版更多選單中的「快速授權」按鈕予以隱藏，全面整合由左上角漢堡抽屜選單統一開啟，畫面動線更清爽專注。</span>
                             </li>
                         </ul>
                     </div>
@@ -4321,7 +4557,7 @@
                     <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-tags"></i></div>
                     <div class="text-left"><span class="block text-stone-900 font-extrabold">作業種類</span><span class="text-[10px] text-stone-400 font-medium">彩色標籤</span></div>
                 </button>
-                <button id="mobile-sheet-quick-auth-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
+                <button id="mobile-sheet-quick-auth-btn" class="hidden p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
                     <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-bolt"></i></div>
                     <div class="text-left"><span class="block text-stone-900 font-extrabold">快速授權</span><span class="text-[10px] text-stone-400 font-medium">認證碼/掃碼</span></div>
                 </button>
