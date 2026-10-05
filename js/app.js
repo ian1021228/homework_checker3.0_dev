@@ -78,8 +78,8 @@ import {
 
 import { setupSidebar } from './sidebar.js';
 import { toggleOverviewFullscreen, copyOverviewDailyReport, renderOverviewPage } from './overview.js';
-import { saveOfficersAndDutySettings, setCustomDutyForDate, renderOfficersPage } from './officers.js';
-import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAttendancePage } from './attendance.js';
+import { saveOfficersAndDutySettings, setCustomDutyForDate, renderOfficersPage, addNewOfficer, resetDefaultOfficers } from './officers.js';
+import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAttendancePage, openAttendanceDatePicker, closeAttendanceDatePicker, changeAttendanceCalendarMonth } from './attendance.js';
 import { createNewAffair, renderAffairsPage } from './affairs.js';
 
 import { setupButtonEvents } from './events.js';
@@ -95,6 +95,7 @@ import {
 } from './qrLogin.js';
 
 // 將核心全域輔助函式掛載至 window，確保相容性與無縫呼叫
+window.state = state;
 window.showToast = showToast;
 window.showAlertModal = showAlertModal;
 window.showConfirmModal = showConfirmModal;
@@ -355,6 +356,12 @@ function setupNewFeaturesEvents() {
     const saveOfficersBtn = document.getElementById('save-officers-btn');
     if (saveOfficersBtn) saveOfficersBtn.addEventListener('click', saveOfficersAndDutySettings);
 
+    const addOfficerBtn = document.getElementById('btn-add-officer');
+    if (addOfficerBtn) addOfficerBtn.addEventListener('click', addNewOfficer);
+
+    const resetOfficersBtn = document.getElementById('btn-reset-default-officers');
+    if (resetOfficersBtn) resetOfficersBtn.addEventListener('click', resetDefaultOfficers);
+
     const swapDutyBtn = document.getElementById('duty-swap-modal-btn');
     const dutyModal = document.getElementById('duty-assign-modal');
     const dutyDateInput = document.getElementById('duty-assign-date');
@@ -388,6 +395,19 @@ function setupNewFeaturesEvents() {
             renderAttendancePage(e.target.value);
         });
     }
+
+    // 簽到專屬月曆事件 (與聯絡簿月曆視覺一致)
+    const openAttDateBtn = document.getElementById('open-attendance-date-picker-btn');
+    if (openAttDateBtn) openAttDateBtn.addEventListener('click', openAttendanceDatePicker);
+
+    const closeAttDateBtn = document.getElementById('close-att-date-picker-btn');
+    if (closeAttDateBtn) closeAttDateBtn.addEventListener('click', closeAttendanceDatePicker);
+
+    const prevAttMonthBtn = document.getElementById('att-prev-month-btn');
+    if (prevAttMonthBtn) prevAttMonthBtn.addEventListener('click', () => changeAttendanceCalendarMonth(-1));
+
+    const nextAttMonthBtn = document.getElementById('att-next-month-btn');
+    if (nextAttMonthBtn) nextAttMonthBtn.addEventListener('click', () => changeAttendanceCalendarMonth(1));
 
     const markAllBtn = document.getElementById('attendance-mark-all-present-btn');
     if (markAllBtn) {

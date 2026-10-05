@@ -1,13 +1,14 @@
 /**
  * 總覽大螢幕課堂看板 (Overview / Classroom Mission Control)
  * 專為教室大螢幕/電子白板設計，一目了然，免向下捲動
- * 整合：各作業未交座號速覽、今日聯絡簿、今日值日生、注意事項、出缺席概況
+ * 整合：各作業未完成座號（按狀態名稱詳細條列）、今日聯絡簿、今日值日生、注意事項、出缺席概況
  */
 
 import { state } from './state.js';
 import { formatDate, safeCopyToClipboard, showToast, openModal, closeModal } from './utils.js';
 import { getTodayDutyStudents } from './officers.js';
 import { getTodayAttendanceSummary } from './attendance.js';
+import { getHomeworkType } from './render.js';
 
 export function getTodayDateStr() {
     const d = new Date();
@@ -30,21 +31,21 @@ export function renderOverviewPage() {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
-    // 1. 日期與班級顯示
+    const todayStr = getTodayDateStr();
+
+    // 1. 頂部日期與班級標題
     const dateDisplay = document.getElementById('overview-date-display');
     if (dateDisplay) {
         dateDisplay.textContent = `${currentClass.name} · ${formatChineseDateWithWeekday()}`;
     }
 
-    const todayStr = getTodayDateStr();
-
-    // 2. 作業未繳交座號速覽
+    // 2. 今日各作業未完成名單（依狀態名稱條列）
     renderOverviewHomeworks(currentClass);
 
-    // 3. 今日出缺席看板
+    // 3. 今日出缺席狀態統計
     renderOverviewAttendance(currentClass, todayStr);
 
-    // 4. 今日聯絡簿
+    // 4. 今日黑板聯絡簿
     renderOverviewContactBook(currentClass, todayStr);
 
     // 5. 今日值日生
@@ -71,41 +72,69 @@ function renderOverviewHomeworks(currentClass) {
         return;
     }
 
-    let totalMissingAcrossAll = 0;
+    let totalIncompleteAcrossAll = 0;
 
     const cardsHtml = classHomeworks.map(hw => {
         const students = hw.students || [];
         const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : students.length;
-        
-        // 找出未繳交學生
-        const missingSeats = [];
+        const type = getHomeworkType(hw.typeId);
+
+        // 依未完成狀態名稱分組收集座號
+        const uncompletedGroups = {}; // { [statusKey]: { text, color, textColor, seats: [] } }
+        let uncompletedCount = 0;
+
         for (let i = 1; i <= maxSeat; i++) {
             const st = students.find(s => Number(s.seat) === i);
-            if (!st || st.status !== 'completed') {
-                missingSeats.push(i);
+            const statusKey = st?.status || type.statuses[0]?.key;
+            const statusObj = type.statuses.find(s => s.key === statusKey) || type.statuses[0];
+            
+            if (!statusObj || !statusObj.isCompleted) {
+                uncompletedCount++;
+                const sKey = statusObj?.key || 'not-submitted';
+                if (!uncompletedGroups[sKey]) {
+                    uncompletedGroups[sKey] = {
+                        text: statusObj?.text || '未繳交',
+                        color: statusObj?.color || 'bg-rose-500',
+                        textColor: statusObj?.textColor || 'text-white',
+                        seats: []
+                    };
+                }
+                uncompletedGroups[sKey].seats.push(i);
             }
         }
 
-        totalMissingAcrossAll += missingSeats.length;
-        const turnedInCount = maxSeat - missingSeats.length;
-        const rate = maxSeat > 0 ? Math.round((turnedInCount / maxSeat) * 100) : 100;
-        const isAllDone = missingSeats.length === 0;
+        totalIncompleteAcrossAll += uncompletedCount;
+        const completedCount = maxSeat - uncompletedCount;
+        const rate = maxSeat > 0 ? Math.round((completedCount / maxSeat) * 100) : 100;
+        const isAllDone = uncompletedCount === 0;
 
-        let missingBadgesHtml = '';
+        let statusSectionsHtml = '';
         if (isAllDone) {
-            missingBadgesHtml = `
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-black text-xs">
-                    <i class="fa-solid fa-circle-check text-emerald-600"></i> 全班已繳齊
-                </span>
+            statusSectionsHtml = `
+                <div class="mt-2">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-100 text-emerald-800 font-black text-xs">
+                        <i class="fa-solid fa-circle-check text-emerald-600"></i> 全班皆已完成
+                    </span>
+                </div>
             `;
         } else {
-            missingBadgesHtml = `
-                <div class="flex flex-wrap items-center gap-1.5 mt-1.5">
-                    <span class="text-xs font-black text-rose-600 shrink-0 mr-1">未交座號：</span>
-                    ${missingSeats.map(seat => `
-                        <span class="inline-flex items-center justify-center min-w-[26px] h-6 px-1.5 rounded-lg bg-rose-600 text-white font-black text-xs shadow-xs">
-                            ${String(seat).padStart(2, '0')}
-                        </span>
+            const groupsArr = Object.values(uncompletedGroups);
+            statusSectionsHtml = `
+                <div class="mt-2 space-y-2">
+                    ${groupsArr.map(group => `
+                        <div class="flex flex-wrap items-center gap-1.5">
+                            <span class="text-xs font-black text-slate-700 shrink-0 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full ${group.color}"></span>
+                                <span>${group.text} (${group.seats.length}人)：</span>
+                            </span>
+                            <div class="flex flex-wrap items-center gap-1">
+                                ${group.seats.map(seat => `
+                                    <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-lg ${group.color} ${group.textColor} font-black text-xs shadow-2xs">
+                                        ${seat}號
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
                     `).join('')}
                 </div>
             `;
@@ -120,33 +149,33 @@ function renderOverviewHomeworks(currentClass) {
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         <span class="text-xs font-black font-mono ${isAllDone ? 'text-emerald-600' : 'text-slate-600'}">
-                            ${turnedInCount} / ${maxSeat} (${rate}%)
+                            ${completedCount} / ${maxSeat} (${rate}%)
                         </span>
                     </div>
                 </div>
 
                 <!-- 進度條 -->
-                <div class="w-full bg-slate-100 rounded-full h-2 mb-2 overflow-hidden">
+                <div class="w-full bg-slate-100 rounded-full h-2 mb-1.5 overflow-hidden">
                     <div class="${isAllDone ? 'bg-emerald-500' : 'bg-indigo-600'} h-2 rounded-full transition-all duration-500" style="width: ${rate}%"></div>
                 </div>
 
-                <!-- 未交座號標籤 -->
-                ${missingBadgesHtml}
+                <!-- 依狀態名稱詳細條列座號 -->
+                ${statusSectionsHtml}
             </div>
         `;
     }).join('');
 
     container.innerHTML = cardsHtml;
     if (badge) {
-        badge.innerHTML = totalMissingAcrossAll === 0 
-            ? `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check mr-1"></i>全員全齊</span>`
-            : `<span>總缺交人次：<strong class="text-rose-600 font-black">${totalMissingAcrossAll}</strong></span>`;
+        badge.innerHTML = totalIncompleteAcrossAll === 0 
+            ? `<span class="text-emerald-600 font-bold"><i class="fa-solid fa-check mr-1"></i>全班作業皆完成</span>`
+            : `<span>總未完成人次：<strong class="text-rose-600 font-black">${totalIncompleteAcrossAll}</strong></span>`;
     }
 }
 
 function renderOverviewAttendance(currentClass, todayStr) {
     const summary = getTodayAttendanceSummary(currentClass, todayStr);
-    
+
     const elPresent = document.getElementById('overview-att-present-count');
     const elTardy = document.getElementById('overview-att-tardy-count');
     const elLeave = document.getElementById('overview-att-leave-count');
@@ -171,14 +200,14 @@ function renderOverviewAttendance(currentClass, todayStr) {
             if (summary.tardies.length > 0) {
                 abnormalItems.push(`
                     <span class="text-amber-800 font-black">
-                        遲到 (${summary.tardyCount}人)：${summary.tardies.map(t => `${String(t.seat).padStart(2, '0')}號 ${t.name || ''}`).join('、')}
+                        遲到 (${summary.tardyCount}人)：${summary.tardies.map(t => `${t.seat}號${t.name ? ' ' + t.name : ''}${t.time ? ` (${t.time} 到校)` : ''}`).join('、')}
                     </span>
                 `);
             }
             if (summary.leaves.length > 0) {
                 abnormalItems.push(`
                     <span class="text-rose-800 font-black">
-                        請假 (${summary.leaveCount}人)：${summary.leaves.map(l => `${String(l.seat).padStart(2, '0')}號 ${l.name || ''} (${l.reason || '假'})`).join('、')}
+                        請假 (${summary.leaveCount}人)：${summary.leaves.map(l => `${l.seat}號${l.name ? ' ' + l.name : ''} (${l.reason || '假'})`).join('、')}
                     </span>
                 `);
             }
@@ -233,7 +262,7 @@ function renderOverviewDutyStudents(currentClass, todayStr) {
         return;
     }
 
-    const namesText = duty.map(d => `${String(d.seat).padStart(2, '0')}號 ${d.name || ''}`).join(' · ');
+    const namesText = duty.map(d => `${d.seat}號${d.name ? ' ' + d.name : ''}`).join('、');
     namesEl.textContent = namesText;
 }
 
@@ -243,63 +272,79 @@ function renderOverviewNotice(currentClass) {
 
     const notice = currentClass.bulletinNotice || '';
     if (notice.trim()) {
-        noticeEl.innerHTML = `<span class="line-clamp-2">${notice.replace(/\n/g, '<br>')}</span>`;
+        noticeEl.textContent = notice.trim();
+        noticeEl.classList.remove('italic', 'text-slate-400');
+        noticeEl.classList.add('text-indigo-950');
     } else {
         noticeEl.textContent = '暫無特殊注意事項，請記得攜帶文具、水壺與作業！';
+        noticeEl.classList.add('italic', 'text-slate-400');
+        noticeEl.classList.remove('text-indigo-950');
     }
 }
 
 /**
- * 一鍵複製今日總通報 (包含作業未交座號、聯絡簿、值日生、出缺席概況、家長端連結)
+ * 複製今日班級總通報文案 (LINE家長群一鍵貼上)
  */
 export function copyOverviewDailyReport() {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
-    if (!currentClass) {
-        showToast('請先選擇班級！', 'warning');
-        return;
-    }
+    if (!currentClass) return;
 
     const todayStr = getTodayDateStr();
-    const dateHeader = formatChineseDateWithWeekday();
-    const code = currentClass.accessCode || '';
-    const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${code}`;
+    const summary = getTodayAttendanceSummary(currentClass, todayStr);
+    const classHomeworks = (state.appData?.homeworks || []).filter(h => h.classId === currentClass.id);
+    const accessCode = currentClass.accessCode || 'DEMO';
+    const parentUrl = `${window.location.origin}${window.location.pathname.replace('homework_checker3.0_dev', 'parent_dashboard_dev')}?code=${accessCode}`;
 
-    let report = `📢 【${currentClass.name}】課堂每日總通報\n`;
-    report += `📅 日期：${dateHeader}\n\n`;
+    let report = `📢 【${currentClass.name} 今日班級聯絡簿與出缺席總通報】\n`;
+    report += `📅 日期：${formatChineseDateWithWeekday()}\n\n`;
 
-    // 1. 今日聯絡簿
-    const contactBook = currentClass.contactBook || {};
-    const todayData = contactBook[todayStr] || {};
-    const items = todayData.items || [];
-    report += `📝 【今日聯絡事項】\n`;
-    if (items.length > 0) {
-        items.forEach((it, idx) => {
-            const txt = typeof it === 'string' ? it : (it.text || '');
-            report += `${idx + 1}. ${txt}\n`;
-        });
-    } else {
-        report += `(今日無特別登記項目)\n`;
+    // 1. 出缺席概況
+    report += `📊 【出缺席概況】：\n`;
+    report += `• 實到出席：${summary.presentCount} 人\n`;
+    report += `• 遲到到校：${summary.tardyCount} 人\n`;
+    report += `• 請假缺席：${summary.leaveCount} 人\n`;
+    if (summary.tardies.length > 0) {
+        report += `• 遲到名單：${summary.tardies.map(t => `${t.seat}號${t.name ? ' ' + t.name : ''}${t.time ? ` (${t.time} 到校)` : ''}`).join('、')}\n`;
+    }
+    if (summary.leaves.length > 0) {
+        report += `• 請假名單：${summary.leaves.map(l => `${l.seat}號${l.name ? ' ' + l.name : ''} (${l.reason || '假'})`).join('、')}\n`;
     }
     report += `\n`;
 
-    // 2. 作業未交座號
-    report += `📋 【作業點收與未交名單】\n`;
-    const classHomeworks = (state.appData?.homeworks || []).filter(h => h.classId === currentClass.id);
+    // 2. 各項作業未完成名單 (按狀態名稱詳細條列)
+    report += `📝 【今日作業完成進度】：\n`;
     if (classHomeworks.length > 0) {
         classHomeworks.forEach(hw => {
             const students = hw.students || [];
             const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : students.length;
-            const missingSeats = [];
+            const type = getHomeworkType(hw.typeId);
+
+            const uncompletedGroups = {};
+            let uncompletedCount = 0;
             for (let i = 1; i <= maxSeat; i++) {
                 const st = students.find(s => Number(s.seat) === i);
-                if (!st || st.status !== 'completed') {
-                    missingSeats.push(String(i).padStart(2, '0'));
+                const statusKey = st?.status || type.statuses[0]?.key;
+                const statusObj = type.statuses.find(s => s.key === statusKey) || type.statuses[0];
+                if (!statusObj || !statusObj.isCompleted) {
+                    uncompletedCount++;
+                    const sKey = statusObj?.key || 'not-submitted';
+                    if (!uncompletedGroups[sKey]) {
+                        uncompletedGroups[sKey] = {
+                            text: statusObj?.text || '未繳交',
+                            seats: []
+                        };
+                    }
+                    uncompletedGroups[sKey].seats.push(i);
                 }
             }
-            if (missingSeats.length === 0) {
-                report += `✔ ${hw.name}：全班繳齊！\n`;
+
+            if (uncompletedCount === 0) {
+                report += `• ${hw.name}：全班皆已完成！✨\n`;
             } else {
-                report += `✘ ${hw.name}（未交座號）：${missingSeats.join(', ')}\n`;
+                report += `• ${hw.name}：\n`;
+                Object.values(uncompletedGroups).forEach(group => {
+                    report += `   - ${group.text} (${group.seats.length}人)：${group.seats.map(s => `${s}號`).join('、')}\n`;
+                });
             }
         });
     } else {
@@ -310,7 +355,7 @@ export function copyOverviewDailyReport() {
     // 3. 值日生
     const duty = getTodayDutyStudents(currentClass, todayStr);
     if (duty && duty.length > 0) {
-        report += `🧹 【今日值日生】：${duty.map(d => `${String(d.seat).padStart(2, '0')}號 ${d.name || ''}`).join('、')}\n\n`;
+        report += `🧹 【今日值日生】：${duty.map(d => `${d.seat}號${d.name ? ' ' + d.name : ''}`).join('、')}\n\n`;
     }
 
     // 4. 注意事項
@@ -326,17 +371,44 @@ export function copyOverviewDailyReport() {
 }
 
 /**
- * 全螢幕切換
+ * 全螢幕切換與按鈕狀態更新
  */
+export function updateOverviewFullscreenButton() {
+    const btn = document.getElementById('overview-fullscreen-btn');
+    if (!btn) return;
+    const isFull = !!document.fullscreenElement;
+    if (isFull) {
+        btn.innerHTML = `<i class="fa-solid fa-compress"></i> <span>離開全螢幕</span>`;
+        btn.classList.add('bg-slate-700', 'hover:bg-slate-800');
+        btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+    } else {
+        btn.innerHTML = `<i class="fa-solid fa-expand"></i> <span>全螢幕投影</span>`;
+        btn.classList.remove('bg-slate-700', 'hover:bg-slate-800');
+        btn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+    }
+}
+
+// 監聽全螢幕變化事件（包含使用者按 ESC 離開）
+if (typeof document !== 'undefined') {
+    document.addEventListener('fullscreenchange', updateOverviewFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateOverviewFullscreenButton);
+}
+
 export function toggleOverviewFullscreen() {
     const el = document.getElementById('overview-page');
     if (!el) return;
 
     if (!document.fullscreenElement) {
-        el.requestFullscreen?.().catch(err => {
-            console.warn("Fullscreen request error:", err);
+        el.requestFullscreen().then(() => {
+            updateOverviewFullscreenButton();
+        }).catch(err => {
+            console.warn('Fullscreen request failed:', err);
         });
     } else {
-        document.exitFullscreen?.().catch(() => {});
+        document.exitFullscreen().then(() => {
+            updateOverviewFullscreenButton();
+        }).catch(err => {
+            console.warn('Exit fullscreen failed:', err);
+        });
     }
 }

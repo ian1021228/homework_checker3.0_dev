@@ -232,6 +232,27 @@ export function startRealtimeStudentScoresSync(curClass) {
             }
           }
         });
+
+        // 實時合併家長端電子簽章與問卷回條
+        if (data.contactSignatures && typeof data.contactSignatures === 'object') {
+          curClass.contactSignatures = curClass.contactSignatures || {};
+          Object.keys(data.contactSignatures).forEach(dateKey => {
+            curClass.contactSignatures[dateKey] = curClass.contactSignatures[dateKey] || {};
+            curClass.contactSignatures[dateKey][seatStr] = data.contactSignatures[dateKey];
+          });
+        }
+        if (data.affairResponses && typeof data.affairResponses === 'object') {
+          curClass.affairResponses = curClass.affairResponses || {};
+          Object.keys(data.affairResponses).forEach(affairId => {
+            curClass.affairResponses[affairId] = curClass.affairResponses[affairId] || {};
+            curClass.affairResponses[affairId][seatStr] = data.affairResponses[affairId];
+          });
+          if (state.currentPage === 'affairs-page') {
+            try {
+              import('./affairs.js').then(m => m.renderAffairsPage());
+            } catch (e) {}
+          }
+        }
       });
 
       if (changed) {

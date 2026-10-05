@@ -136,6 +136,20 @@ export function updateSidebarActiveState(activeViewName = state.currentPage) {
 }
 
 function switchViewFromSidebar(viewKey) {
+    // 若在全螢幕成績系統中，切換至其他分頁時關閉全螢幕成績系統
+    const scoresView = document.getElementById('exam-scores-fullscreen-view');
+    if (scoresView && viewKey !== 'scores') {
+        scoresView.classList.add('hidden');
+        scoresView.classList.remove('flex');
+    }
+
+    // 若在快速授權彈窗中，切換至其他分頁時關閉快速授權
+    const qrScannerModal = document.getElementById('qr-scanner-modal');
+    if (qrScannerModal && viewKey !== 'quickAuth') {
+        qrScannerModal.classList.add('hidden');
+        qrScannerModal.classList.remove('flex', 'opacity-100');
+    }
+
     switch (viewKey) {
         case 'overview':
             showOverviewPage();
@@ -157,6 +171,13 @@ function switchViewFromSidebar(viewKey) {
             break;
         case 'affairs':
             showAffairsPage();
+            break;
+        case 'quickAuth':
+            if (window.openPhoneQrScannerModal) {
+                window.openPhoneQrScannerModal();
+            } else {
+                document.getElementById('main-qr-scan-btn')?.click();
+            }
             break;
         default:
             showMainPage();

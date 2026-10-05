@@ -1,11 +1,11 @@
 /**
  * 簽到及遲到點名模組 (Attendance & Tardy Management)
- * 支援：一鍵點名、座號一鍵循環切換出席/遲到/病假/事假/公假、出勤統計、LINE通報、CSV匯出
+ * 支援：一鍵點名、座號一鍵循環切換出席/遲到/病假/事假/公假、到校時間直接編輯、獨立月曆選擇、出勤統計、LINE通報、CSV匯出
  */
 
 import { state } from './state.js';
 import { saveData } from './storage.js';
-import { showToast, safeCopyToClipboard } from './utils.js';
+import { showToast, safeCopyToClipboard, openModal, closeModal } from './utils.js';
 
 export const ATTENDANCE_STATUSES = [
     { key: 'present', label: '出席', bg: 'bg-emerald-500', text: 'text-emerald-700', border: 'border-emerald-300', lightBg: 'bg-emerald-50' },
@@ -21,6 +21,15 @@ export function getTodayDateStr() {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+}
+
+export function formatDateWithWeekday(dateStr) {
+    if (!dateStr) return '';
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const dateObj = new Date(y, m - 1, d);
+    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    const w = weekdays[dateObj.getDay()] || '';
+    return `${dateStr} (週${w})`;
 }
 
 export function getTodayAttendanceSummary(currentClass, dateStr = getTodayDateStr()) {
@@ -41,7 +50,7 @@ export function getTodayAttendanceSummary(currentClass, dateStr = getTodayDateSt
 
     for (let s = 1; s <= maxSeat; s++) {
         const studentInfo = (currentClass.students || []).find(st => Number(st.seat) === s);
-        const name = studentInfo ? studentInfo.name : `${s}號`;
+        const name = (studentInfo && studentInfo.name && studentInfo.name !== `${s}號`) ? studentInfo.name : '';
         const seatData = attRecord[s];
         const status = seatData?.status || 'present'; // 預設皆為出席
 
@@ -67,16 +76,26 @@ export function getTodayAttendanceSummary(currentClass, dateStr = getTodayDateSt
 }
 
 let activeAttendanceDate = getTodayDateStr();
+let attCalendarDate = new Date();
+
+export function getActiveAttendanceDate() {
+    return activeAttendanceDate;
+}
 
 export function renderAttendancePage(dateStr = activeAttendanceDate) {
     activeAttendanceDate = dateStr;
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
-    // 日期選擇器同步
-    const dateInput = document.getElementById('attendance-date-input');
-    if (dateInput) {
-        dateInput.value = dateStr;
+    // 更新日期顯示按鈕文字與標題
+    const dateBtnText = document.getElementById('attendance-date-btn-text');
+    if (dateBtnText) {
+        dateBtnText.textContent = formatDateWithWeekday(dateStr);
+    }
+    const dateDisplay = document.getElementById('attendance-date-display');
+    if (dateDisplay) {
+        const [y, m, d] = dateStr.split('-');
+        dateDisplay.textContent = `${y} 年 ${Number(m)} 月 ${Number(d)} 日 · 點擊座號切換狀態 · 到校時間可直接修改`;
     }
 
     currentClass.attendance = currentClass.attendance || {};
@@ -108,14 +127,14 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
     if (statPer) statPer.textContent = cntPersonal;
     if (statOff) statOff.textContent = cntOfficial;
 
-    // 2. 渲染學生座號點名卡片矩陣
+    // 2. 渲染學生座號點名卡片矩陣（座號 1號、2號，支援直接修改到校時間）
     const grid = document.getElementById('attendance-students-grid');
     if (!grid) return;
 
     const cardsHtml = [];
     for (let s = 1; s <= maxSeat; s++) {
         const studentInfo = (currentClass.students || []).find(st => Number(st.seat) === s);
-        const name = studentInfo ? studentInfo.name : `${s}號`;
+        const name = (studentInfo && studentInfo.name && studentInfo.name !== `${s}號`) ? studentInfo.name : `${s}號`;
         const seatData = dateRecord[s] || { status: 'present' };
         const statusConfig = ATTENDANCE_STATUSES.find(st => st.key === seatData.status) || ATTENDANCE_STATUSES[0];
 
@@ -128,7 +147,7 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
             >
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-black font-mono px-2 py-0.5 rounded-lg bg-white/80 text-slate-800 shadow-2xs">
-                        ${String(s).padStart(2, '0')}
+                        ${s}號
                     </span>
                     <span class="inline-flex items-center gap-1 text-xs font-black px-2 py-0.5 rounded-lg ${statusConfig.bg} text-white shadow-2xs">
                         ${statusConfig.label}
@@ -136,7 +155,41 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
                 </div>
                 <div class="mt-2 text-center">
                     <div class="font-black text-sm text-slate-900 truncate">${name}</div>
-                    ${seatData.time ? `<div class="text-[10px] text-amber-700 font-bold mt-0.5">${seatData.time} 到校</div>` : ''}
+                    
+                    <!-- 到校時間編輯功能：遲到或手動登記時皆可自由修改 -->
+                    ${seatData.status === 'tardy' ? `
+                        <div class="mt-1.5 flex items-center justify-center gap-1 bg-amber-100/90 rounded-xl px-2 py-1 border border-amber-200" onclick="event.stopPropagation()">
+                            <span class="text-[10px] font-black text-amber-800 flex items-center gap-0.5 shrink-0">
+                                <i class="fa-regular fa-clock text-amber-600"></i> 到校
+                            </span>
+                            <input 
+                                type="time" 
+                                value="${seatData.time || '08:00'}" 
+                                data-seat="${s}" 
+                                class="att-time-input bg-white text-slate-900 text-xs font-mono font-bold px-1.5 py-0.5 rounded-lg border border-amber-300 focus:ring-2 focus:ring-amber-500 focus:outline-none cursor-pointer w-20 text-center" 
+                                title="點擊直接修改遲到到校時間"
+                            />
+                        </div>
+                    ` : (seatData.time ? `
+                        <div class="mt-1.5 flex items-center justify-center gap-1 bg-slate-100/90 rounded-xl px-2 py-1 border border-slate-200" onclick="event.stopPropagation()">
+                            <span class="text-[10px] font-bold text-slate-600 flex items-center gap-0.5 shrink-0">
+                                <i class="fa-regular fa-clock text-slate-500"></i> 到校
+                            </span>
+                            <input 
+                                type="time" 
+                                value="${seatData.time}" 
+                                data-seat="${s}" 
+                                class="att-time-input bg-white text-slate-800 text-xs font-mono font-bold px-1.5 py-0.5 rounded-lg border border-slate-300 focus:ring-1 focus:ring-indigo-500 focus:outline-none cursor-pointer w-20 text-center" 
+                                title="點擊修改到校時間"
+                            />
+                        </div>
+                    ` : `
+                        <div class="mt-1 flex items-center justify-center" onclick="event.stopPropagation()">
+                            <button type="button" class="btn-set-arrival-time text-[10px] text-slate-400 hover:text-emerald-700 font-bold flex items-center gap-1 py-0.5 px-2 rounded-lg hover:bg-emerald-50 transition-colors cursor-pointer" data-seat="${s}" title="登記此學生具體到校時間">
+                                <i class="fa-regular fa-clock"></i> 登記時間
+                            </button>
+                        </div>
+                    `)}
                 </div>
             </div>
         `);
@@ -144,11 +197,44 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
 
     grid.innerHTML = cardsHtml.join('');
 
-    // 綁定點擊循環切換狀態
+    // 綁定點擊卡片循環切換狀態
     grid.querySelectorAll('.attendance-seat-card').forEach(card => {
         card.addEventListener('click', () => {
             const seat = Number(card.dataset.seat);
             cycleStudentAttendance(seat, activeAttendanceDate);
+        });
+    });
+
+    // 綁定到校時間輸入修改
+    grid.querySelectorAll('.att-time-input').forEach(input => {
+        input.addEventListener('change', (e) => {
+            const seat = Number(e.target.dataset.seat);
+            const newTime = e.target.value;
+            if (!currentClass.attendance[dateStr][seat]) {
+                currentClass.attendance[dateStr][seat] = { status: 'present' };
+            }
+            currentClass.attendance[dateStr][seat].time = newTime;
+            currentClass.attendance[dateStr][seat].updatedAt = new Date().toISOString();
+            saveData();
+            showToast(`座號 ${seat} 號到校時間已更新為 ${newTime}`, 'success');
+        });
+        input.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    // 綁定手動登記到校時間
+    grid.querySelectorAll('.btn-set-arrival-time').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const seat = Number(btn.dataset.seat);
+            const nowTime = new Date().toTimeString().slice(0, 5);
+            if (!currentClass.attendance[dateStr][seat]) {
+                currentClass.attendance[dateStr][seat] = { status: 'present' };
+            }
+            currentClass.attendance[dateStr][seat].time = nowTime;
+            currentClass.attendance[dateStr][seat].updatedAt = new Date().toISOString();
+            saveData();
+            renderAttendancePage(dateStr);
+            showToast(`已登記座號 ${seat} 號到校時間為 ${nowTime}`, 'info');
         });
     });
 }
@@ -168,9 +254,12 @@ export function cycleStudentAttendance(seat, dateStr = activeAttendanceDate) {
     const curIdx = statusOrder.indexOf(curStatus);
     const nextStatus = statusOrder[(curIdx + 1) % statusOrder.length];
 
+    const prevTime = currentClass.attendance[dateStr][seat]?.time || '';
+    const nowTime = new Date().toTimeString().slice(0, 5);
+
     currentClass.attendance[dateStr][seat] = {
         status: nextStatus,
-        time: nextStatus === 'tardy' ? new Date().toTimeString().slice(0, 5) : '',
+        time: nextStatus === 'tardy' ? (prevTime || nowTime) : prevTime,
         updatedAt: new Date().toISOString()
     };
 
@@ -181,79 +270,179 @@ export function cycleStudentAttendance(seat, dateStr = activeAttendanceDate) {
 /**
  * 一鍵全員出席
  */
-export function markAllPresent(dateStr = activeAttendanceDate) {
+export function markAllStudentsPresent(dateStr = activeAttendanceDate) {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
     currentClass.attendance = currentClass.attendance || {};
-    currentClass.attendance[dateStr] = {};
-
+    currentClass.attendance[dateStr] = currentClass.attendance[dateStr] || {};
+    
     const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
+    const nowIso = new Date().toISOString();
+
     for (let s = 1; s <= maxSeat; s++) {
         currentClass.attendance[dateStr][s] = {
             status: 'present',
-            updatedAt: new Date().toISOString()
+            time: '',
+            updatedAt: nowIso
         };
     }
 
     saveData();
-    showToast(`已將 ${dateStr} 全班設為全員出席！`, 'success');
     renderAttendancePage(dateStr);
+    showToast(`已設定 ${dateStr} 全員正常出席！`, 'success');
+}
+
+export const markAllPresent = markAllStudentsPresent;
+
+// ==========================================
+// 簽到專屬月曆視窗 (與聯絡簿月曆視覺規格一致)
+// ==========================================
+
+export function renderAttendanceCalendar() {
+    const grid = document.getElementById('att-calendar-grid');
+    const monthYear = document.getElementById('att-current-month-year');
+    if (!grid || !monthYear) return;
+
+    grid.innerHTML = '';
+    const year = attCalendarDate.getFullYear();
+    const month = attCalendarDate.getMonth();
+    monthYear.textContent = `${year}年 ${month + 1}月`;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let i = 0; i < firstDay; i++) {
+        grid.appendChild(document.createElement('div'));
+    }
+
+    const todayStr = getTodayDateStr();
+    const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+    const attendanceRecords = currentClass?.attendance || {};
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayBtn = document.createElement('button');
+        dayBtn.type = 'button';
+        dayBtn.className = 'att-calendar-day h-8 w-8 sm:h-9 sm:w-9 mx-auto flex flex-col items-center justify-center rounded-xl font-bold transition-all text-xs sm:text-sm cursor-pointer relative';
+        dayBtn.textContent = day;
+        dayBtn.dataset.date = dStr;
+
+        if (dStr === activeAttendanceDate) {
+            dayBtn.classList.add('bg-emerald-600', 'text-white', 'shadow-md', 'shadow-emerald-200', 'scale-105');
+        } else if (dStr === todayStr) {
+            dayBtn.classList.add('bg-emerald-50', 'text-emerald-700', 'border', 'border-emerald-300');
+        } else {
+            dayBtn.classList.add('hover:bg-slate-100', 'text-slate-700');
+        }
+
+        // 若該日有點名記錄，顯示綠色小圓點
+        if (attendanceRecords[dStr] && Object.keys(attendanceRecords[dStr]).length > 0) {
+            const dot = document.createElement('span');
+            dot.className = `w-1.5 h-1.5 rounded-full ${dStr === activeAttendanceDate ? 'bg-white' : 'bg-emerald-500'} absolute bottom-0.5`;
+            dayBtn.appendChild(dot);
+        }
+
+        dayBtn.addEventListener('click', () => {
+            activeAttendanceDate = dStr;
+            renderAttendancePage(dStr);
+            closeAttendanceDatePicker();
+        });
+
+        grid.appendChild(dayBtn);
+    }
+}
+
+export function openAttendanceDatePicker() {
+    const modal = document.getElementById('attendance-date-picker-modal');
+    if (!modal) return;
+    const [y, m, d] = activeAttendanceDate.split('-').map(Number);
+    attCalendarDate = new Date(y, m - 1, d || 1);
+    renderAttendanceCalendar();
+    openModal(modal);
+}
+
+export function closeAttendanceDatePicker() {
+    const modal = document.getElementById('attendance-date-picker-modal');
+    if (modal) closeModal(modal);
+}
+
+export function changeAttendanceCalendarMonth(delta) {
+    attCalendarDate.setMonth(attCalendarDate.getMonth() + delta);
+    renderAttendanceCalendar();
 }
 
 /**
- * 一鍵複製出勤通報
+ * 複製出勤通報至剪貼簿
  */
 export function copyAttendanceLineReport(dateStr = activeAttendanceDate) {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
     const summary = getTodayAttendanceSummary(currentClass, dateStr);
+    const dateFormatted = formatDateWithWeekday(dateStr);
 
-    let msg = `📋 【${currentClass.name}】點名通報 (${dateStr})\n`;
-    msg += `👥 應到：${summary.totalStudents} 人，實到：${summary.presentCount} 人\n`;
+    let report = `📢 【${currentClass.name} 出缺席點名日報表】\n`;
+    report += `📅 日期：${dateFormatted}\n\n`;
+    report += `📊 出勤概況：\n`;
+    report += `• 實到出席：${summary.presentCount} 人\n`;
+    report += `• 遲到到校：${summary.tardyCount} 人\n`;
+    report += `• 請假缺席：${summary.leaveCount} 人\n`;
+    report += `• 應到總數：${summary.totalStudents} 人\n\n`;
 
     if (summary.tardyCount > 0) {
-        msg += `⏰ 遲到 (${summary.tardyCount}人)：${summary.tardies.map(t => `${String(t.seat).padStart(2, '0')}號 ${t.name || ''}`).join('、')}\n`;
-    }
-    if (summary.leaveCount > 0) {
-        msg += `🏥 請假 (${summary.leaveCount}人)：${summary.leaves.map(l => `${String(l.seat).padStart(2, '0')}號 ${l.name || ''}`).join('、')}\n`;
-    }
-    if (summary.tardyCount === 0 && summary.leaveCount === 0) {
-        msg += `✨ 全員準時出席，無人缺席或遲到！\n`;
+        report += `⏰ 【遲到學生名單】：\n`;
+        summary.tardies.forEach(t => {
+            report += `  - ${t.seat}號${t.name ? ' ' + t.name : ''} (${t.time ? t.time + ' 到校' : '未註記時間'})\n`;
+        });
+        report += `\n`;
     }
 
-    safeCopyToClipboard(msg);
-    showToast('已複製出勤通報文案！可直接傳送給學務處或家長群', 'success');
+    if (summary.leaveCount > 0) {
+        report += `📋 【請假學生名單】：\n`;
+        summary.leaves.forEach(l => {
+            report += `  - ${l.seat}號${l.name ? ' ' + l.name : ''} (${l.reason || '假'})\n`;
+        });
+        report += `\n`;
+    }
+
+    if (summary.tardyCount === 0 && summary.leaveCount === 0) {
+        report += `✨ 今日全班準時到齊，表現優良！\n\n`;
+    }
+
+    safeCopyToClipboard(report);
+    showToast('已複製出勤日報表至剪貼簿！可直接貼至家長 LINE 官方群組', 'success');
 }
 
 /**
- * 匯出出勤紀錄為 CSV
+ * 匯出出勤紀錄為 CSV 檔案
  */
 export function exportAttendanceCsv(dateStr = activeAttendanceDate) {
     const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     if (!currentClass) return;
 
-    const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
     const dateRecord = currentClass.attendance?.[dateStr] || {};
+    const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
 
     let csvContent = "\uFEFF座號,姓名,出勤狀態,到校時間,備註\n";
+
     for (let s = 1; s <= maxSeat; s++) {
         const studentInfo = (currentClass.students || []).find(st => Number(st.seat) === s);
-        const name = studentInfo ? studentInfo.name : `${s}號`;
+        const name = (studentInfo && studentInfo.name && studentInfo.name !== `${s}號`) ? studentInfo.name : `${s}號`;
         const seatData = dateRecord[s] || { status: 'present' };
         const statusConfig = ATTENDANCE_STATUSES.find(st => st.key === seatData.status) || ATTENDANCE_STATUSES[0];
+        const time = seatData.time || '';
+        const note = seatData.note || '';
 
-        csvContent += `"${s}","${name}","${statusConfig.label}","${seatData.time || ''}","${seatData.note || ''}"\n`;
+        csvContent += `"${s}","${name}","${statusConfig.label}","${time}","${note}"\n`;
     }
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `${currentClass.name}_出勤表_${dateStr}.csv`);
+    link.setAttribute("download", `${currentClass.name}_出勤紀錄_${dateStr}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    showToast('已匯出出勤紀錄 CSV 檔案！', 'success');
+    showToast(`已成功匯出 ${dateStr} 出勤紀錄 CSV！`, 'success');
 }
