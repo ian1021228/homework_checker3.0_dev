@@ -262,6 +262,15 @@ export function startRealtimeStudentScoresSync(curClass) {
 // ==========================================
 // 4. 全螢幕成績系統渲染 (Fullscreen View Render)
 // ==========================================
+export function openExamScoresSystem() {
+  const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+  if (fullscreenView) {
+    fullscreenView.classList.remove('hidden');
+    fullscreenView.classList.add('flex');
+    renderExamScoresView();
+  }
+}
+
 export function renderExamScoresView() {
   const curClass = getCurrentClass();
   const fullscreenView = document.getElementById('exam-scores-fullscreen-view');

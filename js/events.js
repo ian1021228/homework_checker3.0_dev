@@ -107,6 +107,10 @@ import {
     openCopyClassModal,
     showWelcomeStep2
 , fullRender } from './navigation.js';
+import { renderOverviewPage } from './overview.js';
+import { renderOfficersPage } from './officers.js';
+import { renderAttendancePage } from './attendance.js';
+import { renderAffairsPage } from './affairs.js';
 
 import {
     setupExamScoresEvents,
@@ -2899,6 +2903,10 @@ export function setupButtonEvents() {
         const userKey = getUserStorageKey(state.currentUser);
         localStorage.setItem('currentClassId_' + userKey, state.currentClassId);
         renderHomeworkList(); 
+        if (state.currentPage === 'overview-page') renderOverviewPage();
+        if (state.currentPage === 'officers-page') renderOfficersPage();
+        if (state.currentPage === 'attendance-page') renderAttendancePage();
+        if (state.currentPage === 'affairs-page') renderAffairsPage();
     });
 
     // 學生網格點擊

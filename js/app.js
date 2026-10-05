@@ -65,12 +65,22 @@ import {
     showStudentDetailsPage,
     showContactBookPage,
     showHomeworkTypesPage,
+    showOverviewPage,
+    showOfficersPage,
+    showAttendancePage,
+    showAffairsPage,
     openPortalAuthModal,
     closePortalAuthModal,
     proceedIntoSystem,
     promptSystemUsageAndNavigate,
     fullRender
 } from './navigation.js';
+
+import { setupSidebar } from './sidebar.js';
+import { toggleOverviewFullscreen, copyOverviewDailyReport, renderOverviewPage } from './overview.js';
+import { saveOfficersAndDutySettings, setCustomDutyForDate, renderOfficersPage } from './officers.js';
+import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAttendancePage } from './attendance.js';
+import { createNewAffair, renderAffairsPage } from './affairs.js';
 
 import { setupButtonEvents } from './events.js';
 import { ICONS, getSvgIcon } from './icons.js';
@@ -93,6 +103,9 @@ window.openModal = openModal;
 window.closeModal = closeModal;
 window.isGoogleAdmin = isGoogleAdmin;
 window.promptSystemUsageAndNavigate = promptSystemUsageAndNavigate;
+window.openPortalAuthModal = openPortalAuthModal;
+window.closePortalAuthModal = closePortalAuthModal;
+window.proceedIntoSystem = proceedIntoSystem;
 window.getSvgIcon = getSvgIcon;
 window.fullRender = fullRender;
 window.reRenderCurrentPage = () => reRenderCurrentPage(showMainPage, showDetailPage);
@@ -221,6 +234,7 @@ async function init() {
     // 3. 綁定所有互動事件
     setupButtonEvents(); 
     setupQrLoginEvents();
+    setupNewFeaturesEvents();
     checkUrlForQrLogin();
     updateDataManagementUI();
     document.getElementById('loading-page')?.classList.add('hidden');
@@ -257,18 +271,187 @@ async function init() {
         return;
     }
 
-    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types'];
+    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types', '#overview', '#officers', '#attendance', '#affairs'];
     if (!window.location.hash || window.location.hash === '#portal' || !explicitAppSubPages.includes(window.location.hash)) {
         showPortalPage(true);
         return;
     }
     
+    if (window.location.hash === '#overview') {
+        showOverviewPage(true);
+        return;
+    }
+    if (window.location.hash === '#officers') {
+        showOfficersPage(true);
+        return;
+    }
+    if (window.location.hash === '#attendance') {
+        showAttendancePage(true);
+        return;
+    }
+    if (window.location.hash === '#affairs') {
+        showAffairsPage(true);
+        return;
+    }
     if (window.location.hash === '#main') {
         applyCheckMode(localStorage.getItem('checkMode') || 'manual');
         pushPageState({ page: 'main' }, '#main'); 
         showMainPage(true);
         if (state.appData.classes.length === 0) openModal(document.getElementById('manage-classes-modal'));
         return;
+    }
+}
+
+function setupNewFeaturesEvents() {
+    setupSidebar();
+
+    // 總覽頁面事件
+    const fsBtn = document.getElementById('overview-fullscreen-btn');
+    if (fsBtn) fsBtn.addEventListener('click', toggleOverviewFullscreen);
+
+    const refBtn = document.getElementById('overview-refresh-btn');
+    if (refBtn) refBtn.addEventListener('click', renderOverviewPage);
+
+    const copyLineBtn = document.getElementById('overview-copy-line-btn');
+    if (copyLineBtn) copyLineBtn.addEventListener('click', copyOverviewDailyReport);
+
+    const goAttBtn = document.getElementById('overview-go-attendance-btn');
+    if (goAttBtn) goAttBtn.addEventListener('click', () => showAttendancePage());
+
+    const goContactBtn = document.getElementById('overview-go-contact-btn');
+    if (goContactBtn) goContactBtn.addEventListener('click', () => showContactBookPage());
+
+    const goDutyBtn = document.getElementById('overview-go-duty-btn');
+    if (goDutyBtn) goDutyBtn.addEventListener('click', () => showOfficersPage());
+
+    // 總覽注意事項編輯
+    const editNoticeBtn = document.getElementById('overview-edit-notice-btn');
+    const noticeModal = document.getElementById('notice-edit-modal');
+    const noticeTextarea = document.getElementById('overview-notice-textarea');
+    const saveNoticeBtn = document.getElementById('save-overview-notice-btn');
+
+    if (editNoticeBtn && noticeModal && noticeTextarea) {
+        editNoticeBtn.addEventListener('click', () => {
+            const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+            noticeTextarea.value = curClass?.bulletinNotice || '';
+            openModal(noticeModal);
+        });
+    }
+
+    if (saveNoticeBtn && noticeModal && noticeTextarea) {
+        saveNoticeBtn.addEventListener('click', () => {
+            const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+            if (curClass) {
+                curClass.bulletinNotice = noticeTextarea.value.trim();
+                saveData();
+                renderOverviewPage();
+                showToast('已成功更新班級注意事項！', 'success');
+            }
+            closeModal(noticeModal);
+        });
+    }
+
+    // 幹部與值日生事件
+    const saveOfficersBtn = document.getElementById('save-officers-btn');
+    if (saveOfficersBtn) saveOfficersBtn.addEventListener('click', saveOfficersAndDutySettings);
+
+    const swapDutyBtn = document.getElementById('duty-swap-modal-btn');
+    const dutyModal = document.getElementById('duty-assign-modal');
+    const dutyDateInput = document.getElementById('duty-assign-date');
+    const dutySeatsInput = document.getElementById('duty-assign-seats');
+    const saveDutyBtn = document.getElementById('save-custom-duty-btn');
+
+    if (swapDutyBtn && dutyModal) {
+        swapDutyBtn.addEventListener('click', () => {
+            const today = new Date().toISOString().slice(0, 10);
+            if (dutyDateInput) dutyDateInput.value = today;
+            if (dutySeatsInput) dutySeatsInput.value = '';
+            openModal(dutyModal);
+        });
+    }
+
+    if (saveDutyBtn && dutyModal && dutyDateInput && dutySeatsInput) {
+        saveDutyBtn.addEventListener('click', () => {
+            const d = dutyDateInput.value;
+            const seats = dutySeatsInput.value.split(/[,，\s]+/).filter(Boolean);
+            if (d && seats.length > 0) {
+                setCustomDutyForDate(d, seats);
+            }
+            closeModal(dutyModal);
+        });
+    }
+
+    // 簽到及遲到事件
+    const attDateInput = document.getElementById('attendance-date-input');
+    if (attDateInput) {
+        attDateInput.addEventListener('change', (e) => {
+            renderAttendancePage(e.target.value);
+        });
+    }
+
+    const markAllBtn = document.getElementById('attendance-mark-all-present-btn');
+    if (markAllBtn) {
+        markAllBtn.addEventListener('click', () => {
+            const d = document.getElementById('attendance-date-input')?.value;
+            markAllPresent(d);
+        });
+    }
+
+    const copyAttLineBtn = document.getElementById('attendance-copy-line-btn');
+    if (copyAttLineBtn) {
+        copyAttLineBtn.addEventListener('click', () => {
+            const d = document.getElementById('attendance-date-input')?.value;
+            copyAttendanceLineReport(d);
+        });
+    }
+
+    const exportAttCsvBtn = document.getElementById('attendance-export-csv-btn');
+    if (exportAttCsvBtn) {
+        exportAttCsvBtn.addEventListener('click', () => {
+            const d = document.getElementById('attendance-date-input')?.value;
+            exportAttendanceCsv(d);
+        });
+    }
+
+    // 班級事務（問卷回條）事件
+    const createAffairBtn = document.getElementById('create-affair-btn');
+    const affairModal = document.getElementById('affair-create-modal');
+    const affairForm = document.getElementById('affair-create-form');
+
+    if (createAffairBtn && affairModal) {
+        createAffairBtn.addEventListener('click', () => {
+            if (affairForm) affairForm.reset();
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 7);
+            const deadlineInput = document.getElementById('new-affair-deadline');
+            if (deadlineInput) deadlineInput.value = tomorrow.toISOString().slice(0, 10);
+            openModal(affairModal);
+        });
+    }
+
+    if (affairForm && affairModal) {
+        affairForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const title = document.getElementById('new-affair-title')?.value || '';
+            const content = document.getElementById('new-affair-content')?.value || '';
+            const deadline = document.getElementById('new-affair-deadline')?.value || '';
+            const type = document.getElementById('new-affair-type')?.value || 'single';
+            const optionsRaw = document.getElementById('new-affair-options')?.value || '';
+            const requireSignature = document.getElementById('new-affair-require-sign')?.checked ?? true;
+
+            const options = optionsRaw.split('\n').map(s => s.trim()).filter(Boolean);
+
+            createNewAffair({
+                title,
+                content,
+                deadline,
+                type,
+                options: options.length > 0 ? options : ['同意', '不同意'],
+                requireSignature
+            });
+
+            closeModal(affairModal);
+        });
     }
 }
 

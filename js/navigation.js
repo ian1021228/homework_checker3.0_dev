@@ -16,6 +16,11 @@ import {
     isStudentCompleted 
 } from './render.js';
 import { checkInitialMaxSeatSetup } from './examScores.js';
+import { renderOverviewPage } from './overview.js';
+import { renderOfficersPage } from './officers.js';
+import { renderAttendancePage } from './attendance.js';
+import { renderAffairsPage } from './affairs.js';
+import { updateSidebarActiveState } from './sidebar.js';
 
 export function applyCheckMode(mode) {
     state.currentCheckMode = mode;
@@ -97,7 +102,7 @@ export function hideAllPages() {
     if (state.currentPage) {
         state.scrollPositions[state.currentPage] = window.scrollY || document.documentElement.scrollTop;
     }
-    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page'].forEach(id => { 
+    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page'].forEach(id => { 
         const el = document.getElementById(id); 
         if (el) el.classList.add('hidden'); 
     });
@@ -191,6 +196,7 @@ export function showMainPage(fromHistory = false) {
     if (detailPage) detailPage.dataset.from = ''; 
     restoreScroll('main-page');
     updateMobileNavVisibility('main');
+    updateSidebarActiveState('main-page');
     checkInitialMaxSeatSetup();
 }
 
@@ -209,6 +215,7 @@ export function showDetailPage(homeworkId, fromHistory = false) {
     renderStudentGrid(homeworkId); 
     restoreScroll('detail-page');
     updateMobileNavVisibility('detail');
+    updateSidebarActiveState('detail-page');
     requestAnimationFrame(() => { renderStudentGrid(homeworkId); });
 }
 
@@ -220,6 +227,7 @@ export function showStudentDetailsPage(fromHistory = false) {
     renderStudentDetailsPage(); 
     restoreScroll('student-details-page');
     updateMobileNavVisibility('student-details');
+    updateSidebarActiveState('student-details-page');
 
     if (state.lastActiveStudentSeat) {
         const targetSeat = state.lastActiveStudentSeat;
@@ -251,6 +259,7 @@ export function showContactBookPage(fromHistory = false) {
     renderContactBookItems(); 
     restoreScroll('contact-book-page');
     updateMobileNavVisibility('contact-book');
+    updateSidebarActiveState('contact-book-page');
 }
 
 export function showHomeworkTypesPage(fromHistory = false) {
@@ -261,6 +270,46 @@ export function showHomeworkTypesPage(fromHistory = false) {
     renderHomeworkTypesPage(); 
     restoreScroll('homework-types-page');
     updateMobileNavVisibility('homework-types');
+}
+
+export function showOverviewPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('overview-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'overview' }, '#overview');
+    renderOverviewPage();
+    restoreScroll('overview-page');
+    updateSidebarActiveState('overview-page');
+}
+
+export function showOfficersPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('officers-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'officers' }, '#officers');
+    renderOfficersPage();
+    restoreScroll('officers-page');
+    updateSidebarActiveState('officers-page');
+}
+
+export function showAttendancePage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('attendance-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'attendance' }, '#attendance');
+    renderAttendancePage();
+    restoreScroll('attendance-page');
+    updateSidebarActiveState('attendance-page');
+}
+
+export function showAffairsPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('affairs-page');
+    if (el) el.classList.remove('hidden');
+    if (!fromHistory) pushPageState({ page: 'affairs' }, '#affairs');
+    renderAffairsPage();
+    restoreScroll('affairs-page');
+    updateSidebarActiveState('affairs-page');
 }
 
 export function promptSystemUsageAndNavigate() {

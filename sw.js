@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hw-checker-dev-v1.0.0';
+const CACHE_NAME = 'hw-checker-dev-v1.1.0';
 const urlsToCache = [
   './index.html',
   './parent.html',
@@ -15,6 +15,11 @@ const urlsToCache = [
   './js/state.js',
   './js/storage.js',
   './js/utils.js',
+  './js/sidebar.js',
+  './js/overview.js',
+  './js/officers.js',
+  './js/attendance.js',
+  './js/affairs.js',
   './js/lib/qrcode.min.js',
   './js/lib/html5-qrcode.min.js',
   './icon.svg',
