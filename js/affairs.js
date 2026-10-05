@@ -36,9 +36,33 @@ export function renderAffairsPage() {
 
     const cardsHtml = currentClass.affairs.map(item => {
         const responses = currentClass.affairResponses[item.id] || {};
-        const responseCount = Object.keys(responses).length;
-        const rate = maxSeat > 0 ? Math.round((responseCount / maxSeat) * 100) : 0;
         const isClosed = item.deadline && new Date(item.deadline) < new Date();
+
+        let signedCount = 0;
+        const seatBadges = [];
+        for (let s = 1; s <= maxSeat; s++) {
+            const studentInfo = (currentClass.students || []).find(st => Number(st.seat) === s);
+            const name = studentInfo ? studentInfo.name : `${s}號`;
+            const resp = responses[s] || responses[String(s)];
+            const isSigned = Boolean(resp && (resp.signatureDataUrl || resp.signedAt || resp.selectedOptions));
+            if (isSigned) signedCount++;
+
+            seatBadges.push(`
+                <div class="flex items-center justify-between p-1.5 px-2 rounded-xl text-xs font-bold transition-all ${
+                    isSigned 
+                        ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs' 
+                        : 'bg-rose-50/70 text-rose-600 border border-rose-200/80 shadow-2xs'
+                }" title="${s}號 ${name}：${isSigned ? '已簽名' : '未簽名'}">
+                    <span class="font-mono">${String(s).padStart(2, '0')}</span>
+                    <span class="text-[10px] font-black flex items-center gap-0.5 ${isSigned ? 'text-emerald-700' : 'text-rose-500'}">
+                        <i class="fa-solid ${isSigned ? 'fa-check text-emerald-600' : 'fa-xmark text-rose-500'}"></i>
+                        ${isSigned ? '已簽' : '未簽'}
+                    </span>
+                </div>
+            `);
+        }
+
+        const rate = maxSeat > 0 ? Math.round((signedCount / maxSeat) * 100) : 0;
 
         return `
             <div class="glass-card rounded-3xl p-6 border border-slate-200/90 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
@@ -57,13 +81,30 @@ export function renderAffairsPage() {
                     <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">${item.content || '無詳細說明'}</p>
 
                     <!-- 回條簽覆進度 -->
-                    <div class="mb-4">
+                    <div class="mb-3">
                         <div class="flex items-center justify-between text-xs font-black mb-1.5">
                             <span class="text-slate-600">繳回覆核率</span>
-                            <span class="text-rose-600 font-mono">${responseCount} / ${maxSeat} 份 (${rate}%)</span>
+                            <span class="text-rose-600 font-mono">${signedCount} / ${maxSeat} 份 (${rate}%)</span>
                         </div>
                         <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
                             <div class="bg-gradient-to-r from-rose-500 to-pink-500 h-2.5 rounded-full transition-all duration-500" style="width: ${rate}%"></div>
+                        </div>
+                    </div>
+
+                    <!-- 全班座號簽名情形 (標注已簽名 / 未簽名) -->
+                    <div class="p-3 bg-slate-50/80 rounded-2xl border border-slate-200/70 mb-4 space-y-2">
+                        <div class="flex items-center justify-between text-xs font-black">
+                            <span class="text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-signature text-rose-500"></i>
+                                全班各座號簽名情形
+                            </span>
+                            <span class="text-[11px] font-bold text-slate-500">
+                                <span class="text-emerald-700 font-black">已簽名 ${signedCount}</span> / 
+                                <span class="text-rose-600 font-black">未簽名 ${maxSeat - signedCount}</span>
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1.5 max-h-36 overflow-y-auto pr-0.5 custom-scrollbar">
+                            ${seatBadges.join('')}
                         </div>
                     </div>
                 </div>
@@ -74,7 +115,7 @@ export function renderAffairsPage() {
                         class="view-affair-details-btn py-2 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
                         data-id="${item.id}"
                     >
-                        <i class="fa-solid fa-chart-pie"></i> 查看回條詳情
+                        <i class="fa-solid fa-chart-pie"></i> 查看回條詳情與名單
                     </button>
                     <button 
                         type="button" 
@@ -210,38 +251,49 @@ export function openAffairDetailsModal(affairId) {
     // 渲染學生座號繳回清單與簽名預覽
     const tableBody = document.getElementById('affair-responses-table-body');
     const unsubmittedSeats = [];
+    let signedModalCount = 0;
 
     if (tableBody) {
         const rowsHtml = [];
         for (let s = 1; s <= maxSeat; s++) {
             const studentInfo = (currentClass.students || []).find(st => Number(st.seat) === s);
             const name = studentInfo ? studentInfo.name : `${s}號`;
-            const resp = responses[s];
+            const resp = responses[s] || responses[String(s)];
+            const isSigned = Boolean(resp && (resp.signatureDataUrl || resp.signedAt || resp.selectedOptions));
 
-            if (!resp) {
+            if (!isSigned) {
                 unsubmittedSeats.push(s);
                 rowsHtml.push(`
-                    <tr class="border-b border-slate-100 bg-rose-50/20">
+                    <tr class="affair-row border-b border-slate-100 bg-rose-50/20" data-status="unsubmitted">
                         <td class="p-3 text-xs font-mono font-bold text-slate-700">${String(s).padStart(2, '0')}</td>
                         <td class="p-3 text-xs font-black text-slate-800">${name}</td>
-                        <td class="p-3 text-xs font-bold text-rose-500">
-                            <span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-700 text-[11px]">未填寫繳回</span>
+                        <td class="p-3 text-xs font-black">
+                            <span class="px-2 py-0.5 rounded-lg bg-rose-100 text-rose-700 text-[11px] font-black inline-flex items-center gap-1 border border-rose-200">
+                                <i class="fa-solid fa-circle-xmark text-rose-500"></i> 未簽名
+                            </span>
                         </td>
+                        <td class="p-3 text-xs text-rose-400 font-bold">未填寫繳回</td>
                         <td class="p-3 text-xs text-slate-400">-</td>
                         <td class="p-3 text-xs text-slate-400">-</td>
                         <td class="p-3 text-xs text-slate-400">-</td>
                     </tr>
                 `);
             } else {
+                signedModalCount++;
                 const chosenText = Array.isArray(resp.selectedOptions) ? resp.selectedOptions.join('、') : (resp.selectedOptions || '-');
                 const sigPreview = resp.signatureDataUrl 
                     ? `<img src="${resp.signatureDataUrl}" class="h-6 w-auto max-w-[90px] border border-slate-200 rounded bg-white p-0.5" alt="家長簽名">`
-                    : `<span class="text-[11px] text-slate-400 font-bold">免手寫</span>`;
+                    : `<span class="text-[11px] text-emerald-600 font-bold">線上已認證</span>`;
                 
                 rowsHtml.push(`
-                    <tr class="border-b border-slate-100 hover:bg-slate-50">
+                    <tr class="affair-row border-b border-slate-100 hover:bg-slate-50" data-status="signed">
                         <td class="p-3 text-xs font-mono font-bold text-slate-700">${String(s).padStart(2, '0')}</td>
                         <td class="p-3 text-xs font-black text-slate-800">${name}</td>
+                        <td class="p-3 text-xs font-black">
+                            <span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 text-[11px] font-black inline-flex items-center gap-1 border border-emerald-200">
+                                <i class="fa-solid fa-circle-check text-emerald-600"></i> 已簽名
+                            </span>
+                        </td>
                         <td class="p-3 text-xs font-black text-emerald-700">
                             <span class="px-2 py-0.5 rounded-lg bg-emerald-100 text-emerald-800 text-[11px]">${chosenText}</span>
                         </td>
@@ -253,6 +305,35 @@ export function openAffairDetailsModal(affairId) {
             }
         }
         tableBody.innerHTML = rowsHtml.join('');
+
+        // 更新彈窗統計
+        const signedCountEl = document.getElementById('affair-modal-signed-count');
+        const unsubCountEl = document.getElementById('affair-modal-unsub-count');
+        if (signedCountEl) signedCountEl.textContent = `已簽名 ${signedModalCount} 人`;
+        if (unsubCountEl) unsubCountEl.textContent = `未簽名 ${unsubmittedSeats.length} 人`;
+
+        // 綁定篩選按鈕
+        const filterBtns = document.querySelectorAll('.affair-filter-btn');
+        filterBtns.forEach(btn => {
+            btn.onclick = () => {
+                const filter = btn.dataset.filter;
+                filterBtns.forEach(b => {
+                    b.className = 'affair-filter-btn px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer';
+                });
+                btn.className = 'affair-filter-btn px-2.5 py-1 rounded-lg bg-slate-900 text-white cursor-pointer';
+
+                const rows = tableBody.querySelectorAll('.affair-row');
+                rows.forEach(r => {
+                    if (filter === 'all') {
+                        r.classList.remove('hidden');
+                    } else if (filter === 'signed') {
+                        r.classList.toggle('hidden', r.dataset.status !== 'signed');
+                    } else if (filter === 'unsubmitted') {
+                        r.classList.toggle('hidden', r.dataset.status !== 'unsubmitted');
+                    }
+                });
+            };
+        });
     }
 
     // 綁定複製未繳名單按鈕

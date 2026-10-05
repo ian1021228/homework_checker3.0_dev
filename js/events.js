@@ -1889,21 +1889,15 @@ export function setupButtonEvents() {
     });
 
     bindClick('portal-browser-only-btn', () => {
-        showNamePromptModal((name) => {
-            if (name) {
-                sessionStorage.setItem('app_is_guest_mode', 'true');
-                state.currentUser = null;
-                localStorage.removeItem('app_user_session');
-                state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-                state.currentClassId = null;
-                localStorage.removeItem('homeworkAppData');
-                localStorage.removeItem('currentClassId');
-                localStorage.setItem('visitor_name', name.trim());
-                localStorage.setItem('storageSelected', 'true');
-                showToast("已選擇瀏覽器暫存模式 (免帳號體驗，不寫入雲端)", "info");
-                proceedIntoSystem();
-            }
-        });
+        sessionStorage.setItem('app_is_guest_mode', 'true');
+        state.currentUser = null;
+        localStorage.removeItem('app_user_session');
+        if (!state.appData || !Array.isArray(state.appData.classes)) {
+            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+        }
+        localStorage.setItem('storageSelected', 'true');
+        showToast("已以瀏覽器快取模式進入系統（本機獨立，不影響線上正式資料）", "success");
+        proceedIntoSystem();
     });
 
     bindClick('google-logout-btn', performFullLogout);
