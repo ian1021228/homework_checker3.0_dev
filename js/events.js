@@ -105,8 +105,14 @@ import {
     closePortalAuthModal,
     proceedIntoSystem,
     openCopyClassModal,
-    showWelcomeStep2
-, fullRender } from './navigation.js';
+    showWelcomeStep2,
+    showOverviewPage,
+    showOfficersPage,
+    showAttendancePage,
+    showAffairsPage,
+    showExamScoresPage,
+    fullRender
+} from './navigation.js';
 import { renderOverviewPage } from './overview.js';
 import { renderOfficersPage } from './officers.js';
 import { renderAttendancePage } from './attendance.js';
@@ -3467,6 +3473,29 @@ export function setupButtonEvents() {
     window.addEventListener('online', () => {
         showToast("已恢復網路連線，正在自動同步雲端資料...", "success");
         try { syncDataToCloud(true); } catch(e) {}
+    });
+
+    // ==========================================
+    // 瀏覽器上一頁/下一頁 (Popstate) 導覽監聽
+    // ==========================================
+    window.addEventListener('popstate', (e) => {
+        const hash = window.location.hash;
+        if (sessionStorage.getItem('has_passed_portal_in_session') !== 'true') return;
+        if (hash === '#scores') {
+            showExamScoresPage(true);
+        } else if (hash === '#contact-book') {
+            showContactBookPage(true);
+        } else if (hash === '#overview') {
+            showOverviewPage(true);
+        } else if (hash === '#officers') {
+            showOfficersPage(true);
+        } else if (hash === '#attendance') {
+            showAttendancePage(true);
+        } else if (hash === '#affairs') {
+            showAffairsPage(true);
+        } else if (hash === '#main') {
+            showMainPage(true);
+        }
     });
 }
 

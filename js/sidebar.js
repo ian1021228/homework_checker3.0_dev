@@ -11,9 +11,9 @@ import {
     showOverviewPage, 
     showOfficersPage, 
     showAttendancePage, 
-    showAffairsPage 
+    showAffairsPage,
+    showExamScoresPage
 } from './navigation.js';
-import { openExamScoresSystem } from './examScores.js';
 
 let isSidebarOpen = false;
 
@@ -91,8 +91,20 @@ export function openSidebar() {
         curClassNameEl.textContent = curClass ? curClass.name : '未選擇班級';
     }
 
-    // 醒目標示目前分頁
-    updateSidebarActiveState();
+    // 醒目標示目前分頁：優先判斷全螢幕/彈窗覆蓋層
+    const scoresView = document.getElementById('exam-scores-fullscreen-view');
+    const isScoresVisible = scoresView && !scoresView.classList.contains('hidden');
+    const qrModal = document.getElementById('qr-scanner-modal');
+    const isQrModalVisible = qrModal && !qrModal.classList.contains('hidden');
+
+    let currentActive = state.currentPage;
+    if (isScoresVisible) {
+        currentActive = 'scores-page';
+    } else if (isQrModalVisible) {
+        currentActive = 'quickAuth';
+    }
+
+    updateSidebarActiveState(currentActive);
 
     sidebar.classList.remove('-translate-x-full');
     if (backdrop) backdrop.classList.remove('hidden');
@@ -116,9 +128,13 @@ export function updateSidebarActiveState(activeViewName = state.currentPage) {
         'detail-page': 'main',
         'contact-book-page': 'contact-book',
         'student-details-page': 'main',
+        'scores-page': 'scores',
+        'scores': 'scores',
+        'exam-scores': 'scores',
         'officers-page': 'officers',
         'attendance-page': 'attendance',
-        'affairs-page': 'affairs'
+        'affairs-page': 'affairs',
+        'quickAuth': 'quickAuth'
     };
 
     const targetKey = viewMapping[activeViewName] || activeViewName;
@@ -161,7 +177,7 @@ function switchViewFromSidebar(viewKey) {
             showContactBookPage();
             break;
         case 'scores':
-            openExamScoresSystem();
+            showExamScoresPage();
             break;
         case 'officers':
             showOfficersPage();

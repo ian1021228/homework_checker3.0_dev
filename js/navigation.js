@@ -15,7 +15,7 @@ import {
     updateGuestHomeBtnVisibility,
     isStudentCompleted 
 } from './render.js';
-import { checkInitialMaxSeatSetup } from './examScores.js';
+import { checkInitialMaxSeatSetup, renderExamScoresView } from './examScores.js';
 import { renderOverviewPage } from './overview.js';
 import { renderOfficersPage } from './officers.js';
 import { renderAttendancePage } from './attendance.js';
@@ -106,6 +106,16 @@ export function hideAllPages() {
         const el = document.getElementById(id); 
         if (el) el.classList.add('hidden'); 
     });
+    const fullscreenScores = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenScores) {
+        fullscreenScores.classList.add('hidden');
+        fullscreenScores.classList.remove('flex');
+    }
+    const qrScannerModal = document.getElementById('qr-scanner-modal');
+    if (qrScannerModal) {
+        qrScannerModal.classList.add('hidden');
+        qrScannerModal.classList.remove('flex', 'opacity-100');
+    }
     updateGuestHomeBtnVisibility();
 }
 
@@ -310,6 +320,25 @@ export function showAffairsPage(fromHistory = false) {
     renderAffairsPage();
     restoreScroll('affairs-page');
     updateSidebarActiveState('affairs-page');
+}
+
+export function showExamScoresPage(fromHistory = false) {
+    const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+    if (!curClass) {
+        showToast('請先建立或選擇班級後再使用成績系統！', 'warning');
+        return;
+    }
+    hideAllPages();
+    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenView) {
+        fullscreenView.classList.remove('hidden');
+        fullscreenView.classList.add('flex');
+    }
+    if (!fromHistory) pushPageState({ page: 'scores' }, '#scores');
+    state.currentPage = 'scores-page';
+    renderExamScoresView();
+    restoreScroll('scores-page');
+    updateSidebarActiveState('scores-page');
 }
 
 export function promptSystemUsageAndNavigate() {

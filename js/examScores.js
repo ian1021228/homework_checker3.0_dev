@@ -283,12 +283,29 @@ export function startRealtimeStudentScoresSync(curClass) {
 // ==========================================
 // 4. 全螢幕成績系統渲染 (Fullscreen View Render)
 // ==========================================
-export function openExamScoresSystem() {
+export function openExamScoresSystem(fromHistory = false) {
+  if (window.showExamScoresPage) {
+    window.showExamScoresPage(fromHistory);
+  } else {
+    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
+    if (fullscreenView) {
+      fullscreenView.classList.remove('hidden');
+      fullscreenView.classList.add('flex');
+      renderExamScoresView();
+    }
+  }
+}
+
+export function closeExamScoresSystem() {
   const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
   if (fullscreenView) {
-    fullscreenView.classList.remove('hidden');
-    fullscreenView.classList.add('flex');
-    renderExamScoresView();
+    fullscreenView.classList.add('hidden');
+    fullscreenView.classList.remove('flex');
+  }
+  if (unsubscribeStudentScores) {
+    try { unsubscribeStudentScores(); } catch (e) {}
+    unsubscribeStudentScores = null;
+    currentSyncClassCode = null;
   }
 }
 
@@ -1399,12 +1416,7 @@ export function setupExamScoresEvents() {
       showToast('請先建立或選擇班級後再使用成績系統！', 'warning');
       return;
     }
-    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
-    if (fullscreenView) {
-      fullscreenView.classList.remove('hidden');
-      fullscreenView.classList.add('flex');
-      renderExamScoresView();
-    }
+    openExamScoresSystem();
   };
 
   document.getElementById('exam-scores-system-btn')?.addEventListener('click', openScoresSystem);
@@ -1412,16 +1424,8 @@ export function setupExamScoresEvents() {
 
   // 關閉全螢幕成績系統
   document.getElementById('btn-close-exam-scores-view')?.addEventListener('click', () => {
-    const fullscreenView = document.getElementById('exam-scores-fullscreen-view');
-    if (fullscreenView) {
-      fullscreenView.classList.add('hidden');
-      fullscreenView.classList.remove('flex');
-    }
-    if (unsubscribeStudentScores) {
-      try { unsubscribeStudentScores(); } catch (e) {}
-      unsubscribeStudentScores = null;
-      currentSyncClassCode = null;
-    }
+    closeExamScoresSystem();
+    if (window.showMainPage) window.showMainPage();
   });
 
   // 勾選隱藏成績（防偷窺/大螢幕隱私）

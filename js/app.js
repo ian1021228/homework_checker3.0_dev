@@ -69,6 +69,7 @@ import {
     showOfficersPage,
     showAttendancePage,
     showAffairsPage,
+    showExamScoresPage,
     openPortalAuthModal,
     closePortalAuthModal,
     proceedIntoSystem,
@@ -107,6 +108,7 @@ window.promptSystemUsageAndNavigate = promptSystemUsageAndNavigate;
 window.openPortalAuthModal = openPortalAuthModal;
 window.closePortalAuthModal = closePortalAuthModal;
 window.proceedIntoSystem = proceedIntoSystem;
+window.showExamScoresPage = showExamScoresPage;
 window.getSvgIcon = getSvgIcon;
 window.fullRender = fullRender;
 window.reRenderCurrentPage = () => reRenderCurrentPage(showMainPage, showDetailPage);
@@ -272,7 +274,7 @@ async function init() {
         return;
     }
 
-    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types', '#overview', '#officers', '#attendance', '#affairs'];
+    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types', '#overview', '#officers', '#attendance', '#affairs', '#scores'];
     if (!window.location.hash || window.location.hash === '#portal' || !explicitAppSubPages.includes(window.location.hash)) {
         showPortalPage(true);
         return;
@@ -292,6 +294,14 @@ async function init() {
     }
     if (window.location.hash === '#affairs') {
         showAffairsPage(true);
+        return;
+    }
+    if (window.location.hash === '#contact-book') {
+        showContactBookPage(true);
+        return;
+    }
+    if (window.location.hash === '#scores') {
+        showExamScoresPage(true);
         return;
     }
     if (window.location.hash === '#main') {
