@@ -244,6 +244,7 @@ async function init() {
     checkUrlForQrLogin();
     updateDataManagementUI();
     document.getElementById('loading-page')?.classList.add('hidden');
+    window.__app_initialized = true;
 
     // 4. 恢復偏好設定
     const savedMode = localStorage.getItem('checkMode') || 'manual';
