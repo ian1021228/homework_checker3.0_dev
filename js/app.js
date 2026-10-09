@@ -84,6 +84,7 @@ import { markAllPresent, copyAttendanceLineReport, exportAttendanceCsv, renderAt
 import { initTimeWheel } from './timeWheel.js';
 import { openAttendanceStatsModal, initAttendanceStatsEvents } from './attendanceStats.js';
 import { createNewAffair, renderAffairsPage } from './affairs.js';
+import { initAdminDashboard, refreshUserRole } from './adminDashboard.js';
 
 import { setupButtonEvents } from './events.js';
 import { ICONS, getSvgIcon } from './icons.js';
@@ -496,6 +497,9 @@ function setupNewFeaturesEvents() {
     // 初始化時間滾輪與出席統計模組
     initTimeWheel();
     initAttendanceStatsEvents();
+
+    // 初始化管理人員 (Admin) 行政中樞與 RBAC
+    initAdminDashboard();
 }
 
 // 啟動主程式

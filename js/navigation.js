@@ -21,6 +21,7 @@ import { renderOfficersPage } from './officers.js';
 import { renderAttendancePage } from './attendance.js';
 import { renderAffairsPage } from './affairs.js';
 import { updateSidebarActiveState } from './sidebar.js';
+import { renderAdminAuditsInContactBook, renderSchoolBroadcastsInContactBook } from './adminDashboard.js';
 
 export function applyCheckMode(mode) {
     state.currentCheckMode = mode;
@@ -267,6 +268,8 @@ export function showContactBookPage(fromHistory = false) {
     const titleEl = document.getElementById('contact-book-title'); 
     if (titleEl) titleEl.textContent = `${currentClass?.name || ''} 聯絡簿`;
     renderContactBookItems(); 
+    renderAdminAuditsInContactBook();
+    renderSchoolBroadcastsInContactBook();
     restoreScroll('contact-book-page');
     updateMobileNavVisibility('contact-book');
     updateSidebarActiveState('contact-book-page');
@@ -389,13 +392,17 @@ export function proceedIntoSystem() {
     const portalEl = document.getElementById('portal-page');
     if (portalEl) portalEl.classList.add('hidden');
     
-    // 進入系統時確保能選擇點收方式 (手動點收 / 條碼掃描)
+    // 預設手動點收，略過彈窗詢問
+    if (!localStorage.getItem('checkMode')) {
+        localStorage.setItem('checkMode', 'manual');
+        state.currentCheckMode = 'manual';
+    }
     const welcomeModal = document.getElementById('welcome-modal');
     if (welcomeModal) {
-        openModal(welcomeModal);
-        showWelcomeStep2();
-    } else {
-        if (state.appData.classes.length === 0) openModal(document.getElementById('manage-classes-modal'));
+        closeModal(welcomeModal);
+    }
+    if (state.appData?.classes?.length === 0) {
+        openModal(document.getElementById('manage-classes-modal'));
     }
     updateGuestHomeBtnVisibility();
 }

@@ -28,7 +28,8 @@ import {
     closeModal,
     bindClick,
     bindSubmit,
-    bindChange
+    bindChange,
+    triggerHaptic
 } from './utils.js';
 
 import {
@@ -117,6 +118,7 @@ import { renderOverviewPage } from './overview.js';
 import { renderOfficersPage } from './officers.js';
 import { renderAttendancePage } from './attendance.js';
 import { renderAffairsPage } from './affairs.js';
+import { showAdminDashboardPage } from './adminDashboard.js';
 
 import {
     setupExamScoresEvents,
@@ -947,19 +949,21 @@ export function setupButtonEvents() {
                             showAlertModal("登入失敗", "密碼錯誤，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
                             return;
                         }
-                        if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
-                            if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
-                                showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
-                            } else {
-                                showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                        if (!isPasswordMatch) {
+                            if (signInErr.code === 'auth/invalid-credential' || signInErr.code === 'auth/wrong-password' || signInErr.code === 'auth/user-not-found') {
+                                if ((cand.email || '').toLowerCase() === 'ianw.solar@gmail.com' || (cand.email || '').toLowerCase().includes('@gmail.com')) {
+                                    showAlertModal("登入提示", "帳號或密碼不相符。\n\n提示：若此帳號平時是使用 Google 授權登入，請直接點選下方「使用 Google 帳號快速登入」按鈕！");
+                                } else {
+                                    showAlertModal("登入失敗", "密碼錯誤或憑證無效，請確認後重試。若忘記密碼請點選下方「忘記密碼？」");
+                                }
+                                return;
                             }
-                            return;
+                            throw signInErr;
                         }
-                        throw signInErr;
                     }
                 }
 
-                const isUserAdmin = (cand.email || cred.user.email).toLowerCase() === 'ianw.solar@gmail.com';
+                const isUserAdmin = ((cand.email || (cred ? cred.user.email : '')).toLowerCase() === 'ianw.solar@gmail.com') || !!cand.isAdmin || cand.role === 'admin';
                 const userObj = {
                     uid: cred ? cred.user.uid : (cand.uid || cand.id),
                     email: cand.email || (cred ? cred.user.email : ''),
@@ -1600,6 +1604,7 @@ export function setupButtonEvents() {
     };
 
     bindClick('portal-google-btn', handleGoogleLogin);
+    bindClick('portal-signup-google-btn', handleGoogleLogin);
     bindClick('google-login-btn', handleGoogleLogin);
     bindClick('welcome-google-btn', handleGoogleLogin);
 
@@ -1859,12 +1864,9 @@ export function setupButtonEvents() {
     bindClick('admin-modal-exit-view-btn', exitAdminViewMode);
 
     // 本地硬碟連結
-    bindClick('portal-link-file-btn', async () => {
+    const handleLinkFileAction = async () => {
         if (!window.showSaveFilePicker) {
-            showConfirmModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。\n\n是否以「瀏覽器暫存」模式進入系統？", () => {
-                localStorage.setItem('storageSelected', 'true');
-                proceedIntoSystem();
-            });
+            showAlertModal("硬碟直寫限制", "您的瀏覽器環境不支援直接存取本機硬碟（推薦使用 Chrome 或 Edge 桌面版）。");
             return;
         }
         try {
@@ -1886,19 +1888,9 @@ export function setupButtonEvents() {
         } catch (e) {
             if (e.name !== 'AbortError') showAlertModal("無法連結檔案", e.message);
         }
-    });
-
-    bindClick('portal-browser-only-btn', () => {
-        sessionStorage.setItem('app_is_guest_mode', 'true');
-        state.currentUser = null;
-        localStorage.removeItem('app_user_session');
-        if (!state.appData || !Array.isArray(state.appData.classes)) {
-            state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
-        }
-        localStorage.setItem('storageSelected', 'true');
-        showToast("已以瀏覽器快取模式進入系統（本機獨立，不影響線上正式資料）", "success");
-        proceedIntoSystem();
-    });
+    };
+    bindClick('portal-link-file-btn', handleLinkFileAction);
+    bindClick('portal-signup-link-file-btn', handleLinkFileAction);
 
     bindClick('google-logout-btn', performFullLogout);
     bindClick('delete-my-account-btn', deleteMyAccount);
@@ -2915,6 +2907,7 @@ export function setupButtonEvents() {
         studentGrid.addEventListener('click', async (e) => {
             const studentBtn = e.target.closest('.student-btn');
             if (studentBtn) {
+                triggerHaptic('light');
                 const seat = parseInt(studentBtn.dataset.seat); 
                 const hw = state.appData.homeworks.find(h => h.id === state.currentHomeworkId); 
                 if (!hw || !hw.students) return;
@@ -3433,27 +3426,58 @@ export function setupButtonEvents() {
     });
 
     // 手機抽屜內部快捷按鈕
+    document.getElementById('mobile-sheet-overview-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showOverviewPage();
+    });
+    document.getElementById('mobile-sheet-attendance-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAttendancePage();
+    });
+    document.getElementById('mobile-sheet-officers-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showOfficersPage();
+    });
+    document.getElementById('mobile-sheet-affairs-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAffairsPage();
+    });
+    document.getElementById('mobile-sheet-scores-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showExamScoresPage();
+    });
+    document.getElementById('mobile-sheet-admin-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
+        closeModal(document.getElementById('mobile-more-sheet'));
+        showAdminDashboardPage();
+    });
     document.getElementById('mobile-sheet-manage-classes-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('manage-classes-btn')?.click();
     });
-    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
-        closeModal(document.getElementById('mobile-more-sheet'));
-        document.getElementById('set-barcodes-btn')?.click();
-    });
     document.getElementById('mobile-sheet-student-details-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('student-details-btn')?.click();
     });
     document.getElementById('mobile-sheet-types-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('show-types-modal-btn')?.click();
     });
-    document.getElementById('mobile-sheet-quick-auth-btn')?.addEventListener('click', () => {
+    document.getElementById('mobile-sheet-set-barcodes-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
-        document.getElementById('main-qr-scan-btn')?.click();
+        document.getElementById('set-barcodes-btn')?.click();
     });
     document.getElementById('mobile-sheet-settings-btn')?.addEventListener('click', () => {
+        triggerHaptic('light');
         closeModal(document.getElementById('mobile-more-sheet'));
         document.getElementById('settings-btn')?.click();
     });

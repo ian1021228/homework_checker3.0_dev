@@ -475,6 +475,16 @@ export const bindChange = (id, handler) => {
     if (el) el.addEventListener('change', handler);
 };
 
+export function triggerHaptic(type = 'light') {
+    if (typeof navigator === 'undefined' || !navigator.vibrate) return;
+    try {
+        if (type === 'light') navigator.vibrate(10);
+        else if (type === 'medium') navigator.vibrate(20);
+        else if (type === 'heavy') navigator.vibrate([30, 20, 30]);
+        else if (type === 'success') navigator.vibrate([15, 30, 15]);
+    } catch (e) {}
+}
+
 // 嚴格攔截瀏覽器原生彈窗，絕不彈出系統原生提示或詢問框
 if (typeof window !== 'undefined') {
     window.alert = function(msg) {
@@ -489,6 +499,7 @@ if (typeof window !== 'undefined') {
         return def || null;
     };
 
+    window.triggerHaptic = triggerHaptic;
     window.showToast = showToast;
     window.showAlertModal = showAlertModal;
     window.showConfirmModal = showConfirmModal;

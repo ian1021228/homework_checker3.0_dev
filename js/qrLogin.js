@@ -940,6 +940,9 @@ export function setupQrLoginEvents() {
     document.getElementById('portal-modal-qr-login-btn')?.addEventListener('click', () => {
         startDeviceQrLoginSession();
     });
+    document.getElementById('portal-signup-qr-login-btn')?.addEventListener('click', () => {
+        startDeviceQrLoginSession();
+    });
     document.getElementById('settings-show-qr-btn')?.addEventListener('click', () => {
         startDeviceQrLoginSession();
     });

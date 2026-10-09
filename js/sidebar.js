@@ -14,6 +14,8 @@ import {
     showAffairsPage,
     showExamScoresPage
 } from './navigation.js';
+import { showAdminDashboardPage, refreshUserRole } from './adminDashboard.js';
+import { openModal } from './utils.js';
 
 let isSidebarOpen = false;
 
@@ -91,6 +93,17 @@ export function openSidebar() {
         curClassNameEl.textContent = curClass ? curClass.name : '未選擇班級';
     }
 
+    // 檢查管理人員權限
+    refreshUserRole();
+    const adminSidebarBtn = document.getElementById('sidebar-admin-portal-btn');
+    if (adminSidebarBtn) {
+        if (state.currentUserRole === 'admin') {
+            adminSidebarBtn.classList.remove('hidden');
+        } else {
+            adminSidebarBtn.classList.add('hidden');
+        }
+    }
+
     // 醒目標示目前分頁：優先判斷全螢幕/彈窗覆蓋層
     const scoresView = document.getElementById('exam-scores-fullscreen-view');
     const isScoresVisible = scoresView && !scoresView.classList.contains('hidden');
@@ -134,7 +147,9 @@ export function updateSidebarActiveState(activeViewName = state.currentPage) {
         'officers-page': 'officers',
         'attendance-page': 'attendance',
         'affairs-page': 'affairs',
-        'quickAuth': 'quickAuth'
+        'quickAuth': 'quickAuth',
+        'manage-classes': 'manage-classes',
+        'admin-dashboard': 'admin-dashboard'
     };
 
     const targetKey = viewMapping[activeViewName] || activeViewName;
@@ -157,6 +172,13 @@ function switchViewFromSidebar(viewKey) {
     if (scoresView && viewKey !== 'scores') {
         scoresView.classList.add('hidden');
         scoresView.classList.remove('flex');
+    }
+
+    // 若在管理人員全螢幕後台中，切換至其他分頁時關閉管理人員後台
+    const adminPage = document.getElementById('admin-fullscreen-dashboard');
+    if (adminPage && viewKey !== 'admin-dashboard') {
+        adminPage.classList.add('hidden');
+        adminPage.classList.remove('flex');
     }
 
     // 若在快速授權彈窗中，切換至其他分頁時關閉快速授權
@@ -187,6 +209,12 @@ function switchViewFromSidebar(viewKey) {
             break;
         case 'affairs':
             showAffairsPage();
+            break;
+        case 'manage-classes':
+            openModal(document.getElementById('manage-classes-modal'));
+            break;
+        case 'admin-dashboard':
+            showAdminDashboardPage();
             break;
         case 'quickAuth':
             if (window.openPhoneQrScannerModal) {
