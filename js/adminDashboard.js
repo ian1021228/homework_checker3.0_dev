@@ -535,7 +535,7 @@ export function renderBroadcastsView() {
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <span class="px-2.5 py-0.5 rounded-full text-xs font-black ${b.level === 'emergency' ? 'bg-red-600 text-white' : 'bg-amber-500 text-white'}">
-                        ${b.level === 'emergency' ? '重大校安緊急通報' : '學務全校宣導'}
+                        ${b.level === 'emergency' ? '全校重大緊急通報' : '學務全校宣導'}
                     </span>
                     <h4 class="font-black text-slate-900 text-base">${b.title}</h4>
                 </div>

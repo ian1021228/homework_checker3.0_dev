@@ -290,7 +290,6 @@ export function renderClassCredentialsSection() {
     };
 
     bindCopy('copy-teacher-acc-btn', () => tAcc, '已複製教師帳號');
-    bindCopy('copy-teacher-pass-btn', () => tPass, '已複製教師密碼');
     bindCopy('copy-parent-acc-btn', () => pAcc, '已複製家長帳號');
     bindCopy('copy-parent-pass-btn', () => pPass, '已複製家長密碼');
 
@@ -306,6 +305,114 @@ export function renderClassCredentialsSection() {
                 });
             }
         });
+    }
+
+    // ==========================================
+    // 渲染學生成績 6 位數專屬 PIN 碼網格 (導師檢視、自訂修改與一鍵重設)
+    // ==========================================
+    const pinsContainer = document.getElementById('cred-pins-grid-container');
+    if (pinsContainer) {
+        pinsContainer.innerHTML = '';
+        const maxSeat = curClass.lastMaxSeat || 30;
+        const skipped = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
+        curClass.studentPins = curClass.studentPins || {};
+
+        let arePinsRevealed = window._pinsAreRevealed || false;
+
+        for (let seat = 1; seat <= maxSeat; seat++) {
+            const isSkipped = skipped.includes(seat);
+            const defaultPin = String(100000 + seat);
+            const currentPin = curClass.studentPins[seat] || defaultPin;
+            const isCustom = Boolean(curClass.studentPins[seat] && curClass.studentPins[seat] !== defaultPin);
+
+            const card = document.createElement('div');
+            card.className = `p-2.5 rounded-xl border transition-all flex flex-col justify-between space-y-1.5 ${
+                isSkipped ? 'bg-white/5 border-white/5 opacity-40' : 'bg-black/30 border-white/10 hover:border-amber-400/40'
+            }`;
+
+            card.innerHTML = `
+                <div class="flex items-center justify-between text-xs">
+                    <span class="font-mono font-black text-amber-300">${seat} 號</span>
+                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-400' : (isCustom ? 'text-indigo-300' : 'text-slate-400')}">
+                        ${isSkipped ? '缺號' : (isCustom ? '已自訂' : '學校預設')}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between bg-black/40 px-2 py-1 rounded-lg border border-white/5">
+                    <span class="pin-display-text font-mono font-black text-xs sm:text-sm text-white select-all" data-pin="${currentPin}">
+                        ${isSkipped ? '---' : (arePinsRevealed ? currentPin : '••••••')}
+                    </span>
+                    ${!isSkipped ? `
+                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-amber-300 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="修改此座號 PIN 碼">
+                            <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+            pinsContainer.appendChild(card);
+        }
+
+        // 綁定個別座號編輯按鈕
+        pinsContainer.querySelectorAll('.btn-quick-edit-pin').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const seat = parseInt(btn.dataset.seat);
+                const oldPin = curClass.studentPins[seat] || String(100000 + seat);
+                const input = prompt(`請輸入 ${seat} 號學生的新成績查詢 PIN 碼（建議 6 位數數字）：`, oldPin);
+                if (input !== null) {
+                    const trimmed = input.trim();
+                    if (!trimmed) {
+                        delete curClass.studentPins[seat];
+                    } else {
+                        curClass.studentPins[seat] = trimmed;
+                    }
+                    if (window.saveData) window.saveData();
+                    renderClassCredentialsSection();
+                    showToast(`已更新 ${seat} 號學生 PIN 碼`, 'success');
+                }
+            };
+        });
+
+        // 綁定顯示/隱藏全班 PIN 碼
+        const toggleVisBtn = document.getElementById('cred-toggle-pins-visibility-btn');
+        if (toggleVisBtn && !toggleVisBtn.dataset.bound) {
+            toggleVisBtn.dataset.bound = 'true';
+            toggleVisBtn.onclick = () => {
+                window._pinsAreRevealed = !window._pinsAreRevealed;
+                document.getElementById('cred-pins-vis-label').textContent = window._pinsAreRevealed ? '隱藏 PIN 碼' : '顯示 PIN 碼';
+                renderClassCredentialsSection();
+            };
+        }
+
+        // 綁定一鍵重設為學校預設 (100000 + 座號)
+        const resetAllBtn = document.getElementById('cred-reset-all-pins-btn');
+        if (resetAllBtn && !resetAllBtn.dataset.bound) {
+            resetAllBtn.dataset.bound = 'true';
+            resetAllBtn.onclick = () => {
+                if (confirm('確定要將全班所有學生的 PIN 碼重設為學校預設值（100000 + 座號）？')) {
+                    curClass.studentPins = {};
+                    if (window.saveData) window.saveData();
+                    renderClassCredentialsSection();
+                    showToast('已將全班學生成績 PIN 碼重設為學校預設值！', 'success');
+                }
+            };
+        }
+
+        // 綁定複製清冊
+        const copyAllBtn = document.getElementById('cred-copy-all-pins-btn');
+        if (copyAllBtn && !copyAllBtn.dataset.bound) {
+            copyAllBtn.dataset.bound = 'true';
+            copyAllBtn.onclick = () => {
+                let lines = [`【${curClass.name} 學生小考成績查詢 PIN 碼清冊】`];
+                for (let seat = 1; seat <= maxSeat; seat++) {
+                    if (skipped.includes(seat)) continue;
+                    const pin = curClass.studentPins[seat] || String(100000 + seat);
+                    lines.push(`${seat}號\tPIN: ${pin}`);
+                }
+                navigator.clipboard.writeText(lines.join('\n')).then(() => {
+                    showToast('已複製全班學生成績 PIN 碼清冊至剪貼簿！', 'success');
+                });
+            };
+        }
     }
 }
 if (typeof window !== 'undefined') {

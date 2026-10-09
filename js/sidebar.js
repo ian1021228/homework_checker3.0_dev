@@ -236,7 +236,9 @@ function switchViewFromSidebar(viewKey) {
             showAdminDashboardPage();
             break;
         case 'quickAuth':
-            if (window.openPhoneQrScannerModal) {
+            if (window.showQuickAuthPage) {
+                window.showQuickAuthPage();
+            } else if (window.openPhoneQrScannerModal) {
                 window.openPhoneQrScannerModal();
             } else {
                 document.getElementById('main-qr-scan-btn')?.click();

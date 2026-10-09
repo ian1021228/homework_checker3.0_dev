@@ -97,6 +97,7 @@ import {
     openPhoneQrScannerModal,
     closePhoneQrScannerModal
 } from './qrLogin.js';
+import './storageLimit.js';
 
 // 將核心全域輔助函式掛載至 window，確保相容性與無縫呼叫
 window.state = state;
@@ -192,6 +193,7 @@ function replaceFaIconsWithSvg() {
 }
 
 async function init() {
+    console.log("[INIT] Starting init process...");
     // 0. 若重載前停留在管理員檢視模式備份中，主動還原管理員原本的真實本地資料
     if (sessionStorage.getItem('admin_backup_appData')) {
         try {
@@ -238,13 +240,24 @@ async function init() {
     }
 
     // 3. 綁定所有互動事件
-    setupButtonEvents(); 
-    setupQrLoginEvents();
-    setupNewFeaturesEvents();
-    checkUrlForQrLogin();
-    updateDataManagementUI();
+    try {
+        console.log("[INIT] Calling setupButtonEvents...");
+        setupButtonEvents(); 
+        console.log("[INIT] Calling setupQrLoginEvents...");
+        setupQrLoginEvents();
+        console.log("[INIT] Calling setupNewFeaturesEvents...");
+        setupNewFeaturesEvents();
+        console.log("[INIT] Calling checkUrlForQrLogin...");
+        checkUrlForQrLogin();
+        console.log("[INIT] Calling updateDataManagementUI...");
+        updateDataManagementUI();
+    } catch(err) {
+        console.error("[INIT] Error during setup events:", err);
+    }
+
     document.getElementById('loading-page')?.classList.add('hidden');
     window.__app_initialized = true;
+    console.log("[INIT] Successfully initialized! window.__app_initialized = true");
 
     // 4. 恢復偏好設定
     const savedMode = localStorage.getItem('checkMode') || 'manual';

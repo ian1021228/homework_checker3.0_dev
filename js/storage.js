@@ -2,6 +2,7 @@ import { state } from './state.js';
 import { safeStringify, safeClone, sanitizeAppData, fixDates, formatDate, generateId, showToast, showAlertModal, closeModal } from './utils.js';
 import { syncDataToCloud } from './firebase.js';
 import { DEFAULT_TYPES } from './constants.js';
+import { checkStorageQuotaBeforeSave } from './storageLimit.js';
 
 export function getDB() { 
     return new Promise((resolve, reject) => { 
@@ -123,6 +124,11 @@ export function saveData() {
         return Promise.resolve();
     }
     state.isLocalEmptyOnBoot = false; 
+
+    // 存檔前即時檢核容量配額 (80% 警戒提醒)
+    try {
+        checkStorageQuotaBeforeSave();
+    } catch(e) {}
 
     // 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
     try {

@@ -485,6 +485,19 @@ export function triggerHaptic(type = 'light') {
     } catch (e) {}
 }
 
+export function downloadFile(blobOrUrl, fileName) {
+    const url = typeof blobOrUrl === 'string' ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        a.remove();
+        if (typeof blobOrUrl !== 'string') URL.revokeObjectURL(url);
+    }, 100);
+}
+
 // 嚴格攔截瀏覽器原生彈窗，絕不彈出系統原生提示或詢問框
 if (typeof window !== 'undefined') {
     window.alert = function(msg) {

@@ -349,6 +349,11 @@ export async function openPhoneQrScannerModal() {
         return;
     }
 
+    if (window.showQuickAuthPage) {
+        window.showQuickAuthPage();
+        return;
+    }
+
     if (!window.Html5Qrcode) {
         showAlertModal("掃描元件載入中", "相機掃描元件正在加載，請稍候 3 秒後重試。");
         return;
@@ -419,6 +424,47 @@ export async function closePhoneQrScannerModal() {
         closeModal(scannerModal);
     }
 }
+
+/**
+ * 啟動全螢幕快速登入授權視圖 (支援相機掃描與 OTP 一次性認證碼)
+ */
+export async function startPhoneQuickAuth() {
+    startOtpPhoneMode();
+    if (!window.Html5Qrcode) {
+        return;
+    }
+    const viewportEl = document.getElementById('qr-scanner-viewport');
+    if (viewportEl) viewportEl.innerHTML = '';
+    try {
+        if (!html5QrCodeScanner) {
+            html5QrCodeScanner = new window.Html5Qrcode("qr-scanner-viewport");
+        }
+        if (html5QrCodeScanner.isScanning) {
+            await html5QrCodeScanner.stop();
+        }
+        const config = {
+            fps: 15,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+        };
+        await html5QrCodeScanner.start(
+            { facingMode: "environment" },
+            config,
+            async (decodedText) => {
+                const challengeId = parseChallengeId(decodedText);
+                if (challengeId) {
+                    await promptAuthorizeChallenge(challengeId);
+                } else {
+                    showAlertModal("無法辨識的 QR Code", "此 QR Code 並非班級經營系統的登入碼，請對準電腦螢幕上的登入 QR Code 再次掃描。");
+                }
+            },
+            () => {}
+        );
+    } catch (err) {
+        console.warn("Camera start error in full-screen quickAuth view:", err);
+    }
+}
+window.startPhoneQuickAuth = startPhoneQuickAuth;
 
 /**
  * 解析 QR Code 字串

@@ -103,7 +103,7 @@ export function hideAllPages() {
     if (state.currentPage) {
         state.scrollPositions[state.currentPage] = window.scrollY || document.documentElement.scrollTop;
     }
-    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page', 'manage-classes-fullscreen-view'].forEach(id => { 
+    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page', 'manage-classes-fullscreen-view', 'qr-auth-fullscreen-view'].forEach(id => { 
         const el = document.getElementById(id); 
         if (el) {
             el.classList.add('hidden');
@@ -119,6 +119,9 @@ export function hideAllPages() {
     if (qrScannerModal) {
         qrScannerModal.classList.add('hidden');
         qrScannerModal.classList.remove('flex', 'opacity-100');
+    }
+    if (window.closePhoneQrScannerModal) {
+        try { window.closePhoneQrScannerModal(); } catch(e) {}
     }
     updateGuestHomeBtnVisibility();
 }
@@ -364,6 +367,22 @@ export function showManageClassesPage(fromHistory = false) {
     updateSidebarActiveState('manage-classes-fullscreen-view');
 }
 
+export function showQuickAuthPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('qr-auth-fullscreen-view');
+    if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+    }
+    if (!fromHistory) pushPageState({ page: 'quickAuth' }, '#quick-auth');
+    state.currentPage = 'qr-auth-fullscreen-view';
+    if (window.startPhoneQuickAuth) {
+        window.startPhoneQuickAuth();
+    }
+    restoreScroll('qr-auth-fullscreen-view');
+    updateSidebarActiveState('quickAuth');
+}
+
 export function promptSystemUsageAndNavigate() {
     if (state.currentUser) {
         sessionStorage.removeItem('app_is_guest_mode');
@@ -425,6 +444,13 @@ export function proceedIntoSystem() {
         showManageClassesPage();
     }
     updateGuestHomeBtnVisibility();
+
+    // 檢查 60 天以上歷史點收紀錄滾動修剪
+    if (window.checkRollingRetention) {
+        setTimeout(() => {
+            window.checkRollingRetention();
+        }, 1200);
+    }
 }
 
 export function openCopyClassModal() {
@@ -509,4 +535,5 @@ if (typeof window !== 'undefined') {
     window.showAffairsPage = showAffairsPage;
     window.showExamScoresPage = showExamScoresPage;
     window.showManageClassesPage = showManageClassesPage;
+    window.showQuickAuthPage = showQuickAuthPage;
 }
