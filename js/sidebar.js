@@ -63,6 +63,20 @@ export function setupSidebar() {
         });
     }
 
+    const settingsBtn = document.getElementById('sidebar-settings-btn');
+    if (settingsBtn) {
+        settingsBtn.addEventListener('click', () => {
+            closeSidebar();
+            const originalSettingsBtn = document.getElementById('settings-btn') || document.getElementById('open-settings-modal-btn');
+            if (originalSettingsBtn) {
+                originalSettingsBtn.click();
+            } else {
+                const settingsModal = document.getElementById('settings-modal');
+                if (settingsModal) openModal(settingsModal);
+            }
+        });
+    }
+
     const logoutBtn = document.getElementById('sidebar-logout-btn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
@@ -211,7 +225,12 @@ function switchViewFromSidebar(viewKey) {
             showAffairsPage();
             break;
         case 'manage-classes':
-            openModal(document.getElementById('manage-classes-modal'));
+            if (window.showManageClassesPage) {
+                window.showManageClassesPage();
+            } else {
+                const modal = document.getElementById('manage-classes-modal');
+                if (modal) openModal(modal);
+            }
             break;
         case 'admin-dashboard':
             showAdminDashboardPage();

@@ -5,25 +5,33 @@
 
 ---
 
-## 📌 系統全景與三大端架構
+---
 
-本系統由**教師端（本專案）**、**家長端**與**學生端**三大獨立又緊密聯動的 Web 應用程式組成，致力於全面數位化取代傳統紙本作業登記簿與聯絡簿：
+## 📌 系統全景與四層級架構
+
+本系統由**最高管理端**、**學校管理端**、**教師端**與**家長端**四大獨立又緊密聯動的 Web 應用程式組成，致力於全面數位化取代傳統紙本作業登記簿與聯絡簿：
 
 ```mermaid
 flowchart TD
-    Teacher["👩‍🏫 教師端 (作業點收與班級管理)\n• 班級/作業管理 • 條碼槍點收\n• 未交名單統計 • 聯絡簿派發 • 雙螢幕模式\n• 成績專屬 6 位數 PIN 碼管理與一鍵重設後門"]
+    SuperAdmin["👑 最高管理端 (Google 授權驗證)\n• ianw.solar@gmail.com\n• 學校管理帳號派發\n• 多校租戶授權管理"]
+    SchoolAdmin["🏫 學校管理端 (行政中樞)\n• 08:00 晨間出缺席大看板\n• 線上行政抽查核章\n• 全校校安廣播\n• 統一設定班級人數、缺號與兩端帳密"]
+    Teacher["👩‍🏫 教師端 (作業點收與班級管理)\n• 班級/作業管理 • 條碼槍點收\n• 未交名單統計 • 聯絡簿派發 • 雙螢幕模式\n• 專屬兩端帳密查閱 • 自動跳過缺號"]
     Firebase[("☁️ Firebase Firestore 雲端資料庫\n(端對端即時毫秒同步 · 零覆蓋安全機制)")]
-    Parent["👨‍👩‍👧 家長端即時查核看板\n• 作業完成度免密碼直查\n• 獨立小考成績 (6位數專屬 PIN 碼保護)\n• 108課綱 21 門學科表現矩陣 • PWA 桌面化"]
-    Student["🎒 學生端數位聯絡簿\n• 自主作業檢核 • 108課綱 21 門成績登記\n• 6位數 PIN 本機免密與跨座號防窺 • PWA 支援"]
+    Parent["👨‍👩‍👧 家長端即時查核看板\n• 作業完成度查核 • 聯絡簿查閱與電子簽章\n• 出席紀錄 • 班級事務問卷調查"]
 
+    SuperAdmin -->|指派學校帳密| SchoolAdmin
+    SchoolAdmin -->|統一派發帳密與缺號| Teacher
+    SchoolAdmin -->|統一派發代碼憑證| Parent
     Teacher <-->|即時推播與同步| Firebase
     Firebase <-->|即時監聽與查核| Parent
-    Firebase <-->|自主登記與上傳| Student
+    SchoolAdmin <-->|行政抽查與晨間數據| Firebase
 ```
 
 - 🌐 **教師端與門戶首頁**：[https://ian1021228.github.io/homework_checker3.0/](https://ian1021228.github.io/homework_checker3.0/)
-- 👨‍👩‍👧 **家長端即時查核看板**：[https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/](https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/)
-- 🎒 **學生端數位聯絡簿與成績登記**：[https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/](https://ian1021228.github.io/ian_homework_checker2.0_online_student_dashboard/)
+- 🏫 **學校管理端行政中心**：[https://ian1021228.github.io/school_admin_dashboard_dev/](https://ian1021228.github.io/school_admin_dashboard_dev/)
+- 👨‍👩‍👧 **家長端即時查核看板**：[https://ian1021228.github.io/parent_dashboard_dev/](https://ian1021228.github.io/parent_dashboard_dev/)
+
+---
 
 ---
 
@@ -79,23 +87,11 @@ flowchart TD
 
 ---
 
-## 🚀 本地開發與快速部署
+## 🌐 線上雲端服務架構與部署
 
-本系統為純靜態網頁架構，可直接於任何靜態伺服器運行：
-
-```bash
-# 1. 複製倉庫
-git clone https://github.com/ian1021228/homework_checker3.0.git
-cd homework_checker3.0
-
-# 2. 啟動本機 HTTP 伺服器 (Python 3)
-python3 -m http.server 3567
-
-# 3. 開啟瀏覽器造訪
-http://127.0.0.1:3567/
-```
-
-- **GitHub Pages 部署**：推送至 `main` 分支後，於倉庫設定中啟用 GitHub Pages（選擇 `Deploy from a branch` -> `/ (root)`）即可自動發布。
+本系統為無伺服器雲端網頁應用程式 (Cloud Web App)，直接透過現代瀏覽器即可體驗完整服務：
+- **自動化持續部署**：每次系統功能演進與驗證後，均經由 GitHub Actions / GitHub Pages 自動發布至正式線路。
+- **免安裝、免下載**：教師與家長無須下載安裝繁重應用程式，打開瀏覽器或透過 PWA 即可立即使用。
 
 ---
 

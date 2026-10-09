@@ -103,9 +103,12 @@ export function hideAllPages() {
     if (state.currentPage) {
         state.scrollPositions[state.currentPage] = window.scrollY || document.documentElement.scrollTop;
     }
-    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page'].forEach(id => { 
+    ['portal-page', 'main-page', 'detail-page', 'student-details-page', 'contact-book-page', 'homework-types-page', 'overview-page', 'officers-page', 'attendance-page', 'affairs-page', 'manage-classes-fullscreen-view'].forEach(id => { 
         const el = document.getElementById(id); 
-        if (el) el.classList.add('hidden'); 
+        if (el) {
+            el.classList.add('hidden');
+            el.classList.remove('flex');
+        }
     });
     const fullscreenScores = document.getElementById('exam-scores-fullscreen-view');
     if (fullscreenScores) {
@@ -344,6 +347,23 @@ export function showExamScoresPage(fromHistory = false) {
     updateSidebarActiveState('scores-page');
 }
 
+export function showManageClassesPage(fromHistory = false) {
+    hideAllPages();
+    const el = document.getElementById('manage-classes-fullscreen-view');
+    if (el) {
+        el.classList.remove('hidden');
+        el.classList.add('flex');
+    }
+    if (!fromHistory) pushPageState({ page: 'manage-classes' }, '#manage-classes');
+    state.currentPage = 'manage-classes-fullscreen-view';
+    renderClassList();
+    if (window.renderClassCredentialsSection) {
+        window.renderClassCredentialsSection();
+    }
+    restoreScroll('manage-classes-fullscreen-view');
+    updateSidebarActiveState('manage-classes-fullscreen-view');
+}
+
 export function promptSystemUsageAndNavigate() {
     if (state.currentUser) {
         sessionStorage.removeItem('app_is_guest_mode');
@@ -402,7 +422,7 @@ export function proceedIntoSystem() {
         closeModal(welcomeModal);
     }
     if (state.appData?.classes?.length === 0) {
-        openModal(document.getElementById('manage-classes-modal'));
+        showManageClassesPage();
     }
     updateGuestHomeBtnVisibility();
 }
@@ -488,4 +508,5 @@ if (typeof window !== 'undefined') {
     window.showOfficersPage = showOfficersPage;
     window.showAffairsPage = showAffairsPage;
     window.showExamScoresPage = showExamScoresPage;
+    window.showManageClassesPage = showManageClassesPage;
 }

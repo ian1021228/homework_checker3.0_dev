@@ -101,62 +101,215 @@ export function renderClassList() {
     if (!classListDiv) return; 
     classListDiv.innerHTML = '';
     
+    const totalCountEl = document.getElementById('manage-classes-total-count');
+    if (totalCountEl) totalCountEl.textContent = String(state.appData.classes.length);
+
     if (state.appData.classes.length === 0) {
-        classListDiv.innerHTML = '<div class="text-center py-6 text-slate-400 font-medium text-xs">目前尚未建立任何班級</div>';
+        classListDiv.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400 font-bold bg-white rounded-3xl border border-slate-200/80 shadow-xs"><i class="fa-solid fa-school-circle-exclamation text-3xl mb-2 text-slate-300 block"></i>目前尚未建立任何班級，請使用上方表單建立第一個班級。</div>';
+        renderClassCredentialsSection();
         return;
     }
 
     state.appData.classes.forEach(c => {
+        const isCurrent = c.id === state.currentClassId;
         const classItem = document.createElement('div');
-        classItem.className = 'p-3.5 sm:p-4 bg-white border border-slate-200/80 rounded-2xl mb-3 shadow-xs transition-all hover:border-indigo-200 group';
+        classItem.className = `p-6 bg-white border ${isCurrent ? 'border-indigo-400 ring-2 ring-indigo-500/15' : 'border-slate-200/90'} rounded-3xl shadow-sm transition-all hover:shadow-md flex flex-col justify-between gap-5 group`;
         const code = c.accessCode || '';
+        const tAcc = c.teacherUsername || `${(code || c.id).toLowerCase()}_teacher`;
+        const pAcc = c.parentUsername || `${(code || c.id).toLowerCase()}_parent`;
+
         classItem.innerHTML = `
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-                <div class="class-name-container flex items-center gap-2 shrink-0 min-w-[130px]">
-                    <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 shrink-0"></span>
-                    <span class="class-name-text font-black text-slate-800 text-sm sm:text-base cursor-pointer hover:text-indigo-600 select-none" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name || '未命名班級'}</span>
-                    <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="rename-class-btn text-slate-400 hover:text-indigo-600 px-2 py-1 rounded-lg hover:bg-indigo-50 transition-colors text-xs shrink-0 flex items-center gap-1" title="修改班級名稱">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                        <span class="text-[11px] hidden sm:inline">改名</span>
-                    </button>
+            <div class="space-y-4">
+                <!-- 頂部：班級名稱與使用中徽章 -->
+                <div class="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-3.5 h-3.5 rounded-full ${isCurrent ? 'bg-indigo-600 animate-pulse' : 'bg-slate-300'} shrink-0"></span>
+                        <h3 class="class-name-text text-xl font-black text-slate-900 truncate hover:text-indigo-600 cursor-pointer select-none" data-class-id="${c.id}" title="點擊修改班級名稱：${c.name}">${c.name || '未命名班級'}</h3>
+                        <button type="button" data-class-id="${c.id}" data-name="${c.name}" class="rename-class-btn text-slate-400 hover:text-indigo-600 p-1.5 rounded-xl hover:bg-indigo-50 transition-colors text-xs shrink-0" title="修改班級名稱">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                    ${isCurrent ? '<span class="px-3 py-1 rounded-full text-xs font-black bg-indigo-50 text-indigo-700 border border-indigo-200 shrink-0">使用中</span>' : ''}
                 </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">最後座號</span>
-                        <input type="number" min="1" max="100" data-class-id="${c.id}" class="class-max-seat-input w-12 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none text-center" value="${c.lastMaxSeat || 30}">
-                        <button type="button" data-class-id="${c.id}" class="save-class-max-seat-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存最後座號">儲存</button>
+
+                <!-- 權限碼與座號人數資訊區 -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <!-- 權限碼 -->
+                    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">班級權限碼</span>
+                        <div class="flex items-center justify-between gap-1">
+                            <input type="text" data-class-id="${c.id}" class="class-code-input w-full bg-transparent font-mono font-black text-indigo-700 focus:outline-none uppercase text-sm" placeholder="未設定" value="${code}" maxlength="16">
+                            <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-2 py-1 rounded hover:bg-indigo-100/60 transition-colors shrink-0" title="儲存代碼">儲存</button>
+                            <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs text-slate-400 hover:text-slate-700 p-1 rounded hover:bg-slate-200 transition-colors shrink-0" title="隨機產生代碼"><i class="fa-solid fa-dice"></i></button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-amber-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-amber-500/20 transition-all">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">缺號</span>
-                        <input type="text" data-class-id="${c.id}" class="class-skipped-seats-input w-20 sm:w-24 bg-transparent text-xs font-mono font-bold text-amber-700 focus:outline-none placeholder:text-slate-300" placeholder="無" value="${Array.isArray(c.skippedSeats) ? c.skippedSeats.join(', ') : (c.lastMissingSeats || '')}" title="缺號/轉出座號（例如：5, 12）">
-                        <button type="button" data-class-id="${c.id}" class="save-class-skipped-seats-btn text-xs font-bold text-amber-600 hover:text-amber-800 px-1.5 py-0.5 rounded hover:bg-amber-50 transition-colors whitespace-nowrap" title="儲存缺號設定">儲存</button>
+
+                    <!-- 最後座號 -->
+                    <div class="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-1">
+                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">最後座號 (人數)</span>
+                        <div class="flex items-center justify-between gap-1">
+                            <input type="number" min="1" max="100" data-class-id="${c.id}" class="class-max-seat-input w-16 bg-transparent font-mono font-black text-indigo-700 focus:outline-none text-sm text-center" value="${c.lastMaxSeat || 30}">
+                            <button type="button" data-class-id="${c.id}" class="save-class-max-seat-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-2 py-1 rounded hover:bg-indigo-100/60 transition-colors shrink-0" title="儲存最後座號">儲存</button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-1 focus-within:border-indigo-400 focus-within:bg-white focus-within:ring-2 focus-within:ring-indigo-500/20 transition-all">
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">權限碼</span>
-                        <input type="text" data-class-id="${c.id}" class="class-code-input w-24 sm:w-28 bg-transparent text-xs font-mono font-black text-indigo-700 focus:outline-none uppercase" placeholder="未設定" value="${code}" maxlength="16">
-                        <button type="button" data-class-id="${c.id}" class="save-class-code-btn text-xs font-bold text-indigo-600 hover:text-indigo-800 px-1.5 py-0.5 rounded hover:bg-indigo-50 transition-colors whitespace-nowrap" title="儲存權限碼">儲存</button>
-                        <button type="button" data-class-id="${c.id}" class="regen-class-code-btn text-xs font-bold text-slate-400 hover:text-slate-700 px-1.5 py-0.5 rounded hover:bg-slate-200 transition-colors shrink-0 flex items-center justify-center" title="隨機產生權限碼"><i class="fa-solid fa-dice"></i></button>
+                </div>
+
+                <!-- 缺號設定 -->
+                <div class="p-3 rounded-2xl bg-amber-50/50 border border-amber-200/70 text-xs space-y-1">
+                    <span class="text-[10px] font-black text-amber-800 uppercase tracking-wider block">缺號座號 (自動排除跳過)</span>
+                    <div class="flex items-center justify-between gap-2">
+                        <input type="text" data-class-id="${c.id}" class="class-skipped-seats-input w-full bg-transparent font-mono font-bold text-amber-900 focus:outline-none placeholder:text-amber-300 text-xs" placeholder="無缺號 (例如：4, 17)" value="${Array.isArray(c.skippedSeats) ? c.skippedSeats.join(', ') : (c.lastMissingSeats || '')}" title="缺號/轉出座號（例如：4, 17）">
+                        <button type="button" data-class-id="${c.id}" class="save-class-skipped-seats-btn text-xs font-black text-amber-700 hover:text-amber-900 px-2 py-1 rounded hover:bg-amber-100 transition-colors shrink-0" title="儲存缺號設定">儲存</button>
                     </div>
+                </div>
+
+                <!-- 兩端帳號備忘 -->
+                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 text-[11px] text-slate-500 space-y-1">
+                    <div class="flex items-center justify-between">
+                        <span>教師端帳號：<strong class="font-mono text-slate-800">${tAcc}</strong></span>
+                        <span>家長端帳號：<strong class="font-mono text-slate-800">${pAcc}</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 卡片動作按鈕列 -->
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between gap-2 flex-wrap">
+                <div class="flex items-center gap-2">
+                    ${!isCurrent ? `
+                        <button type="button" class="switch-to-class-btn px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black shadow-xs transition-all active:scale-95 cursor-pointer" data-class-id="${c.id}">
+                            切換至此班
+                        </button>
+                    ` : `
+                        <span class="px-3 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl text-xs font-black flex items-center gap-1.5">
+                            <i class="fa-solid fa-check"></i> 目前班級
+                        </span>
+                    `}
                     ${code ? `
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-class-code-btn px-2.5 py-1.5 text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0" title="複製此班級權限代碼">
-                            <i class="fa-solid fa-copy"></i>
-                            <span class="text-[11px] hidden sm:inline">複製代碼</span>
-                        </button>
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-2.5 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬家長端連結（已包含此班級代碼）">
+                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-parent-link-btn px-3 py-2 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-xl transition-colors font-black flex items-center gap-1.5 cursor-pointer" title="複製此班級專屬家長端連結">
                             <i class="fa-solid fa-house-chimney-user"></i>
-                            <span class="text-[11px] hidden sm:inline">複製家長端連結</span>
-                        </button>
-                        <button type="button" data-code="${code}" data-name="${c.name}" class="copy-student-link-btn px-2.5 py-1.5 text-xs bg-sky-50 hover:bg-sky-100 text-sky-700 rounded-xl transition-colors font-bold flex items-center gap-1.5 shrink-0 shadow-2xs" title="複製此班級專屬學生端數位聯絡簿連結（已包含此班級代碼）">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <span class="text-[11px] hidden sm:inline">複製學生端連結</span>
+                            <span>複製家長端連結</span>
                         </button>
                     ` : ''}
-                    <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-300 hover:text-rose-500 font-bold p-1.5 rounded-xl hover:bg-rose-50 transition-colors text-lg leading-none shrink-0 ml-0.5" title="刪除班級">&times;</button>
                 </div>
+                <button data-id="${c.id}" data-name="${c.name}" class="delete-class-btn text-slate-400 hover:text-rose-600 font-bold p-2 rounded-xl hover:bg-rose-50 transition-colors text-sm cursor-pointer" title="刪除班級">
+                    <i class="fa-solid fa-trash-can"></i>
+                </button>
             </div>
         `;
         classListDiv.appendChild(classItem);
     });
+
+    renderClassCredentialsSection();
+}
+
+/**
+ * 渲染目前班級的教師與家長兩端專屬帳密展示區
+ */
+export function renderClassCredentialsSection() {
+    const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId) || state.appData?.classes?.[0];
+    const totalCountEl = document.getElementById('manage-classes-total-count');
+    if (totalCountEl) totalCountEl.textContent = String(state.appData?.classes?.length || 0);
+
+    const card = document.getElementById('active-class-credentials-card');
+    if (!card) return;
+    if (!curClass) {
+        card.classList.add('hidden');
+        return;
+    }
+    card.classList.remove('hidden');
+
+    const classNameBadge = document.getElementById('cred-class-name-badge');
+    if (classNameBadge) classNameBadge.textContent = curClass.name || '目前班級';
+
+    const teacherAccEl = document.getElementById('cred-teacher-account');
+    const teacherPassEl = document.getElementById('cred-teacher-pass');
+    const parentAccEl = document.getElementById('cred-parent-account');
+    const parentPassEl = document.getElementById('cred-parent-pass');
+    const maxSeatEl = document.getElementById('cred-max-seat');
+    const skippedSeatsEl = document.getElementById('cred-skipped-seats');
+
+    const tAcc = curClass.teacherUsername || `${(curClass.accessCode || curClass.id).toLowerCase()}_teacher`;
+    const tPass = curClass.teacherPassword || '123456';
+    const pAcc = curClass.parentUsername || `${(curClass.accessCode || curClass.id).toLowerCase()}_parent`;
+    const pPass = curClass.parentPassword || 'p123456';
+    const maxSeat = curClass.lastMaxSeat || 30;
+    const skipped = Array.isArray(curClass.skippedSeats) ? (curClass.skippedSeats.length > 0 ? curClass.skippedSeats.join(', ') : '無') : (curClass.lastMissingSeats || '無');
+
+    if (teacherAccEl) teacherAccEl.textContent = tAcc;
+    if (teacherPassEl) {
+        teacherPassEl.textContent = teacherPassEl.dataset.revealed === 'true' ? tPass : '••••••';
+        teacherPassEl.dataset.realPassword = tPass;
+    }
+    if (parentAccEl) parentAccEl.textContent = pAcc;
+    if (parentPassEl) {
+        parentPassEl.textContent = parentPassEl.dataset.revealed === 'true' ? pPass : '••••••';
+        parentPassEl.dataset.realPassword = pPass;
+    }
+    if (maxSeatEl) maxSeatEl.textContent = `${maxSeat}`;
+    if (skippedSeatsEl) skippedSeatsEl.textContent = skipped;
+
+    // Toggle password buttons
+    const toggleTPassBtn = document.getElementById('toggle-teacher-pass-btn');
+    if (toggleTPassBtn && !toggleTPassBtn.dataset.bound) {
+        toggleTPassBtn.dataset.bound = 'true';
+        toggleTPassBtn.addEventListener('click', () => {
+            const el = document.getElementById('cred-teacher-pass');
+            if (!el) return;
+            const isRevealed = el.dataset.revealed === 'true';
+            el.dataset.revealed = isRevealed ? 'false' : 'true';
+            el.textContent = isRevealed ? '••••••' : el.dataset.realPassword;
+            toggleTPassBtn.innerHTML = isRevealed ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
+        });
+    }
+
+    const togglePPassBtn = document.getElementById('toggle-parent-pass-btn');
+    if (togglePPassBtn && !togglePPassBtn.dataset.bound) {
+        togglePPassBtn.dataset.bound = 'true';
+        togglePPassBtn.addEventListener('click', () => {
+            const el = document.getElementById('cred-parent-pass');
+            if (!el) return;
+            const isRevealed = el.dataset.revealed === 'true';
+            el.dataset.revealed = isRevealed ? 'false' : 'true';
+            el.textContent = isRevealed ? '••••••' : el.dataset.realPassword;
+            togglePPassBtn.innerHTML = isRevealed ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
+        });
+    }
+
+    // Copy buttons
+    const bindCopy = (id, textFn, msg) => {
+        const btn = document.getElementById(id);
+        if (btn && !btn.dataset.bound) {
+            btn.dataset.bound = 'true';
+            btn.addEventListener('click', () => {
+                const text = textFn();
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => showToast(msg, 'success')).catch(() => {});
+                }
+            });
+        }
+    };
+
+    bindCopy('copy-teacher-acc-btn', () => tAcc, '已複製教師帳號');
+    bindCopy('copy-teacher-pass-btn', () => tPass, '已複製教師密碼');
+    bindCopy('copy-parent-acc-btn', () => pAcc, '已複製家長帳號');
+    bindCopy('copy-parent-pass-btn', () => pPass, '已複製家長密碼');
+
+    const copyNoticeBtn = document.getElementById('copy-class-parent-notice-btn');
+    if (copyNoticeBtn && !copyNoticeBtn.dataset.bound) {
+        copyNoticeBtn.dataset.bound = 'true';
+        copyNoticeBtn.addEventListener('click', () => {
+            const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(curClass.accessCode || '')}`;
+            const noticeText = `【${curClass.name} 家長重要通知】\n親愛的家長您好：\n本班已全面啟用「班級經營與每日數位聯絡簿系統」！\n請您點擊下方專屬連結或前往家長端登入查閱今日各科作業缺交與聯絡事項：\n\n📌 家長端專屬登入網址：${parentUrl}\n🔑 家長登入帳號：${tAcc.replace('_teacher', '_parent')}\n🔒 初始密碼：${pPass}\n班級代碼：${curClass.accessCode || '無'}\n\n每日放學後請上線查閱並完成電子簽章，感謝您的配合！`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(noticeText).then(() => {
+                    showToast('已複製家長開學登入通知函文案至剪貼簿！', 'success');
+                });
+            }
+        });
+    }
+}
+if (typeof window !== 'undefined') {
+    window.renderClassCredentialsSection = renderClassCredentialsSection;
 }
 
 export function renderAllDoneList(studentsOrSeats, containerId) {

@@ -112,6 +112,7 @@ import {
     showAttendancePage,
     showAffairsPage,
     showExamScoresPage,
+    showManageClassesPage,
     fullRender
 } from './navigation.js';
 import { renderOverviewPage } from './overview.js';
@@ -241,8 +242,7 @@ export function setupButtonEvents() {
     bindClick('contact-book-btn', () => {
         if (!state.currentClassId || state.appData.classes.length === 0) {
             showAlertModal("提示", "請先建立或選擇班級，方可使用聯絡簿功能！");
-            renderClassList();
-            openModal(document.getElementById('manage-classes-modal'));
+            showManageClassesPage();
             return;
         }
         showContactBookPage();
@@ -252,8 +252,7 @@ export function setupButtonEvents() {
     bindClick('student-details-btn', () => {
         if (!state.currentClassId || state.appData.classes.length === 0) {
             showAlertModal("提示", "請先建立或選擇班級，方可查閱學生詳情！");
-            renderClassList();
-            openModal(document.getElementById('manage-classes-modal'));
+            showManageClassesPage();
             return;
         }
         showStudentDetailsPage();
@@ -261,8 +260,7 @@ export function setupButtonEvents() {
 
     // 4. 管理班級按鈕
     bindClick('manage-classes-btn', () => {
-        renderClassList();
-        openModal(document.getElementById('manage-classes-modal'));
+        showManageClassesPage();
     });
 
     // 倒退還原備份資料處理器
@@ -290,8 +288,7 @@ export function setupButtonEvents() {
     bindClick('show-add-modal-btn', () => {
         if (!state.currentClassId || state.appData.classes.length === 0) {
             showAlertModal("提示", "請先在「管理班級」建立班級後，再新增作業！");
-            renderClassList();
-            openModal(document.getElementById('manage-classes-modal'));
+            showManageClassesPage();
             return;
         }
         const modal = document.getElementById('add-homework-modal');
@@ -355,8 +352,7 @@ export function setupButtonEvents() {
     bindClick('set-barcodes-btn', () => {
         if (!state.currentClassId || state.appData.classes.length === 0) {
             showAlertModal("提示", "請先建立或選擇班級，方可進行學生條碼設定！");
-            renderClassList();
-            openModal(document.getElementById('manage-classes-modal'));
+            showManageClassesPage();
             return;
         }
         renderBarcodeModalInputs();
@@ -1673,7 +1669,7 @@ export function setupButtonEvents() {
         closeModal(document.getElementById('welcome-modal'));
         showMainPage();
         if (state.appData.classes.length === 0) {
-            openModal(document.getElementById('manage-classes-modal'));
+            showManageClassesPage();
         }
         showToast(mode === 'manual' ? "已選擇「手動點收」模式，開始使用！" : "已選擇「條碼掃描」模式，開始使用！", "success");
     };
@@ -1715,7 +1711,7 @@ export function setupButtonEvents() {
             document.getElementById('contact-book-page')?.classList.contains('hidden')) {
             showMainPage();
             if (state.appData.classes.length === 0) {
-                openModal(document.getElementById('manage-classes-modal'));
+                showManageClassesPage();
             }
         }
     });
@@ -2489,14 +2485,23 @@ export function setupButtonEvents() {
                 return;
             }
 
-            // 複製該班級專屬學生端連結（包含代碼參數，測試版）
-            const copyStudentBtn = e.target.closest('.copy-student-link-btn');
-            if (copyStudentBtn) {
+            // 切換至此班級
+            const switchBtn = e.target.closest('.switch-to-class-btn');
+            if (switchBtn) {
                 e.stopPropagation();
-                const code = copyStudentBtn.dataset.code;
-                const name = copyStudentBtn.dataset.name;
-                const studentUrl = `https://ian1021228.github.io/student_dashboard_dev/?code=${encodeURIComponent(code)}`;
-                await safeCopyToClipboard(studentUrl, `已複製「${name}」專屬學生端聯絡簿連結（包含代碼）！`);
+                const targetId = switchBtn.dataset.classId;
+                if (targetId && targetId !== state.currentClassId) {
+                    state.currentClassId = targetId;
+                    localStorage.setItem('currentClassId', targetId);
+                    const userKey = getUserStorageKey(state.currentUser);
+                    localStorage.setItem('currentClassId_' + userKey, targetId);
+                    const selector = document.getElementById('class-selector');
+                    if (selector) selector.value = targetId;
+                    renderClassList();
+                    renderHomeworkList();
+                    if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+                    showToast("已切換班級", "success");
+                }
                 return;
             }
 
