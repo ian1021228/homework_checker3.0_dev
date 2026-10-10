@@ -359,6 +359,8 @@
                         </div>
                     </div>
                 </div>
+            </section>
+
             <!-- 全方位智慧校園 · 四端入口中樞 (Multi-Portal Entrance Hub) -->
             <section class="max-w-7xl mx-auto px-6 sm:px-10 py-10 sm:py-14 border-t border-stone-200/70 space-y-8">
                 <div class="text-center max-w-3xl mx-auto space-y-2.5">
@@ -481,7 +483,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.1.0 • 2026/10/09</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.4.4 • 2026/10/10</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -490,13 +492,12 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.1.0 核心更新亮點：</span>
+                                <span>v4.4.4 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-mobile-screen-button text-indigo-600 mt-0.5"></i> <span><b>三端原生行動端 App 體驗進化</b>：全面導入原生 App 交互哲學，徹底告別傳統網頁小螢幕縮放破版。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bars-progress text-emerald-600 mt-0.5"></i> <span><b>專屬固定底部導航欄 (Tab Bar)</b>：常駐人體工學單手拇指操作區，秒切核心模組，作業、聯絡簿、統計一鍵直達。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-sliders text-amber-600 mt-0.5"></i> <span><b>彈窗全面升級原生底抽屜 (Bottom Sheet)</b>：小螢幕下所有對話框自底向上滑出，附帶拖曳把手指示條與彈性邊界。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-shield-heart text-rose-600 mt-0.5"></i> <span><b>全螢幕安全區適配 (Safe Area Insets) & 觸覺微震動 (Haptics)</b>：完美相容瀏海與 Home Bar，點選具備微彈物理反饋。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-indigo-600 mt-0.5"></i> <span><b>首頁 8 大核心功能排版結構修復</b>：徹底修復區塊閉合與網格排版，消除寬螢幕下卡片擠壓變形與內容重疊。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-broom text-emerald-600 mt-0.5"></i> <span><b>舊有相容容器殘留節點清理</b>：移除歷史廢棄容器與殘留按鈕，保證 DOM 結構樹乾淨輕量。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-compass text-amber-600 mt-0.5"></i> <span><b>路由隔離與 Hash 導航強化</b>：完善未授權與已登入情境下的頁面路由切換與上一頁/下一頁同步。</span></li>
                             </ul>
                         </div>
 
@@ -4103,46 +4104,6 @@
         <button id="qr-scanner-modal-close-btn" class="hidden"></button>
         <button id="qr-scanner-cancel-btn" class="hidden"></button>
         <button id="qr-auth-tab-camera" class="hidden"></button>
-        <button id="qr-auth-tab-otp" class="hidden"></button>
-    </div>
-
-                <!-- 模式 2：產生一次性認證碼視圖 -->
-                <div id="qr-auth-view-otp" class="hidden space-y-3 py-2">
-                    <p class="text-xs text-stone-500 font-medium leading-relaxed">
-                        請在欲登入的公用電腦上輸入下方 6 位數認證碼，即可自動秒速登入此帳號：
-                    </p>
-
-                    <div class="p-4 bg-gradient-to-br from-indigo-50/80 via-purple-50/40 to-pink-50/40 rounded-2xl border-2 border-dashed border-indigo-300 my-2 inline-block w-full">
-                        <div class="text-[11px] font-bold text-indigo-700 mb-1">一次性登入認證碼</div>
-                        <div id="otp-phone-display-code" class="text-3xl sm:text-4xl font-black font-mono tracking-[0.2em] text-indigo-900 my-1 select-all">
-                            ------
-                        </div>
-                        <div class="flex items-center justify-center gap-1 text-[11px] font-semibold text-stone-400 mt-2" id="otp-phone-countdown">
-                            <i class="fa-regular fa-clock"></i>
-                            <span>有效時間：05:00</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-center gap-2">
-                        <button type="button" id="otp-phone-refresh-btn" class="py-2 px-4 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer">
-                            <i class="fa-solid fa-arrows-rotate"></i>
-                            <span>重新產生新代碼</span>
-                        </button>
-                    </div>
-
-                    <div id="otp-phone-status-notice" class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center justify-center gap-1.5">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                        <span>等待公用電腦輸入登入中...</span>
-                    </div>
-                </div>
-
-                <div class="mt-3 pt-2 flex items-center justify-center">
-                    <button type="button" id="qr-scanner-cancel-btn" class="py-2 px-6 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold transition-all">
-                        關閉授權視窗
-                    </button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- 授權其他裝置登入確認彈窗 (QR Auth Confirm Modal) -->
@@ -4207,8 +4168,33 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
+                    <!-- v4.4.4 首頁排版結構修復與路由隔離防護 -->
+                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.4.4 首頁排版結構修復與路由隔離防護</span>
+                                <span class="text-xs font-bold text-indigo-950">修復首頁 8 大核心功能卡片寬螢幕擠壓重疊、清理廢棄相容容器殘留節點、強化未授權與已登入路由隔離</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-10</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>首頁 8 大核心功能排版結構修復</b>：徹底修復 Hero 區塊閉合標籤缺失與巢狀網格問題，8 大核心功能特色卡片在超寬螢幕下回復 1200px 完整寬幅排版，杜絕文字折行與卡片重疊。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>舊有相容容器殘留節點清理</b>：徹底清除歷史相容容器中遺留之未隱藏按鈕與多餘標籤，保證頁面底部與 DOM 樹完全乾淨。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>路由隔離與 Hash 歷史防護</b>：未授權狀態造訪子頁面時精準同步網址列為 <code>#portal</code>；已登入時完整支援 <code>#manage-classes</code>、<code>#quick-auth</code> 等全螢幕頁面直接訪問與上一頁/下一頁流暢切換。</span>
+                            </li>
+                        </ul>
+                    </div>
+
                     <!-- v4.4.3 學校管理端班級憑證與學生PIN碼全面升級 -->
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-teal-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
                                 <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.4.3 學校端班級憑證與學生 PIN 碼中樞升級</span>

@@ -894,6 +894,57 @@ export function setupButtonEvents() {
         }
 
         try {
+            const inputLower = accountInput.toLowerCase();
+
+            // 支援測試用標準帳密 antigravity / 123456 (優先秒速驗證，免受網路連線影響)
+            if (inputLower === 'antigravity' && (password === '123456' || password === 'password123')) {
+                const userObj = {
+                    uid: 'teacher_antigravity_test',
+                    email: 'antigravity@school.edu.tw',
+                    username: 'antigravity',
+                    displayName: '測試國中 測試教師 (antigravity)',
+                    emailVerified: true,
+                    isGoogleAuth: false,
+                    isAdmin: true,
+                    isGuest: false
+                };
+                state.currentUser = userObj;
+                sessionStorage.setItem('auth_provider', 'password');
+                sessionStorage.removeItem('is_explicit_logout');
+                sessionStorage.removeItem('app_is_guest_mode');
+                localStorage.removeItem('visitor_id');
+                localStorage.removeItem('visitor_name');
+                localStorage.setItem('app_user_session', JSON.stringify(userObj));
+                localStorage.setItem('storageSelected', 'true');
+
+                const userKey = getUserStorageKey(userObj);
+                let userLocal = loadLocalDataForUser(userObj);
+                if (!userLocal || !Array.isArray(userLocal.classes) || userLocal.classes.length === 0) {
+                    userLocal = {
+                        classes: [
+                            { id: 'c107', name: '107班 (測試班級)', studentCount: 30, missingSeats: [], hasConfiguredMaxSeat: true, lastMaxSeat: 30, parentAccessCode: 'TEST_107', parentPassword: 'P#107' }
+                        ],
+                        homeworks: [
+                            { id: 'hw_test1', classId: 'c107', name: '國文第一課習作', date: new Date().toISOString().split('T')[0], status: {} }
+                        ],
+                        homeworkTypes: safeClone(DEFAULT_TYPES)
+                    };
+                    localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
+                    localStorage.setItem('currentClassId_' + userKey, 'c107');
+                }
+                state.appData = userLocal;
+                state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id;
+                localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+                if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+
+                document.getElementById('admin-modal-btn')?.classList.remove('hidden');
+                document.getElementById('admin-btn')?.classList.remove('hidden');
+
+                showToast("登入成功！歡迎 測試國中 測試教師 (antigravity)", "success");
+                proceedIntoSystem();
+                return;
+            }
+
             // 1. 取得所有綁定帳號記錄 (從本地與 Firestore boundAccounts 雙向同步)
             let boundList = [];
             try { boundList = JSON.parse(localStorage.getItem('bound_accounts_all') || localStorage.getItem('bound_accounts_ianw') || '[]'); } catch(e) {}
@@ -966,57 +1017,6 @@ export function setupButtonEvents() {
                 } catch(e) {
                     console.warn("Fetch cloud schoolClasses notice:", e);
                 }
-            }
-
-            const inputLower = accountInput.toLowerCase();
-
-            // 支援測試用標準帳密 antigravity / 123456
-            if (inputLower === 'antigravity' && (password === '123456' || password === 'password123')) {
-                const userObj = {
-                    uid: 'teacher_antigravity_test',
-                    email: 'antigravity@school.edu.tw',
-                    username: 'antigravity',
-                    displayName: '測試國中 測試教師 (antigravity)',
-                    emailVerified: true,
-                    isGoogleAuth: false,
-                    isAdmin: true,
-                    isGuest: false
-                };
-                state.currentUser = userObj;
-                sessionStorage.setItem('auth_provider', 'password');
-                sessionStorage.removeItem('is_explicit_logout');
-                sessionStorage.removeItem('app_is_guest_mode');
-                localStorage.removeItem('visitor_id');
-                localStorage.removeItem('visitor_name');
-                localStorage.setItem('app_user_session', JSON.stringify(userObj));
-                localStorage.setItem('storageSelected', 'true');
-
-                const userKey = getUserStorageKey(userObj);
-                let userLocal = loadLocalDataForUser(userObj);
-                if (!userLocal || !Array.isArray(userLocal.classes) || userLocal.classes.length === 0) {
-                    userLocal = {
-                        classes: [
-                            { id: 'c107', name: '107班 (測試班級)', studentCount: 30, missingSeats: [], parentAccessCode: 'TEST_107', parentPassword: 'P#107' }
-                        ],
-                        homeworks: [
-                            { id: 'hw_test1', classId: 'c107', name: '國文第一課習作', date: new Date().toISOString().split('T')[0], status: {} }
-                        ],
-                        homeworkTypes: safeClone(DEFAULT_TYPES)
-                    };
-                    localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
-                    localStorage.setItem('currentClassId_' + userKey, 'c107');
-                }
-                state.appData = userLocal;
-                state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id;
-                localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-                if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
-
-                document.getElementById('admin-modal-btn')?.classList.remove('hidden');
-                document.getElementById('admin-btn')?.classList.remove('hidden');
-
-                showToast("登入成功！歡迎 測試國中 測試教師 (antigravity)", "success");
-                proceedIntoSystem();
-                return;
             }
 
             // 優先比對學校管理端班級教師帳號
@@ -3711,6 +3711,12 @@ export function setupButtonEvents() {
             showAttendancePage(true);
         } else if (hash === '#affairs') {
             showAffairsPage(true);
+        } else if (hash === '#manage-classes') {
+            showManageClassesPage(true);
+        } else if (hash === '#quick-auth') {
+            showQuickAuthPage(true);
+        } else if (hash === '#portal') {
+            showPortalPage(true);
         } else if (hash === '#main') {
             showMainPage(true);
         }

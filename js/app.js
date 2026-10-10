@@ -287,11 +287,14 @@ async function init() {
     // 6. 頁面導航初始化
     const hasPassedPortalInSession = sessionStorage.getItem('has_passed_portal_in_session') === 'true';
     if (!hasPassedPortalInSession) {
+        if (window.location.hash && window.location.hash !== '#portal') {
+            try { history.replaceState({ page: 'portal' }, '', '#portal'); } catch(e) {}
+        }
         showPortalPage(true);
         return;
     }
 
-    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types', '#overview', '#officers', '#attendance', '#affairs', '#scores'];
+    const explicitAppSubPages = ['#main', '#detail', '#student-details', '#contact-book', '#homework-types', '#overview', '#officers', '#attendance', '#affairs', '#scores', '#manage-classes', '#quick-auth'];
     if (!window.location.hash || window.location.hash === '#portal' || !explicitAppSubPages.includes(window.location.hash)) {
         showPortalPage(true);
         return;
@@ -319,6 +322,14 @@ async function init() {
     }
     if (window.location.hash === '#scores') {
         showExamScoresPage(true);
+        return;
+    }
+    if (window.location.hash === '#manage-classes') {
+        showManageClassesPage(true);
+        return;
+    }
+    if (window.location.hash === '#quick-auth') {
+        showQuickAuthPage(true);
         return;
     }
     if (window.location.hash === '#main') {
