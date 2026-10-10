@@ -3843,9 +3843,9 @@ export function generateLineReportText() {
                 }
             }
             if (missingSeats.length === 0) {
-                text += `${idx + 1}. ${hw.name}（全班已交齊）\n`;
+                text += `${idx + 1}. ${hw.name}（全班已完成）\n`;
             } else {
-                text += `${idx + 1}. ${hw.name}（缺交：${missingSeats.join('、')}）\n`;
+                text += `${idx + 1}. ${hw.name}（未完成：${missingSeats.join('、')}）\n`;
             }
         });
     }

@@ -343,7 +343,8 @@ export function copyOverviewDailyReport() {
             } else {
                 report += `• ${hw.name}：\n`;
                 Object.values(uncompletedGroups).forEach(group => {
-                    report += `   - ${group.text} (${group.seats.length}人)：${group.seats.map(s => `${s}號`).join('、')}\n`;
+                    const statusText = (group.text === '未繳交' || group.text === '未交') ? '未完成' : group.text;
+                    report += `   - ${statusText} (${group.seats.length}人)：${group.seats.map(s => `${s}號`).join('、')}\n`;
                 });
             }
         });
