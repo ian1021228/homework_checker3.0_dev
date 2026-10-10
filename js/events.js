@@ -976,7 +976,7 @@ export function setupButtonEvents() {
                     uid: 'teacher_antigravity_test',
                     email: 'antigravity@school.edu.tw',
                     username: 'antigravity',
-                    displayName: '七賢國中 測試教師 (antigravity)',
+                    displayName: '測試國中 測試教師 (antigravity)',
                     emailVerified: true,
                     isGoogleAuth: false,
                     isAdmin: true,
@@ -1014,7 +1014,7 @@ export function setupButtonEvents() {
                 document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                 document.getElementById('admin-btn')?.classList.remove('hidden');
 
-                showToast("登入成功！歡迎 七賢國中 測試教師 (antigravity)", "success");
+                showToast("登入成功！歡迎 測試國中 測試教師 (antigravity)", "success");
                 proceedIntoSystem();
                 return;
             }
