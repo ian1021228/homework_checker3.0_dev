@@ -35,7 +35,7 @@ export function initAdminDashboard() {
  */
 export function refreshUserRole() {
     const user = state.currentUser;
-    const isAntigravity = user?.username === 'antigravity' || user?.email === 'antigravity';
+    const isAntigravity = user?.username === 'antigravity' || user?.email === 'antigravity' || user?.username === 'ianantigravity';
     const isSavedAdmin = localStorage.getItem('user_role') === 'admin' || user?.isAdmin === true || user?.role === 'admin';
 
     if (isAntigravity || isSavedAdmin) {

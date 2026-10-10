@@ -896,13 +896,16 @@ export function setupButtonEvents() {
         try {
             const inputLower = accountInput.toLowerCase();
 
-            // 支援測試用標準帳密 antigravity / 123456 (優先秒速驗證，免受網路連線影響)
-            if (inputLower === 'antigravity' && (password === '123456' || password === 'password123')) {
+            // 支援系統管理員帳密：ianantigravity / ianistall188，以及測試帳密 antigravity / 123456
+            const isSuperAdmin = (inputLower === 'ianantigravity' && password === 'ianistall188');
+            const isTestTeacher = (inputLower === 'antigravity' && (password === '123456' || password === 'password123'));
+
+            if (isSuperAdmin || isTestTeacher) {
                 const userObj = {
-                    uid: 'teacher_antigravity_test',
-                    email: 'antigravity@school.edu.tw',
-                    username: 'antigravity',
-                    displayName: '測試國中 測試教師 (antigravity)',
+                    uid: isSuperAdmin ? 'superadmin_ianantigravity' : 'teacher_antigravity_test',
+                    email: isSuperAdmin ? 'ianw.solar@gmail.com' : 'antigravity@school.edu.tw',
+                    username: isSuperAdmin ? 'ianantigravity' : 'antigravity',
+                    displayName: isSuperAdmin ? '系統管理員 (ianantigravity)' : '測試國中 測試教師 (antigravity)',
                     emailVerified: true,
                     isGoogleAuth: false,
                     isAdmin: true,
@@ -918,29 +921,79 @@ export function setupButtonEvents() {
                 localStorage.setItem('storageSelected', 'true');
 
                 const userKey = getUserStorageKey(userObj);
-                let userLocal = loadLocalDataForUser(userObj);
-                if (!userLocal || !Array.isArray(userLocal.classes) || userLocal.classes.length === 0) {
-                    userLocal = {
-                        classes: [
-                            { id: 'c107', name: '107班 (測試班級)', studentCount: 30, missingSeats: [], hasConfiguredMaxSeat: true, lastMaxSeat: 30, parentAccessCode: 'TEST_107', parentPassword: 'P#107' }
-                        ],
-                        homeworks: [
-                            { id: 'hw_test1', classId: 'c107', name: '國文第一課習作', date: new Date().toISOString().split('T')[0], status: {} }
-                        ],
-                        homeworkTypes: safeClone(DEFAULT_TYPES)
-                    };
-                    localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
-                    localStorage.setItem('currentClassId_' + userKey, 'c107');
+                let userLocal = loadLocalDataForUser(userObj) || { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+
+                // 搜尋是否有學校管理端設定好的 701 / 107 班級與 PIN 碼
+                let schoolClasses = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const k = localStorage.key(i);
+                    if (k && (k.startsWith('school_classes') || k.startsWith('school_admin_classes'))) {
+                        try {
+                            const parsed = JSON.parse(localStorage.getItem(k) || '[]');
+                            if (Array.isArray(parsed)) schoolClasses.push(...parsed);
+                        } catch(e) {}
+                    }
                 }
+                const matched701 = schoolClasses.find(c => c.classCode === '701' || c.className?.includes('7年1班') || c.className?.includes('107'));
+
+                const defaultPins = {};
+                for (let i = 1; i <= 30; i++) {
+                    if (i !== 14) defaultPins[i] = String(100000 + i);
+                }
+                const syncedPins = (matched701 && matched701.studentPins && Object.keys(matched701.studentPins).length > 0)
+                    ? matched701.studentPins
+                    : defaultPins;
+
+                let class107 = (userLocal.classes || []).find(c => c.id === 'c107' || c.id === '701' || c.name?.includes('107') || c.name?.includes('7年1班'));
+                if (!class107) {
+                    class107 = {
+                        id: 'c107',
+                        name: '107班 (七年一班)',
+                        studentCount: matched701?.studentCount || 30,
+                        missingSeats: matched701?.missingSeats || [14],
+                        skippedSeats: matched701?.missingSeats || [14],
+                        lastMaxSeat: matched701?.studentCount || 30,
+                        hasConfiguredMaxSeat: true,
+                        accessCode: matched701?.parentAccessCode || 'SHS_701',
+                        parentAccessCode: matched701?.parentAccessCode || 'SHS_701',
+                        parentUsername: matched701?.parentAccessCode || 'SHS_701',
+                        parentPassword: matched701?.parentPassword || 'Pass#701',
+                        teacherUsername: matched701?.teacherUsername || 't701_shs',
+                        teacherPassword: matched701?.teacherPassword || 'Pass#701',
+                        studentPins: syncedPins
+                    };
+                    userLocal.classes = [class107, ...(userLocal.classes || []).filter(c => !c.name?.includes('602'))];
+                } else {
+                    class107.name = '107班 (七年一班)';
+                    class107.studentPins = { ...(class107.studentPins || {}), ...syncedPins };
+                    if (matched701?.missingSeats) {
+                        class107.missingSeats = matched701.missingSeats;
+                        class107.skippedSeats = matched701.missingSeats;
+                    }
+                    if (matched701?.studentCount) {
+                        class107.studentCount = matched701.studentCount;
+                        class107.lastMaxSeat = matched701.studentCount;
+                    }
+                    userLocal.classes = [class107, ...(userLocal.classes || []).filter(c => c.id !== class107.id && !c.name?.includes('602'))];
+                }
+
+                if (!userLocal.homeworks || userLocal.homeworks.length === 0) {
+                    userLocal.homeworks = [
+                        { id: 'hw_test1', classId: 'c107', name: '國文第一課習作', date: new Date().toISOString().split('T')[0], status: {} }
+                    ];
+                }
+
                 state.appData = userLocal;
-                state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id;
+                state.currentClassId = class107.id;
+                localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
+                localStorage.setItem('currentClassId_' + userKey, class107.id);
                 localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-                if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+                localStorage.setItem('currentClassId', state.currentClassId);
 
                 document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                 document.getElementById('admin-btn')?.classList.remove('hidden');
 
-                showToast("登入成功！歡迎 測試國中 測試教師 (antigravity)", "success");
+                showToast(isSuperAdmin ? "登入成功！歡迎 系統管理員 (ianantigravity)" : "登入成功！已為您載入【107班 (七年一班)】", "success");
                 proceedIntoSystem();
                 return;
             }
@@ -1046,28 +1099,38 @@ export function setupButtonEvents() {
                     localStorage.setItem('storageSelected', 'true');
 
                     const userKey = getUserStorageKey(userObj);
-                    let userLocal = loadLocalDataForUser(userObj);
-                    if (!userLocal || !Array.isArray(userLocal.classes) || userLocal.classes.length === 0) {
-                        const classItem = {
-                            id: matchedSchoolClass.classCode,
-                            name: matchedSchoolClass.className,
-                            studentCount: matchedSchoolClass.studentCount || 30,
-                            missingSeats: matchedSchoolClass.missingSeats || [],
-                            parentAccessCode: matchedSchoolClass.parentAccessCode || '',
-                            parentPassword: matchedSchoolClass.parentPassword || ''
-                        };
-                        userLocal = {
-                            classes: [classItem],
-                            homeworks: [],
-                            homeworkTypes: safeClone(DEFAULT_TYPES)
-                        };
-                        localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
-                        localStorage.setItem('currentClassId_' + userKey, classItem.id);
+                    let userLocal = loadLocalDataForUser(userObj) || { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
+                    
+                    const classItem = {
+                        id: matchedSchoolClass.classCode || '701',
+                        name: matchedSchoolClass.className || '7年1班',
+                        studentCount: matchedSchoolClass.studentCount || 30,
+                        missingSeats: matchedSchoolClass.missingSeats || [],
+                        skippedSeats: matchedSchoolClass.missingSeats || [],
+                        lastMaxSeat: matchedSchoolClass.studentCount || 30,
+                        hasConfiguredMaxSeat: true,
+                        accessCode: matchedSchoolClass.parentAccessCode || '',
+                        parentAccessCode: matchedSchoolClass.parentAccessCode || '',
+                        parentUsername: matchedSchoolClass.parentAccessCode || '',
+                        parentPassword: matchedSchoolClass.parentPassword || '',
+                        teacherUsername: matchedSchoolClass.teacherUsername,
+                        teacherPassword: matchedSchoolClass.teacherPassword,
+                        studentPins: matchedSchoolClass.studentPins || {}
+                    };
+
+                    const existingIdx = userLocal.classes.findIndex(c => c.id === classItem.id || c.name === classItem.name || c.teacherUsername === classItem.teacherUsername);
+                    if (existingIdx >= 0) {
+                        userLocal.classes[existingIdx] = { ...userLocal.classes[existingIdx], ...classItem };
+                    } else {
+                        userLocal.classes.unshift(classItem);
                     }
+
                     state.appData = userLocal;
-                    state.currentClassId = localStorage.getItem('currentClassId_' + userKey) || state.appData.classes[0]?.id;
+                    state.currentClassId = classItem.id;
+                    localStorage.setItem('homeworkAppData_' + userKey, safeStringify(userLocal));
+                    localStorage.setItem('currentClassId_' + userKey, classItem.id);
                     localStorage.setItem('homeworkAppData', safeStringify(state.appData));
-                    if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
+                    localStorage.setItem('currentClassId', state.currentClassId);
 
                     showToast(`登入成功！已為您載入【${matchedSchoolClass.className}】`, "success");
                     proceedIntoSystem();
@@ -1731,7 +1794,7 @@ export function setupButtonEvents() {
             if (isAdmin) {
                 document.getElementById('admin-modal-btn')?.classList.remove('hidden');
                 document.getElementById('admin-btn')?.classList.remove('hidden');
-                showToast("歡迎最高管理員 (Google 帳號授權登入)", "success");
+                showToast("歡迎系統管理員登入", "success");
             } else {
                 document.getElementById('admin-modal-btn')?.classList.add('hidden');
                 document.getElementById('admin-btn')?.classList.add('hidden');

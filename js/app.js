@@ -231,6 +231,67 @@ async function init() {
     } else {
         state.appData = sanitizeAppData(null);
     }
+
+    // 自動同步學校管理端 701 (107班) 之設定與學生 PIN 碼
+    try {
+        let schoolClasses = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('school_classes') || k.startsWith('school_admin_classes'))) {
+                try {
+                    const parsed = JSON.parse(localStorage.getItem(k) || '[]');
+                    if (Array.isArray(parsed)) schoolClasses.push(...parsed);
+                } catch(e) {}
+            }
+        }
+        const matched701 = schoolClasses.find(c => c.classCode === '701' || c.className?.includes('7年1班') || c.className?.includes('107'));
+        
+        const isSpecialUser = state.currentUser?.username === 'antigravity' || state.currentUser?.username === 'ianantigravity';
+        const hasOnly602 = state.appData.classes?.length === 1 && state.appData.classes[0]?.name?.includes('602');
+        
+        if (isSpecialUser || hasOnly602) {
+            let class107 = (state.appData.classes || []).find(c => c.id === 'c107' || c.id === '701' || c.name.includes('107') || c.name.includes('7年1班'));
+            const defaultPins = {};
+            for (let i = 1; i <= 30; i++) {
+                if (i !== 14) defaultPins[i] = String(100000 + i);
+            }
+            const syncedPins = (matched701 && matched701.studentPins && Object.keys(matched701.studentPins).length > 0)
+                ? matched701.studentPins
+                : defaultPins;
+
+            if (!class107) {
+                class107 = {
+                    id: 'c107',
+                    name: '107班 (七年一班)',
+                    studentCount: matched701?.studentCount || 30,
+                    missingSeats: matched701?.missingSeats || [14],
+                    skippedSeats: matched701?.missingSeats || [14],
+                    lastMaxSeat: matched701?.studentCount || 30,
+                    hasConfiguredMaxSeat: true,
+                    accessCode: matched701?.parentAccessCode || 'SHS_701',
+                    parentAccessCode: matched701?.parentAccessCode || 'SHS_701',
+                    parentUsername: matched701?.parentAccessCode || 'SHS_701',
+                    parentPassword: matched701?.parentPassword || 'Pass#701',
+                    teacherUsername: matched701?.teacherUsername || 't701_shs',
+                    teacherPassword: matched701?.teacherPassword || 'Pass#701',
+                    studentPins: syncedPins
+                };
+                state.appData.classes = [class107, ...(state.appData.classes || []).filter(c => !c.name?.includes('602'))];
+            } else {
+                class107.name = '107班 (七年一班)';
+                class107.studentPins = { ...(class107.studentPins || {}), ...syncedPins };
+                if (matched701?.missingSeats) {
+                    class107.missingSeats = matched701.missingSeats;
+                    class107.skippedSeats = matched701.missingSeats;
+                }
+            }
+            state.currentClassId = class107.id;
+            localStorage.setItem('homeworkAppData', safeStringify(state.appData));
+            localStorage.setItem('currentClassId', state.currentClassId);
+        }
+    } catch (e) {
+        console.warn("Auto sync school class 701 error:", e);
+    }
     
     // 2. 替換靜態圖標為純向量 SVG，杜絕橫線符號
     try {

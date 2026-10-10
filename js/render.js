@@ -327,22 +327,24 @@ export function renderClassCredentialsSection() {
 
             const card = document.createElement('div');
             card.className = `p-2.5 rounded-xl border transition-all flex flex-col justify-between space-y-1.5 ${
-                isSkipped ? 'bg-white/5 border-white/5 opacity-40' : 'bg-black/30 border-white/10 hover:border-amber-400/40'
+                isSkipped 
+                    ? 'bg-slate-100/50 border-slate-200 opacity-40' 
+                    : 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs hover:shadow-xs'
             }`;
 
             card.innerHTML = `
                 <div class="flex items-center justify-between text-xs">
-                    <span class="font-mono font-black text-amber-300">${seat} 號</span>
-                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-400' : (isCustom ? 'text-indigo-300' : 'text-slate-400')}">
+                    <span class="font-mono font-black text-indigo-700">${seat} 號</span>
+                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-500' : (isCustom ? 'text-emerald-600' : 'text-slate-400')}">
                         ${isSkipped ? '缺號' : (isCustom ? '已自訂' : '學校預設')}
                     </span>
                 </div>
-                <div class="flex items-center justify-between bg-black/40 px-2 py-1 rounded-lg border border-white/5">
-                    <span class="pin-display-text font-mono font-black text-xs sm:text-sm text-white select-all" data-pin="${currentPin}">
+                <div class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
+                    <span class="pin-display-text font-mono font-black text-xs sm:text-sm text-slate-900 select-all" data-pin="${currentPin}">
                         ${isSkipped ? '---' : (arePinsRevealed ? currentPin : '••••••')}
                     </span>
                     ${!isSkipped ? `
-                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-amber-300 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="修改此座號 PIN 碼">
+                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="修改此座號 PIN 碼">
                             <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                         </button>
                     ` : ''}

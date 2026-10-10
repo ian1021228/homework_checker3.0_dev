@@ -393,7 +393,7 @@ export function renderAdminUsersList() {
         const size = data.dataSizeKB ? `${data.dataSizeKB} KB` : '未知';
 
         const roleBadge = isAdminUser
-            ? '<span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.5 rounded-md ml-1.5 align-middle">最高管理員</span>'
+            ? '<span class="inline-block bg-amber-100 text-amber-800 text-[10px] font-black px-1.5 py-0.5 rounded-md ml-1.5 align-middle">系統管理員</span>'
             : (u.isGuest ? '<span class="inline-block bg-slate-200 text-slate-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md ml-1.5 align-middle">訪客</span>' : '');
 
         const tr = document.createElement('tr');
@@ -411,7 +411,7 @@ export function renderAdminUsersList() {
             <td class="p-3 border-b border-slate-100">${statusHtml}</td>
             <td class="p-3 border-b border-slate-100 text-right space-x-1 whitespace-nowrap">
                 ${isAdminUser ? 
-                    '<span class="text-xs font-bold text-slate-400 px-2 py-1 mr-2 flex items-center gap-1"><i class="fa-solid fa-shield-halved text-indigo-500"></i> 最高權限</span>' : 
+                    '<span class="text-xs font-bold text-slate-400 px-2 py-1 mr-2 flex items-center gap-1"><i class="fa-solid fa-shield-halved text-indigo-500"></i> 系統管理權限</span>' : 
                     `<button class="bg-slate-100 hover:bg-slate-200 text-slate-600 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-colors toggle-lock-btn shadow-sm cursor-pointer" data-id="${id}" data-locked="${isLocked}">
                         ${isLocked ? '<i class="fa-solid fa-lock-open mr-1"></i> 解鎖' : '<i class="fa-solid fa-lock mr-1"></i> 鎖定'}
                     </button>`
