@@ -607,9 +607,9 @@
               <i class="fa-solid fa-shield-halved"></i>
               <span>座號 <span id="locked-seat-display">--</span> 號 學生隱私安全防護</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">請輸入學生端專屬驗證碼 (PIN)</h2>
+            <h2 class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">請輸入專屬查核驗證碼 (PIN)</h2>
             <p class="text-xs sm:text-sm text-slate-500 max-w-md mx-auto mt-2 mb-6 leading-relaxed">
-              為保護學生個人各項隱私，查看前需輸入專屬 PIN 碼（預設為 <strong>班級代碼 + 座號</strong>，家長與學生共用相同密碼）。
+              為保護學生個人各項隱私，查看前需輸入專屬 6 位數 PIN 碼（預設為 <strong>100000 + 座號</strong>，亦可洽詢導師）。
             </p>
 
             <form id="parent-pin-form" class="max-w-xs mx-auto space-y-4">
@@ -637,7 +637,7 @@
               <!-- PIN Error Alert -->
               <div id="pin-error-box" class="hidden p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2 text-left">
                 <i class="fa-solid fa-circle-exclamation mt-0.5 text-rose-500 flex-shrink-0"></i>
-                <span id="pin-error-msg" class="leading-snug">密碼不正確，請確認孩子學生端顯示之 6 位數 PIN 碼！</span>
+                <span id="pin-error-msg" class="leading-snug">密碼不正確，請確認 6 位數 PIN 碼（或洽詢導師）！</span>
               </div>
 
               <button
@@ -758,7 +758,7 @@
             <!-- Error alert -->
             <div id="scores-pin-error-box" class="hidden p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs sm:text-sm flex items-start gap-2 text-left">
               <i class="fa-solid fa-circle-exclamation mt-0.5 text-rose-500 flex-shrink-0"></i>
-              <span id="scores-pin-error-msg" class="leading-snug">密碼不正確！請向孩子確認學生端顯示之專屬查閱密碼。</span>
+              <span id="scores-pin-error-msg" class="leading-snug">密碼不正確！請輸入正確之 6 位數專屬查閱密碼（PIN）。</span>
             </div>
 
             <button
@@ -1104,7 +1104,7 @@
                 <span>孩子今日心情日記</span>
                 <span id="contact-tab-mood-emoji" class="text-base"></span>
               </h3>
-              <p class="text-xs text-slate-400">由孩子在學生端登記的心情札記與生活心得</p>
+              <p class="text-xs text-slate-400">孩子的心情札記與生活心得</p>
             </div>
           </div>
           <p id="contact-tab-mood-text" class="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium bg-slate-50 p-4 rounded-2xl border border-slate-100"></p>
@@ -1143,7 +1143,7 @@
           <span class="mx-2 text-slate-300">|</span>
           <a href="https://docs.google.com/forms/d/19BPzX6vMrSnvW3j2s4OOvaiP3p1gS8auGbRt3f9aFkM/edit" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline font-bold">回報問題/提供建議</a>
           <span class="mx-2 text-slate-300">|</span>
-          <a href="https://ian1021228.github.io/student_dashboard_dev/" class="text-indigo-600 hover:underline font-bold">學生端 (DEV)</a>
+          <a href="https://ian1021228.github.io/school_admin_dashboard_dev/" class="text-indigo-600 hover:underline font-bold">管理端 (DEV)</a>
           <span class="mx-2 text-slate-300">|</span>
           <a href="https://ian1021228.github.io/homework_checker3.0_dev/" class="text-slate-600 hover:underline font-semibold">首頁 (DEV)</a>
         </div>
@@ -1321,7 +1321,7 @@
           </div>
           <div>
             <h3 id="parent-score-modal-title" class="text-base font-extrabold text-slate-900">登記小考／作業成績</h3>
-            <p class="text-xs text-slate-500">同步至學生端與雲端備份</p>
+            <p class="text-xs text-slate-500">同步至雲端資料庫</p>
           </div>
         </div>
         <button id="btn-parent-close-score-modal" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-colors cursor-pointer">
@@ -1437,7 +1437,7 @@
         </div>
 
         <p class="text-[11px] text-slate-400 leading-snug">
-          ※ 登記或修改後將即時同步至雲端，學生端與家長端皆能同步查閱。
+          ※ 登記或修改後將即時同步至雲端資料庫。
         </p>
       </div>
 
@@ -3011,7 +3011,7 @@
         elements.studentScoresList.innerHTML = `
           <div class="text-center py-4 px-3 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs text-slate-400">
             <i class="fa-regular fa-clipboard text-lg mb-1 block text-slate-300"></i>
-            學生端尚未登記平時小考成績
+            目前尚無平時小考成績紀錄
           </div>
         `;
         if (elements.studentScoresAvgBadge) {
@@ -3062,7 +3062,7 @@
         elements.studentScoresList.innerHTML = `
           <div class="text-center py-4 px-3 rounded-2xl bg-slate-50 border border-slate-200/60 text-xs text-slate-400">
             <i class="fa-regular fa-clipboard text-lg mb-1 block text-slate-300"></i>
-            學生端尚未登記平時小考成績
+            目前尚無平時小考成績紀錄
           </div>
         `;
         if (elements.studentScoresAvgBadge) {
@@ -3635,7 +3635,7 @@
               <i class="fa-solid fa-folder-open"></i>
             </div>
             查無符合條件的成績紀錄<br>
-            <span class="text-xs text-slate-400 mt-1 inline-block">可調整上方篩選條件，或等待孩子在學生端登記小考</span>
+            <span class="text-xs text-slate-400 mt-1 inline-block">可調整上方篩選條件，或等待導師發布小考成績</span>
           </div>
         `;
         return;

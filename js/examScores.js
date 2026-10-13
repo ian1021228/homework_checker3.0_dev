@@ -887,7 +887,7 @@ export async function saveExamFromForm() {
     };
     curClass.exams.unshift(newExam);
     currentSelectedExamId = newExam.id;
-    showToast('已發布新考試！學生端已同步開放填寫分數', 'success');
+    showToast('已發布新考試！已同步開放填寫成績', 'success');
   }
 
   saveData();
@@ -1432,18 +1432,6 @@ export function setupExamScoresEvents() {
   document.getElementById('toggle-hide-scores-privacy')?.addEventListener('change', (e) => {
     hideScoresPrivacy = e.target.checked;
     renderSelectedExamDetails();
-  });
-
-  // 學生端直達連結按鈕
-  document.getElementById('btn-copy-student-link-from-scores')?.addEventListener('click', () => {
-    const curClass = getCurrentClass();
-    if (!curClass || !curClass.accessCode) {
-      showToast('此班級尚未設定權限代碼！', 'warning');
-      return;
-    }
-    const studentUrl = `${window.location.origin}/student.html?code=${encodeURIComponent(curClass.accessCode)}`;
-    safeCopyToClipboard(studentUrl);
-    showToast(`已複製【${curClass.name}】學生端直達連結！`, 'success');
   });
 
   // PIN 碼設定按鈕 (直接觸發班級 PIN 碼管理)

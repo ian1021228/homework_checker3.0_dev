@@ -483,7 +483,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.4.5 • 2026/10/10</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.4.6 • 2026/10/13</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -492,19 +492,19 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.4.5 核心更新亮點：</span>
+                                <span>v4.4.6 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-indigo-600 mt-0.5"></i> <span><b>班級管理容器閉合修復</b>：補正全螢幕班級管理卡片容器結構，徹底杜絕首頁下方溢出顯示新增班級與班級清單。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-user-shield text-emerald-600 mt-0.5"></i> <span><b>最高管理端全面更名為「系統管理員」</b>：依指示移除所有數據查閱相關文字，並更新專屬登入帳密。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-compass text-amber-600 mt-0.5"></i> <span><b>路由隔離與 Hash 導航強化</b>：完善未授權與已登入情境下的頁面路由切換與上一頁/下一頁同步。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-wand-magic-sparkles text-indigo-600 mt-0.5"></i> <span><b>學生端介面連結與文案全面除役</b>：全面清理教師端與家長端中所有學生端直達連結、按鈕監聽與提示文字，精簡操作體驗。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600 mt-0.5"></i> <span><b>家長端 PIN 碼查核引導淨化</b>：將家長端成績防窺驗證說明優化為導師派發之 6 位數 PIN 碼（100000 + 座號），消弭多端認知負擔。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-network-wired text-amber-600 mt-0.5"></i> <span><b>系統四端架構收斂整合</b>：確立系統管理員、學校管理端、教師端、家長端之現代化四端獨立雲端協同架構。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.4.5)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.4.6)</span>
                             </button>
                         </div>
                     </div>
@@ -4169,12 +4169,37 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.4.5 班級管理容器結構修復與系統管理員規範升級 -->
+                    <!-- v4.4.6 系統架構精簡與學生端文案連結除役 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.4.5 班級管理容器修復與系統管理員升級</span>
-                                <span class="text-xs font-bold text-indigo-950">修復班級管理容器閉合結構杜絕首頁外溢、最高管理端全面更名為「系統管理員」、移除數據查閱描述、更新專屬帳密</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.4.6 系統架構精簡與學生端介面除役</span>
+                                <span class="text-xs font-bold text-indigo-950">全面除役學生端介面連結與文案、淨化家長端 PIN 碼查核引導、穩固四端校園系統架構</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>學生端介面連結與文案全面除役</b>：全面自教師端主系統與家長端即時查核看板中移除對「學生端」的所有介面連結、按鈕監聽與提示文字，精簡操作體驗，落實介面淨化。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>家長端 6 位數 PIN 碼查核引導淨化</b>：將家長端查閱小考成績之 PIN 碼驗證說明、防窺提示與錯誤警示文案，優化為以導師派發之專屬 6 位數 PIN 碼（100000 + 座號）為依據，消弭多端認知負擔。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>四端入口樞紐架構穩固</b>：校園系統體系維持「系統管理員、學校行政管理端、教師端作業點收、家長端即時查核」四端獨立運作，親師互動流程更加聚焦直覺。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.4.5 班級管理容器結構修復與系統管理員規範升級 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.4.5 班級管理容器修復與系統管理員升級</span>
+                                <span class="text-xs font-bold text-slate-800">修復班級管理容器閉合結構杜絕首頁外溢、最高管理端全面更名為「系統管理員」、移除數據查閱描述、更新專屬帳密</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-10</span>
                         </div>
@@ -5336,7 +5361,7 @@
                             <h2 class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">班級成績與小考管理系統</h2>
                             <span id="scores-view-class-badge" class="px-2.5 py-0.5 rounded-full text-xs font-black bg-teal-50 text-teal-700 border border-teal-200">班級</span>
                         </div>
-                        <p class="text-xs text-slate-400 font-medium hidden sm:block">教師統一發布考試、學生端填寫分數、缺考補考標記與多格式一鍵匯出</p>
+                        <p class="text-xs text-slate-400 font-medium hidden sm:block">教師統一發布考試、即時登記分數、缺考補考標記與多格式一鍵匯出</p>
                     </div>
                 </div>
 
@@ -5954,7 +5979,7 @@
                 </div>
 
                 <p class="text-[11px] text-slate-400 leading-snug">
-                    ※ 修改後，教師端、學生端與家長端皆會以小字標註最後修改時間及原分數。
+                    ※ 修改後，教師端與家長端皆會以小字標註最後修改時間及原分數。
                 </p>
 
                 <div class="flex justify-end gap-2.5 pt-3 border-t border-slate-100">
