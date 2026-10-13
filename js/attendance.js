@@ -100,7 +100,11 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
     }
     const dateDisplay = document.getElementById('attendance-date-display');
     if (dateDisplay) {
-        dateDisplay.textContent = '點擊座號一鍵循環切換出席狀態 · 點擊時間開啟時間滾輪';
+        const hasRecords = Object.keys(dateRecord).length > 0;
+        dateDisplay.innerHTML = `
+            <span>點擊座號一鍵循環切換出席狀態 · 點擊時間開啟時間滾輪</span>
+            ${hasRecords ? `<span class="ml-2 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800"><i class="fa-solid fa-circle-check text-[10px]"></i> 出席紀錄已即時連動通報學務處晨間看板</span>` : ''}
+        `;
     }
 
     currentClass.attendance = currentClass.attendance || {};

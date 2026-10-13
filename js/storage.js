@@ -92,6 +92,25 @@ export function runAutoBackup() {
     } catch (e) {}
 }
 
+export function updateSyncIndicator(status = 'synced') {
+    const el = document.getElementById('cloud-sync-status-indicator');
+    if (!el) return;
+    el.classList.remove('hidden');
+    if (status === 'saving') {
+        el.className = 'hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-800 border border-amber-200 transition-all';
+        el.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span><span id="cloud-sync-status-text">雲端同步中...</span>`;
+    } else if (status === 'error') {
+        el.className = 'hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-800 border border-rose-200 transition-all';
+        el.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span id="cloud-sync-status-text">本地已儲存 (雲端排隊)</span>`;
+    } else {
+        el.className = 'hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 transition-all';
+        el.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span id="cloud-sync-status-text">已自動儲存並同步至雲端</span>`;
+    }
+}
+if (typeof window !== 'undefined') {
+    window.updateSyncIndicator = updateSyncIndicator;
+}
+
 export async function flushPendingSave() {
     if (state.saveTimeout) {
         clearTimeout(state.saveTimeout);
@@ -113,9 +132,14 @@ export async function flushPendingSave() {
         if (state.currentUser && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
             await syncDataToCloud();
         }
+        updateSyncIndicator('synced');
     } catch(e) {
         console.warn("flushPendingSave notice:", e);
+        updateSyncIndicator('error');
     }
+}
+if (typeof window !== 'undefined') {
+    window.flushPendingSave = flushPendingSave;
 }
 
 export function saveData() {
@@ -130,7 +154,7 @@ export function saveData() {
         checkStorageQuotaBeforeSave();
     } catch(e) {}
 
-    // 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取，各帳號完全隔離
+    // 1. 立即同步寫入該帳號專屬之 localStorage 與全域快取 (0ms 本地持久化)
     try {
         const userKey = getUserStorageKey(state.currentUser);
         const dataStr = safeStringify(state.appData);
@@ -147,9 +171,11 @@ export function saveData() {
         console.error("Local storage save error:", err);
     }
 
-    // 2. 背景非同步防抖處理磁碟寫入與雲端備份，完全不卡死 UI 執行緒
+    // 2. 背景非同步防抖 1.5 秒處理雲端同步與備份，兼顧即時自救與資料庫保護
     if (state.saveTimeout) clearTimeout(state.saveTimeout);
     state.isSaving = true;
+    updateSyncIndicator('saving');
+
     state.saveTimeout = setTimeout(async () => {
         try {
             runAutoBackup();
@@ -161,12 +187,14 @@ export function saveData() {
             if (sessionStorage.getItem('app_is_guest_mode') !== 'true') {
                 await syncDataToCloud();
             }
+            updateSyncIndicator('synced');
         } catch (error) { 
             console.error("Background sync error:", error); 
+            updateSyncIndicator('error');
         } finally { 
             state.isSaving = false; 
         }
-    }, 300);
+    }, 1500);
 
     return Promise.resolve();
 }

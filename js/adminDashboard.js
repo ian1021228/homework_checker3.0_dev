@@ -596,9 +596,26 @@ export function renderAdminAuditsInContactBook() {
     const stampContainer = document.getElementById('contact-book-admin-stamp-container');
     if (!stampContainer) return;
 
-    const classId = state.currentClassId;
+    const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     const dateStr = formatDate(state.selectedDate || new Date());
-    const auditRecord = state.adminAudits?.[`${classId}_${dateStr}`];
+    let auditRecord = state.adminAudits?.[`${state.currentClassId}_${dateStr}`];
+
+    if (!auditRecord && currentClass?.latestInspection) {
+        auditRecord = {
+            deptName: currentClass.latestInspection.deptName || '查訖',
+            inspector: currentClass.latestInspection.inspector || '行政主管',
+            comment: currentClass.latestInspection.comment || '查訖准予備查',
+            timestamp: (currentClass.latestInspection.stampedAt || '').slice(0, 16).replace('T', ' ')
+        };
+    } else if (!auditRecord && Array.isArray(currentClass?.inspectionStamps) && currentClass.inspectionStamps.length > 0) {
+        const first = currentClass.inspectionStamps[0];
+        auditRecord = {
+            deptName: first.deptName || '查訖',
+            inspector: first.inspector || '行政主管',
+            comment: first.comment || '查訖准予備查',
+            timestamp: (first.stampedAt || '').slice(0, 16).replace('T', ' ')
+        };
+    }
 
     if (!auditRecord) {
         stampContainer.innerHTML = '';
@@ -608,19 +625,20 @@ export function renderAdminAuditsInContactBook() {
 
     stampContainer.classList.remove('hidden');
     stampContainer.innerHTML = `
-        <div class="border-2 border-red-500 bg-red-50/95 backdrop-blur-sm rounded-2xl p-3 flex items-start gap-3 shadow-md max-w-sm ml-auto animate-fade-in">
-            <div class="w-12 h-12 rounded-full border-2 border-red-600 flex flex-col items-center justify-center font-black text-red-600 shrink-0 rotate-[-12deg] shadow-xs">
-                <span class="text-[8px] tracking-wider leading-none">管理人員</span>
-                <span class="text-[10px] font-black leading-tight">查閱合格</span>
-                <span class="text-[7px] scale-90 leading-none">${dateStr}</span>
+        <div class="border-2 border-rose-500 bg-rose-50/95 backdrop-blur-sm rounded-2xl p-3 flex items-start gap-3 shadow-md max-w-sm ml-auto animate-fade-in">
+            <div class="w-13 h-13 rounded-full border-2 border-rose-600 flex flex-col items-center justify-center font-black text-rose-600 shrink-0 rotate-[-10deg] shadow-xs bg-white">
+                <span class="text-[8px] tracking-wider leading-none">學校行政</span>
+                <span class="text-[10px] font-black leading-tight my-0.5 border-y border-rose-600/40 px-1">${auditRecord.deptName || '查訖'}</span>
+                <span class="text-[7px] scale-90 leading-none font-mono">${(auditRecord.timestamp || dateStr).slice(0, 10)}</span>
             </div>
             <div class="flex-1 text-left">
                 <div class="flex items-center justify-between">
-                    <span class="font-black text-xs text-red-700">學務行政線上查核</span>
-                    <span class="text-[10px] text-red-400 font-mono">${auditRecord.timestamp || ''}</span>
+                    <span class="font-black text-xs text-rose-800">學校行政線上抽查核章</span>
+                    <span class="text-[10px] text-rose-400 font-mono">${auditRecord.timestamp || ''}</span>
                 </div>
-                <p class="text-xs text-red-950 font-bold mt-1 leading-snug">
-                    「${auditRecord.comment || '查核合格'}」
+                <div class="text-[11px] text-slate-500 font-bold mt-0.5">核章人員：${auditRecord.inspector || '行政主管'}</div>
+                <p class="text-xs text-slate-800 font-bold mt-1 leading-snug">
+                    「${auditRecord.comment || '查核詳實，准予備查。'}」
                 </p>
             </div>
         </div>
@@ -634,14 +652,23 @@ export function renderSchoolBroadcastsInContactBook() {
     const broadcastContainer = document.getElementById('contact-book-school-broadcast-banner');
     if (!broadcastContainer) return;
 
-    const broadcasts = state.schoolBroadcasts || [];
-    if (broadcasts.length === 0) {
+    let latest = (state.schoolBroadcasts || [])[0];
+    if (!latest && Array.isArray(state.broadcasts) && state.broadcasts.length > 0) {
+        const b = state.broadcasts[0];
+        latest = {
+            level: b.level || 'notice',
+            title: b.title || '校園即時安全通報',
+            content: b.message || b.content || '',
+            timestamp: (b.createdAt || '').slice(0, 16).replace('T', ' ')
+        };
+    }
+
+    if (!latest) {
         broadcastContainer.innerHTML = '';
         broadcastContainer.classList.add('hidden');
         return;
     }
 
-    const latest = broadcasts[0];
     broadcastContainer.classList.remove('hidden');
     broadcastContainer.innerHTML = `
         <div class="p-3.5 rounded-2xl border ${latest.level === 'emergency' ? 'bg-red-500/10 border-red-400 text-red-950' : 'bg-amber-500/10 border-amber-400 text-amber-950'} flex items-start gap-3 shadow-xs">

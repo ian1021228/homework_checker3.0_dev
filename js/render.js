@@ -321,30 +321,29 @@ export function renderClassCredentialsSection() {
 
         for (let seat = 1; seat <= maxSeat; seat++) {
             const isSkipped = skipped.includes(seat);
-            const defaultPin = String(100000 + seat);
-            const currentPin = curClass.studentPins[seat] || defaultPin;
-            const isCustom = Boolean(curClass.studentPins[seat] && curClass.studentPins[seat] !== defaultPin);
+            const hasPin = Boolean(curClass.studentPins[seat] && String(curClass.studentPins[seat]).trim());
+            const currentPin = hasPin ? curClass.studentPins[seat] : '未設定';
 
             const card = document.createElement('div');
             card.className = `p-2.5 rounded-xl border transition-all flex flex-col justify-between space-y-1.5 ${
                 isSkipped 
                     ? 'bg-slate-100/50 border-slate-200 opacity-40' 
-                    : 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs hover:shadow-xs'
+                    : (hasPin ? 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs hover:shadow-xs' : 'bg-slate-50 border-slate-200/70')
             }`;
 
             card.innerHTML = `
                 <div class="flex items-center justify-between text-xs">
                     <span class="font-mono font-black text-indigo-700">${seat} 號</span>
-                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-500' : (isCustom ? 'text-emerald-600' : 'text-slate-400')}">
-                        ${isSkipped ? '缺號' : (isCustom ? '已自訂' : '學校預設')}
+                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-500' : (hasPin ? 'text-emerald-600' : 'text-slate-400')}">
+                        ${isSkipped ? '缺號' : (hasPin ? '已開通認證碼' : '學校尚未派發')}
                     </span>
                 </div>
                 <div class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
                     <span class="pin-display-text font-mono font-black text-xs sm:text-sm text-slate-900 select-all" data-pin="${currentPin}">
-                        ${isSkipped ? '---' : (arePinsRevealed ? currentPin : '••••••')}
+                        ${isSkipped ? '---' : (!hasPin ? '尚未開通' : (arePinsRevealed ? currentPin : '••••••'))}
                     </span>
                     ${!isSkipped ? `
-                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="修改此座號 PIN 碼">
+                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="自訂/修改此座號 PIN 碼">
                             <i class="fa-solid fa-pen-to-square text-[11px]"></i>
                         </button>
                     ` : ''}
@@ -358,10 +357,10 @@ export function renderClassCredentialsSection() {
             btn.onclick = (e) => {
                 e.stopPropagation();
                 const seat = parseInt(btn.dataset.seat);
-                const oldPin = curClass.studentPins[seat] || String(100000 + seat);
-                const input = prompt(`請輸入 ${seat} 號學生的新成績查詢 PIN 碼（建議 6 位數數字）：`, oldPin);
+                const oldPin = curClass.studentPins[seat] || '';
+                const input = prompt(`請輸入 ${seat} 號學生的成績認證 PIN 碼（若留空則清除）：`, oldPin);
                 if (input !== null) {
-                    const trimmed = input.trim();
+                    const trimmed = input.trim().toUpperCase();
                     if (!trimmed) {
                         delete curClass.studentPins[seat];
                     } else {
@@ -385,16 +384,16 @@ export function renderClassCredentialsSection() {
             };
         }
 
-        // 綁定一鍵重設為學校預設 (100000 + 座號)
+        // 綁定一鍵清除全班 PIN 碼
         const resetAllBtn = document.getElementById('cred-reset-all-pins-btn');
         if (resetAllBtn && !resetAllBtn.dataset.bound) {
             resetAllBtn.dataset.bound = 'true';
             resetAllBtn.onclick = () => {
-                if (confirm('確定要將全班所有學生的 PIN 碼重設為學校預設值（100000 + 座號）？')) {
+                if (confirm('確定要清除全班學生的自訂成績認證 PIN 碼？')) {
                     curClass.studentPins = {};
                     if (window.saveData) window.saveData();
                     renderClassCredentialsSection();
-                    showToast('已將全班學生成績 PIN 碼重設為學校預設值！', 'success');
+                    showToast('已重設全班學生成績認證碼清單', 'info');
                 }
             };
         }
@@ -407,7 +406,7 @@ export function renderClassCredentialsSection() {
                 let lines = [`【${curClass.name} 學生小考成績查詢 PIN 碼清冊】`];
                 for (let seat = 1; seat <= maxSeat; seat++) {
                     if (skipped.includes(seat)) continue;
-                    const pin = curClass.studentPins[seat] || String(100000 + seat);
+                    const pin = curClass.studentPins[seat] || '（尚未開通）';
                     lines.push(`${seat}號\tPIN: ${pin}`);
                 }
                 navigator.clipboard.writeText(lines.join('\n')).then(() => {

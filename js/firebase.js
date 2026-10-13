@@ -732,7 +732,16 @@ if (typeof window !== 'undefined') {
     window.addEventListener('visibilitychange', () => {
         if (!document.hidden && (fbAuth?.currentUser || state.currentUser) && !state.adminViewModeUserId && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
             startRealtimeCloudSync();
+        } else if (document.hidden) {
+            // 切換分頁、後台或即將關閉時，立即執行急速自救同步
+            if (window.flushPendingSave) window.flushPendingSave();
         }
+    });
+    window.addEventListener('beforeunload', () => {
+        if (window.flushPendingSave) window.flushPendingSave();
+    });
+    window.addEventListener('pagehide', () => {
+        if (window.flushPendingSave) window.flushPendingSave();
     });
     window.addEventListener('online', () => {
         if ((fbAuth?.currentUser || state.currentUser) && !state.adminViewModeUserId && sessionStorage.getItem('app_is_guest_mode') !== 'true') {
@@ -796,17 +805,12 @@ export async function syncDataToCloud() {
                         studentCount: typeof h.studentCount === 'number' ? h.studentCount : (h.students || []).length,
                         students: (h.students || []).map(s => ({ seat: s.seat, status: s.status }))
                     }));
-                    // 規範：預設 PIN 碼全面採用【班級代碼 + 座號】
+                    // 規範：教師端絕不擅自生成預設 PIN 碼！成績認證碼一開始由學校統一設定，教師只能查看與個別修改
                     c.studentPins = c.studentPins || {};
-                    const maxSeat = typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : 30;
-                    for (let s = 1; s <= maxSeat; s++) {
-                        const legacyPin = String(100000 + Number(s));
-                        if (!c.studentPins[s] || c.studentPins[s] === legacyPin) {
-                            c.studentPins[s] = `${code}${s}`;
-                        }
-                    }
 
-                    // 保護學生已提交之小考成績，避免雲端同步時遭空 submissions 覆寫
+                    // 保護學生已提交之小考成績、家長簽名、回覆，以及學校行政處室之抽查核章紀錄
+                    let cloudInspectionStamps = c.inspectionStamps || [];
+                    let cloudLatestInspection = c.latestInspection || null;
                     try {
                         const existingSnap = await getDoc(parentDocRef);
                         if (existingSnap.exists()) {
@@ -833,6 +837,19 @@ export async function syncDataToCloud() {
                                     ...(c.affairResponses || {})
                                 };
                             }
+                            // 若雲端已有學校派發的 PIN 碼且本地尚未設定，自動繼承學校派發之 PIN 碼
+                            if (cloudData.studentPins && Object.keys(cloudData.studentPins).length > 0 && (!c.studentPins || Object.keys(c.studentPins).length === 0)) {
+                                c.studentPins = { ...cloudData.studentPins };
+                            }
+                            // 完整保留學校管理端蓋上的電子行政核章戳記
+                            if (Array.isArray(cloudData.inspectionStamps) && cloudData.inspectionStamps.length > 0) {
+                                cloudInspectionStamps = cloudData.inspectionStamps;
+                                c.inspectionStamps = cloudInspectionStamps;
+                            }
+                            if (cloudData.latestInspection) {
+                                cloudLatestInspection = cloudData.latestInspection;
+                                c.latestInspection = cloudLatestInspection;
+                            }
                         }
                     } catch (e) {}
 
@@ -857,13 +874,59 @@ export async function syncDataToCloud() {
                         affairs: c.affairs || [],
                         affairResponses: c.affairResponses || {},
                         contactSignatures: c.contactSignatures || {},
-                        bulletinNotice: c.bulletinNotice || ''
+                        bulletinNotice: c.bulletinNotice || '',
+                        inspectionStamps: cloudInspectionStamps,
+                        latestInspection: cloudLatestInspection
                     };
                     await setDoc(parentDocRef, {
                         ...parentPayload,
                         data: safeStringify(parentPayload),
                         updatedAt: new Date().toISOString()
                     });
+
+                    // 同步晨間出缺席通報至學校學務處 (若今日有出缺席紀錄)
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    if (c.attendance && c.attendance[todayStr]) {
+                        try {
+                            const todayAtt = c.attendance[todayStr];
+                            const maxSeat = typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : 30;
+                            const absentSeats = [];
+                            const tardySeats = [];
+                            let presentCount = 0;
+                            for (let s = 1; s <= maxSeat; s++) {
+                                const st = todayAtt[s]?.status || 'present';
+                                if (st === 'present') presentCount++;
+                                else if (st === 'tardy') tardySeats.push(s);
+                                else absentSeats.push(s);
+                            }
+                            const schoolId = state.currentUser?.schoolId || c.schoolId || 'shs';
+                            const schAttRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_att_${schoolId}_${todayStr}`);
+                            const schAttSnap = await getDoc(schAttRef);
+                            let list = [];
+                            if (schAttSnap.exists() && Array.isArray(schAttSnap.data()?.list)) {
+                                list = schAttSnap.data().list;
+                            }
+                            const attRec = {
+                                schoolId,
+                                classCode: code,
+                                className: c.name,
+                                totalStudents: maxSeat,
+                                presentCount,
+                                absentCount: absentSeats.length,
+                                tardyCount: tardySeats.length,
+                                absentSeats,
+                                tardySeats,
+                                reportedAt: new Date().toISOString(),
+                                reportedBy: state.currentUser?.displayName || '導師'
+                            };
+                            const existIdx = list.findIndex(r => r.classCode === code);
+                            if (existIdx >= 0) list[existIdx] = attRec;
+                            else list.push(attRec);
+                            await setDoc(schAttRef, { list, updatedAt: new Date().toISOString() }, { merge: true });
+                        } catch (attSyncErr) {
+                            console.warn("晨間出缺席通報至學務處提示:", attSyncErr);
+                        }
+                    }
                 }
             }
         }

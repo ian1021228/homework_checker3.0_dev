@@ -936,13 +936,9 @@ export function setupButtonEvents() {
                 }
                 const matched701 = schoolClasses.find(c => c.classCode === '701' || c.className?.includes('7年1班') || c.className?.includes('107'));
 
-                const defaultPins = {};
-                for (let i = 1; i <= 30; i++) {
-                    if (i !== 14) defaultPins[i] = String(100000 + i);
-                }
                 const syncedPins = (matched701 && matched701.studentPins && Object.keys(matched701.studentPins).length > 0)
                     ? matched701.studentPins
-                    : defaultPins;
+                    : {};
 
                 let class107 = (userLocal.classes || []).find(c => c.id === 'c107' || c.id === '701' || c.name?.includes('107') || c.name?.includes('7年1班'));
                 if (!class107) {
@@ -1235,6 +1231,40 @@ export function setupButtonEvents() {
                     state.appData = { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
                     state.currentClassId = null;
                 }
+
+                // 一秒自動進班：若學校端已派發班級與帳密，登入時自動掛載該班級、學生與學校派發之 PIN 碼，免除手動新增班級
+                if (cand.classCode) {
+                    const autoClass = {
+                        id: cand.classCode,
+                        name: cand.className || `${cand.classCode}班`,
+                        studentCount: cand.studentCount || 30,
+                        missingSeats: cand.missingSeats || [],
+                        skippedSeats: cand.missingSeats || [],
+                        lastMaxSeat: cand.studentCount || 30,
+                        hasConfiguredMaxSeat: true,
+                        accessCode: cand.parentAccessCode || '',
+                        parentAccessCode: cand.parentAccessCode || '',
+                        parentUsername: cand.parentAccessCode || '',
+                        parentPassword: cand.parentPassword || '',
+                        teacherUsername: cand.username || '',
+                        teacherPassword: cand.password || '',
+                        studentPins: cand.studentPins || {}
+                    };
+                    const cIdx = state.appData.classes.findIndex(c => c.id === autoClass.id || c.name === autoClass.name || c.accessCode === autoClass.accessCode);
+                    if (cIdx >= 0) {
+                        state.appData.classes[cIdx] = {
+                            ...state.appData.classes[cIdx],
+                            ...autoClass,
+                            studentPins: { ...(autoClass.studentPins || {}), ...(state.appData.classes[cIdx].studentPins || {}) }
+                        };
+                    } else {
+                        state.appData.classes.unshift(autoClass);
+                    }
+                    state.currentClassId = autoClass.id;
+                }
+
+                localStorage.setItem('homeworkAppData_' + userKey, safeStringify(state.appData));
+                localStorage.setItem('currentClassId_' + userKey, state.currentClassId || '');
                 localStorage.setItem('homeworkAppData', safeStringify(state.appData));
                 if (state.currentClassId) localStorage.setItem('currentClassId', state.currentClassId);
 
@@ -2929,7 +2959,7 @@ export function setupButtonEvents() {
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
                                 isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
                             }">
-                                ${isEnabled ? '已開通成績' : '未開通 (無法查閱成績)'}
+                                ${isEnabled ? '學校已派發開通' : '未開通 / 學校尚未派發'}
                             </span>
                         </div>
                     </div>
@@ -2938,18 +2968,21 @@ export function setupButtonEvents() {
                 <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                     <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 shadow-2xs">
                         <span class="text-[10px] font-bold text-slate-400">PIN:</span>
-                        <input type="text" maxlength="32" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-amber-900 tracking-wider w-28 bg-transparent focus:outline-none uppercase" placeholder="未設定" value="${pin}">
+                        <input type="password" maxlength="32" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-amber-900 tracking-wider w-24 bg-transparent focus:outline-none uppercase" placeholder="尚未派發" value="${pin}">
+                        <button type="button" class="btn-toggle-row-pin-eye p-0.5 text-slate-400 hover:text-slate-600 cursor-pointer" title="查看/隱藏 PIN 碼">
+                            <i class="fa-regular fa-eye text-[11px]"></i>
+                        </button>
                     </div>
-                    <button type="button" data-seat="${seat}" class="btn-reset-seat-pin px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="一鍵重設此座號預設密碼（班級代碼+座號）">
-                        <i class="fa-solid fa-arrows-rotate text-[10px]"></i>
-                        <span>預設重設</span>
+                    <button type="button" data-seat="${seat}" class="btn-copy-seat-notice px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="複製此座號家長通知文案">
+                        <i class="fa-regular fa-copy text-[10px]"></i>
+                        <span>複製通知</span>
                     </button>
                     ${isEnabled ? `
-                        <button type="button" data-seat="${seat}" class="btn-disable-seat-pin px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer" title="關閉開通">
-                            關閉
+                        <button type="button" data-seat="${seat}" class="btn-disable-seat-pin px-2.5 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold transition-colors cursor-pointer" title="清除/停用此認證碼">
+                            清除
                         </button>
                     ` : `
-                        <button type="button" data-seat="${seat}" class="btn-enable-seat-pin px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer" title="啟用開通">
+                        <button type="button" data-seat="${seat}" class="btn-enable-seat-pin px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer" title="設定此座號認證碼">
                             開通
                         </button>
                     `}
@@ -2991,26 +3024,15 @@ export function setupButtonEvents() {
             closeModal(studentPinsModal);
         });
 
-        // Batch action: Random pins for all
+        // Toggle all PINs visibility in modal
         document.getElementById('btn-batch-random-pins')?.addEventListener('click', () => {
-            const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
-            if (!cls) return;
-            const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
-            cls.studentPins = cls.studentPins || {};
-            for (let s = 1; s <= maxSeat; s++) {
-                cls.studentPins[s] = String(Math.floor(100000 + Math.random() * 900000));
-            }
-            renderStudentPinsList(cls);
-            showToast("已隨機生成全班 PIN 碼，請點擊「儲存並同步至雲端」！", "info");
-        });
-
-        // Batch action: Clear all
-        document.getElementById('btn-batch-clear-pins')?.addEventListener('click', () => {
-            const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
-            if (!cls) return;
-            cls.studentPins = {};
-            renderStudentPinsList(cls);
-            showToast("已清除全班 PIN 碼（成績系統將全面鎖定），請點擊「儲存並同步至雲端」！", "info");
+            const inputs = studentPinsModal.querySelectorAll('.student-pin-input');
+            const isCurrentlyPassword = inputs[0] ? inputs[0].type === 'password' : false;
+            inputs.forEach(inp => {
+                inp.type = isCurrentlyPassword ? 'text' : 'password';
+            });
+            const btnSpan = document.querySelector('#btn-batch-random-pins span');
+            if (btnSpan) btnSpan.textContent = isCurrentlyPassword ? '隱藏全部 PIN 碼' : '顯示全部 PIN 碼';
         });
 
         // Copy roster
@@ -3020,31 +3042,44 @@ export function setupButtonEvents() {
             const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
             const code = String(cls.accessCode || '').trim();
             cls.studentPins = cls.studentPins || {};
-            let rosterText = `【${cls.name}】學生個人專屬成績 PIN 碼表：\n班級代碼：${code || '未設定'}\n------------------------------------\n`;
+            let rosterText = `【${cls.name}】學生成績認證碼 (PIN) 派發通知表：\n班級代碼：${code || '未設定'}\n------------------------------------\n`;
             for (let s = 1; s <= maxSeat; s++) {
-                const p = cls.studentPins[s] || `${code}${s}`;
+                const p = cls.studentPins[s] ? cls.studentPins[s] : '（學校尚未開通）';
                 rosterText += `座號 ${String(s).padStart(2, ' ')} 號：${p}\n`;
             }
-            rosterText += `------------------------------------\n※ 預設密碼為【班級代碼 + 座號】（學生與家長共用相同 PIN 碼解鎖成績系統）。\n※ 學生手機在首次輸入驗證成功後將自動記憶憑證，日後免密直開！`;
-            await safeCopyToClipboard(rosterText, "已複製全班密碼對照表至剪貼簿！");
+            rosterText += `------------------------------------\n※ 成績認證碼由學校統一設定派發，導師可查看與個別修改。\n※ 家長端查閱網址：https://ian1021228.github.io/parent_dashboard_dev/?code=${code}`;
+            await safeCopyToClipboard(rosterText, "已複製全班成績認證碼清單至剪貼簿！");
         });
 
-        // Seat row click delegation (Reset, Disable, Enable)
+        // Seat row click delegation (Disable, Enable, Copy Seat Notice, Toggle Eye)
         const pinsListContainer = document.getElementById('student-pins-list-container');
         if (pinsListContainer) {
-            pinsListContainer.addEventListener('click', (e) => {
+            pinsListContainer.addEventListener('click', async (e) => {
                 const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
                 if (!cls) return;
                 const code = String(cls.accessCode || '').trim();
                 cls.studentPins = cls.studentPins || {};
 
-                const resetBtn = e.target.closest('.btn-reset-seat-pin');
-                if (resetBtn) {
-                    const seat = resetBtn.dataset.seat;
-                    const newPin = `${code}${seat}`;
-                    cls.studentPins[seat] = newPin;
-                    renderStudentPinsList(cls);
-                    showToast(`已重設 ${seat} 號密碼為：${newPin}（請點擊儲存並同步）`, "info");
+                // Toggle eye for single row
+                const eyeBtn = e.target.closest('.btn-toggle-row-pin-eye');
+                if (eyeBtn) {
+                    const row = eyeBtn.closest('.flex');
+                    const inp = row?.querySelector('.student-pin-input');
+                    if (inp) {
+                        const isPwd = inp.type === 'password';
+                        inp.type = isPwd ? 'text' : 'password';
+                        eyeBtn.innerHTML = `<i class="fa-regular ${isPwd ? 'fa-eye-slash' : 'fa-eye'} text-[11px]"></i>`;
+                    }
+                    return;
+                }
+
+                // Copy single seat notification
+                const copyNoticeBtn = e.target.closest('.btn-copy-seat-notice');
+                if (copyNoticeBtn) {
+                    const seat = copyNoticeBtn.dataset.seat;
+                    const pin = cls.studentPins[seat] || '';
+                    const noticeText = `【${cls.name} 家長成績查詢通知】\n學生座號：${seat} 號\n班級代碼：${code || '未設定'}\n成績認證碼：${pin || '（學校尚未開通）'}\n家長端專屬查閱網址：https://ian1021228.github.io/parent_dashboard_dev/?code=${code}&seat=${seat}`;
+                    await safeCopyToClipboard(noticeText, `已複製 ${seat} 號家長通知文案！`);
                     return;
                 }
 
@@ -3053,16 +3088,19 @@ export function setupButtonEvents() {
                     const seat = disableBtn.dataset.seat;
                     delete cls.studentPins[seat];
                     renderStudentPinsList(cls);
-                    showToast(`已關閉 ${seat} 號開通狀態`, "info");
+                    showToast(`已清除 ${seat} 號認證碼`, "info");
                     return;
                 }
 
                 const enableBtn = e.target.closest('.btn-enable-seat-pin');
                 if (enableBtn) {
                     const seat = enableBtn.dataset.seat;
-                    cls.studentPins[seat] = `${code}${seat}`;
-                    renderStudentPinsList(cls);
-                    showToast(`已為 ${seat} 號開通專屬密碼：${cls.studentPins[seat]}`, "info");
+                    const val = prompt(`請輸入 ${seat} 號學生的成績認證碼：`, '');
+                    if (val && val.trim()) {
+                        cls.studentPins[seat] = val.trim().toUpperCase();
+                        renderStudentPinsList(cls);
+                        showToast(`已為 ${seat} 號設定認證碼：${cls.studentPins[seat]}（請點擊儲存）`, "info");
+                    }
                     return;
                 }
             });
