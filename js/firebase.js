@@ -98,27 +98,41 @@ if (fbAuth) {
                     startRealtimeCloudSync();
                 }
             } else {
+                const isGuest = sessionStorage.getItem('app_is_guest_mode') === 'true';
                 const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
-                if (isQrAuth && state.currentUser) {
-                    const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
-                    const badgeText = isGoogle ? 'Google 帳號掃碼授權同步中' : '跨裝置掃碼授權同步中';
+                const isGoogle = isGoogleAuthUser(state.currentUser) || sessionStorage.getItem('auth_provider') === 'google';
+
+                if (state.currentUser && !isGuest) {
+                    let badgeText = '<i class="fa-solid fa-circle-check text-emerald-500 mr-1.5"></i>雲端同步已連線';
+                    if (isGoogle) {
+                        badgeText = '<i class="fa-solid fa-circle-check text-emerald-500 mr-1.5"></i>雲端同步已連線 (Google 授權)';
+                    } else if (state.currentUser.schoolName) {
+                        badgeText = `<i class="fa-solid fa-circle-check text-emerald-500 mr-1.5"></i>雲端同步已連線 (${state.currentUser.schoolName})`;
+                    } else {
+                        badgeText = '<i class="fa-solid fa-circle-check text-emerald-500 mr-1.5"></i>雲端同步已連線 (校園帳號)';
+                    }
+                    const userDisplayTitle = state.currentUser.displayName || state.currentUser.username || state.currentUser.email || '已授權教師';
                     if (syncStatus) {
-                        syncStatus.innerHTML = `狀態：${badgeText} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${state.currentUser.displayName || state.currentUser.email}</span>`;
+                        syncStatus.innerHTML = `狀態：${badgeText} <br><span class="text-sky-900 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-sky-100 text-[11px] tracking-wide"><i class="fa-solid fa-user-check mr-1 text-sky-600"></i> ${userDisplayTitle}</span>`;
                     }
                     if (loginBtn) loginBtn.classList.add('hidden');
                     if (cloudActions) cloudActions.classList.remove('hidden');
                     if (storageContainer) storageContainer.classList.remove('hidden');
-                    if (sessionStorage.getItem('app_is_guest_mode') !== 'true' && !state.adminViewModeUserId) {
+                    if (!state.adminViewModeUserId) {
                         startRealtimeCloudSync();
                     }
+                } else if (state.currentUser && isGuest) {
+                    stopRealtimeCloudSync();
+                    if (syncStatus) {
+                        syncStatus.innerHTML = `狀態：訪客體驗模式 (資料暫存於此瀏覽器) <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide"><i class="fa-solid fa-user-clock mr-1 text-amber-500"></i> 訪客帳號</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">建議登入學校指派帳號或 Google 帳號以啟用即時雲端備份</span>`;
+                    }
+                    if (loginBtn) loginBtn.classList.remove('hidden');
+                    if (cloudActions) cloudActions.classList.add('hidden');
+                    if (storageContainer) storageContainer.classList.add('hidden');
                 } else {
                     stopRealtimeCloudSync();
                     if (syncStatus) {
-                        if (state.currentUser) {
-                            syncStatus.innerHTML = `狀態：本地離線模式 <br><span class="text-slate-700 font-bold bg-white px-3 py-1.5 rounded-xl inline-block mt-2 shadow-sm border border-slate-200 text-[11px] tracking-wide"><i class="fa-solid fa-user mr-1 text-sky-600"></i> ${state.currentUser.displayName || state.currentUser.email}</span><br><span class="text-[11px] text-sky-600 mt-1 inline-block">點擊下方按鈕登入 Google 帳號以啟用雲端同步</span>`;
-                        } else {
-                            syncStatus.innerHTML = "狀態：未登入，點擊下方按鈕登入以啟用雲端同步。";
-                        }
+                        syncStatus.innerHTML = "狀態：未登入，請登入校園派發帳號以啟用雲端同步。";
                     }
                     if (loginBtn) loginBtn.classList.remove('hidden');
                     if (cloudActions) cloudActions.classList.add('hidden');

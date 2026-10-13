@@ -483,7 +483,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.5.0 • 2026/10/13</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.5.1 • 2026/10/13</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -492,20 +492,20 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.5.0 核心更新亮點：</span>
+                                <span>v4.5.1 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-network-wired text-indigo-600 mt-0.5"></i> <span><b>全校四端深度互聯與零假資料</b>：系統管理端、學校管理端、教師端與家長端即時資料流全面打通，徹底移除假資料。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-key text-amber-600 mt-0.5"></i> <span><b>一秒自動進班與成績認證碼派發規範</b>：學校派發帳密後教師登入自動載入班級；認證碼由學校統一派發、教師僅查看與個別修改，杜絕擅自覆寫。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-cloud-arrow-up text-emerald-600 mt-0.5"></i> <span><b>資料庫防護與即時自救存檔機制</b>：0ms 本地持久化、1.5 秒寫入防抖、頁面切換急速自救同步與頂部微型同步指示燈。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-stamp text-rose-600 mt-0.5"></i> <span><b>行政抽查核章與即時校安通報連動</b>：學校處室線上查核戳章與安全廣播即時同步教師端聯絡簿與家長端通報看板。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-600 mt-0.5"></i> <span><b>學校端認證中樞與導航權限隔離</b>：精簡為單一學校專屬登入，登入前強制嚴格隱藏晨間出缺席、行政核章等導航列。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-user-check text-sky-600 mt-0.5"></i> <span><b>多校租戶帳號即時授權比對</b>：支援多租戶帳密即時雲端比對與重新載入機制，確保各校派發管理員 100% 順暢登入。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-arrow-right-from-bracket text-rose-600 mt-0.5"></i> <span><b>教師端安全登出流程修復</b>：採用自訂安全確認視窗替代原生彈窗，修復登出觸發流程並安全返回首頁。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-window-maximize text-teal-600 mt-0.5"></i> <span><b>校園連線狀態修正與寬螢幕設定頁面</b>：修正學校帳號雲端連線狀態顯示，設定視窗大幅加寬為大氣雙欄響應式版面。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.0)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.1)</span>
                             </button>
                         </div>
                     </div>
@@ -2813,10 +2813,18 @@
 
     <!-- 系統設定 Modal -->
     <div id="settings-modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-md flex items-center justify-center p-4 hidden modal z-50">
-        <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 w-full max-w-md transform scale-95 max-h-[90vh] overflow-y-auto border border-slate-100 custom-scrollbar relative">
-           <h2 class="text-2xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">系統設定</h2>
+        <div class="modal-content glass-card rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 w-full max-w-4xl transform scale-95 max-h-[90vh] overflow-y-auto border border-slate-100 custom-scrollbar relative">
+           <div class="flex items-center justify-between mb-6 pb-2 border-b border-slate-100">
+               <div>
+                   <h2 class="text-2xl sm:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-600 drop-shadow-sm">系統設定中心</h2>
+                   <p class="text-xs text-slate-400 mt-1 font-medium">個人化偏好、校園雲端帳號同步、雙螢幕聯絡簿與資料備份管理</p>
+               </div>
+               <button type="button" class="cancel-btn w-10 h-10 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all cursor-pointer shrink-0" title="關閉設定">
+                   <i class="fa-solid fa-xmark text-base"></i>
+               </button>
+           </div>
            
-           <div class="space-y-4">
+           <div class="space-y-5">
                <!-- 回報錯誤／功能修正建議 按鈕 (置於設定頁面最上方) -->
                <a id="feedback-report-btn" href="https://forms.gle/XKRam7QknSCxDfL8A" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-2xl font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-orange-500/20 hover:shadow-lg hover:shadow-orange-500/30 transition-all transform hover:-translate-y-0.5 active:translate-y-0 text-center cursor-pointer">
                    <i class="fa-solid fa-bullhorn text-base shrink-0"></i>
@@ -2839,6 +2847,8 @@
                    </span>
                </button>
 
+               <!-- 點收偏好 與 下載App (雙欄佈局) -->
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                <!-- 點收模式設定區塊 (手動點收 / 條碼掃描) -->
                <div class="p-5 border border-indigo-200 rounded-2xl bg-gradient-to-br from-indigo-50/70 to-purple-50/50 shadow-sm relative overflow-hidden">
                    <h3 class="font-extrabold text-indigo-950 mb-1.5 flex items-center justify-between relative z-10 text-sm sm:text-base">
@@ -2879,8 +2889,11 @@
                        提示：若未出現提示，亦可透過瀏覽器選單點擊「加到主畫面」或「安裝應用程式」
                    </p>
                </div>
+               </div>
 
 
+               <!-- 雲端同步 與 儲存空間分析 (雙欄佈局) -->
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                <!-- 學校指派帳號雲端同步與空間分析區塊 -->
                <div class="p-5 border border-sky-100 rounded-3xl bg-sky-50/50 shadow-sm relative overflow-hidden space-y-4">
                    <div class="flex items-center justify-between">
@@ -2949,7 +2962,10 @@
                    <!-- 圓餅圖與分類佔比動態容器 (由 storageLimit.js 渲染) -->
                    <div id="settings-storage-pie-container" class="min-h-[200px]"></div>
                </div>
+               </div>
 
+               <!-- 其他班級資料 與 雙螢幕模式 (雙欄佈局) -->
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
                <!-- 使用其他班級資料 -->
                <div class="p-5 border border-indigo-100 rounded-xl bg-indigo-50/50 shadow-sm relative overflow-hidden">
                    <div class="flex items-center gap-2 mb-2">
@@ -2982,7 +2998,11 @@
                        </label>
                    </div>
                </div>
+               </div>
 
+               <!-- 資料備份與還原 (雙欄佈局) -->
+               <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+               <div>
                <div class="relative flex py-2 items-center">
                    <div class="flex-grow border-t border-slate-200"></div>
                    <span class="flex-shrink-0 mx-3 text-slate-400 text-xs font-bold tracking-wider uppercase">時光機自動備份</span>
@@ -2996,6 +3016,8 @@
                    <div id="auto-backup-list" class="space-y-2 max-h-24 overflow-y-auto pr-1 custom-scrollbar"></div>
                </div>
 
+               </div>
+               <div>
                <div class="relative flex py-2 items-center">
                    <div class="flex-grow border-t border-slate-200"></div>
                    <span class="flex-shrink-0 mx-3 text-slate-400 text-xs font-bold tracking-wider uppercase">手動匯出與匯入</span>
@@ -3024,6 +3046,8 @@
                    <p class="text-xs text-rose-500 mb-2 font-bold">警告：還原將覆蓋現有資料！</p>
                    <input type="file" id="import-file-input" accept=".json" class="hidden">
                    <button id="trigger-import-btn" class="w-full bg-white text-rose-600 border border-rose-200 font-bold py-2.5 px-4 text-sm rounded-xl hover:bg-rose-50 shadow-sm transition-colors">選擇檔案並覆蓋還原</button>
+               </div>
+               </div>
                </div>
            </div>
 
@@ -4170,11 +4194,40 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.5.0 全校四端深度互聯、自動進班與雲端防護全面升級 -->
+                    <!-- v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕設定版面升級 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.0 全校四端深度互聯與零假資料架構</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕版面升級</span>
+                                <span class="text-xs font-bold text-indigo-950">單一學校認證、多校租戶授權比對、自訂安全登出彈窗、設定視窗寬螢幕雙欄化</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>學校端認證中樞精簡與導航權限徹底隔離</b>：移除學校管理端之系統管理員登入區塊，改為單一居中大氣卡片；未登入前嚴格以樣式隱藏晨間出缺席、行政核章等五大行政模組導航欄。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>多校租戶管理員帳號即時雲端比對</b>：全面支援系統管理端派發之 <code>adminAccount</code> 與 <code>adminUsername</code> 欄位，增加 Firestore 即時重新拉取機制，杜絕快取未更新導致之登入失敗。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>教師端安全登出流程修復</b>：採用自訂 <code>showConfirmModal</code> 安全對話方塊取代遭全域阻斷的原生 <code>confirm</code>，修復登出觸發流程並安全清除工作階段返回首頁。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>校園連線狀態修正與寬螢幕大氣設定版面</b>：學校派發教師正確標註為「雲端同步已連線」，移除矛盾之離線提示；設定視窗大幅加寬為 <code>max-w-4xl</code> 雙欄響應式佈局，視覺寬敞舒適。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.0 全校四端深度互聯、自動進班與雲端防護全面升級 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.0 全校四端深度互聯與零假資料架構</span>
                                 <span class="text-xs font-bold text-indigo-950">一秒自動進班、成績認證碼學校派發與防呆維護、1.5s防抖與離頁自救存檔、行政抽查核章全通報</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>

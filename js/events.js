@@ -302,11 +302,11 @@ export function setupButtonEvents() {
     });
 
     // 設定頁面登出按鈕
-    bindClick('settings-logout-btn', async () => {
-        if (confirm("確定要登出目前教師帳號嗎？")) {
+    bindClick('settings-logout-btn', () => {
+        showConfirmModal('確認登出', '確定要登出目前教師帳號嗎？', async () => {
             closeModal(document.getElementById('settings-modal'));
-            await executeSignOut();
-        }
+            await performFullLogout();
+        }, null, { okText: '確定登出', okClass: 'bg-rose-600 text-white font-bold py-2.5 px-6 text-sm rounded-xl hover:bg-rose-700 shadow-md transition-colors' });
     });
 
     // 6. 新增作業按鈕
@@ -636,7 +636,7 @@ export function setupButtonEvents() {
     });
 
     // 登出邏輯
-    const performFullLogout = async () => {
+    async function performFullLogout() {
         // 先完整保存當前帳號的最新修改至該用戶專屬之本地快取與雲端
         await flushPendingSave();
         stopRealtimeCloudSync();
