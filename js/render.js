@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { DEFAULT_TYPES } from './constants.js';
 import { formatDate, safeStringify, showToast, showConfirmModal, closeModal } from './utils.js';
-import { fbDb, fbAuth, isGoogleAdmin, isGoogleAuthUser } from './firebase.js';
+import { fbDb, fbAuth, isGoogleAdmin, isGoogleAuthUser, fetchClassStudentPinsFromCloud, syncClassStudentPinsToCloud } from './firebase.js';
 
 export function getHomeworkType(typeId) { 
     return state.appData.homeworkTypes.find(t => t.id === typeId) || state.appData.homeworkTypes.find(t => t.id === 'default') || DEFAULT_TYPES[0]; 
@@ -224,14 +224,12 @@ export function renderClassCredentialsSection() {
     const teacherAccEl = document.getElementById('cred-teacher-account');
     const teacherPassEl = document.getElementById('cred-teacher-pass');
     const parentAccEl = document.getElementById('cred-parent-account');
-    const parentPassEl = document.getElementById('cred-parent-pass');
     const maxSeatEl = document.getElementById('cred-max-seat');
     const skippedSeatsEl = document.getElementById('cred-skipped-seats');
 
     const tAcc = curClass.teacherUsername || `${(curClass.accessCode || curClass.id).toLowerCase()}_teacher`;
     const tPass = curClass.teacherPassword || '123456';
-    const pAcc = curClass.parentUsername || `${(curClass.accessCode || curClass.id).toLowerCase()}_parent`;
-    const pPass = curClass.parentPassword || 'p123456';
+    const pAcc = curClass.parentUsername || curClass.parentAccessCode || curClass.accessCode || `${(curClass.accessCode || curClass.id).toLowerCase()}_parent`;
     const maxSeat = curClass.lastMaxSeat || 30;
     const skipped = Array.isArray(curClass.skippedSeats) ? (curClass.skippedSeats.length > 0 ? curClass.skippedSeats.join(', ') : '無') : (curClass.lastMissingSeats || '無');
 
@@ -241,14 +239,10 @@ export function renderClassCredentialsSection() {
         teacherPassEl.dataset.realPassword = tPass;
     }
     if (parentAccEl) parentAccEl.textContent = pAcc;
-    if (parentPassEl) {
-        parentPassEl.textContent = parentPassEl.dataset.revealed === 'true' ? pPass : '••••••';
-        parentPassEl.dataset.realPassword = pPass;
-    }
     if (maxSeatEl) maxSeatEl.textContent = `${maxSeat}`;
     if (skippedSeatsEl) skippedSeatsEl.textContent = skipped;
 
-    // Toggle password buttons
+    // Toggle teacher password button
     const toggleTPassBtn = document.getElementById('toggle-teacher-pass-btn');
     if (toggleTPassBtn && !toggleTPassBtn.dataset.bound) {
         toggleTPassBtn.dataset.bound = 'true';
@@ -259,19 +253,6 @@ export function renderClassCredentialsSection() {
             el.dataset.revealed = isRevealed ? 'false' : 'true';
             el.textContent = isRevealed ? '••••••' : el.dataset.realPassword;
             toggleTPassBtn.innerHTML = isRevealed ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
-        });
-    }
-
-    const togglePPassBtn = document.getElementById('toggle-parent-pass-btn');
-    if (togglePPassBtn && !togglePPassBtn.dataset.bound) {
-        togglePPassBtn.dataset.bound = 'true';
-        togglePPassBtn.addEventListener('click', () => {
-            const el = document.getElementById('cred-parent-pass');
-            if (!el) return;
-            const isRevealed = el.dataset.revealed === 'true';
-            el.dataset.revealed = isRevealed ? 'false' : 'true';
-            el.textContent = isRevealed ? '••••••' : el.dataset.realPassword;
-            togglePPassBtn.innerHTML = isRevealed ? '<i class="fa-regular fa-eye"></i>' : '<i class="fa-regular fa-eye-slash"></i>';
         });
     }
 
@@ -290,20 +271,61 @@ export function renderClassCredentialsSection() {
     };
 
     bindCopy('copy-teacher-acc-btn', () => tAcc, '已複製教師帳號');
-    bindCopy('copy-parent-acc-btn', () => pAcc, '已複製家長帳號');
-    bindCopy('copy-parent-pass-btn', () => pPass, '已複製家長密碼');
+    bindCopy('copy-parent-acc-btn', () => pAcc, '已複製家長代碼');
 
+    // 複製家長免密碼直達連結按鈕
+    const copyParentLinkBtn = document.getElementById('copy-parent-link-btn');
+    if (copyParentLinkBtn && !copyParentLinkBtn.dataset.bound) {
+        copyParentLinkBtn.dataset.bound = 'true';
+        copyParentLinkBtn.addEventListener('click', () => {
+            const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(pAcc)}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(parentUrl).then(() => {
+                    showToast('已複製家長免密碼直達連結！', 'success');
+                }).catch(() => {});
+            }
+        });
+    }
+
+    // 家長端開學通知函（落實家長免密碼直達原則）
     const copyNoticeBtn = document.getElementById('copy-class-parent-notice-btn');
     if (copyNoticeBtn && !copyNoticeBtn.dataset.bound) {
         copyNoticeBtn.dataset.bound = 'true';
         copyNoticeBtn.addEventListener('click', () => {
-            const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(curClass.accessCode || '')}`;
-            const noticeText = `【${curClass.name} 家長重要通知】\n親愛的家長您好：\n本班已全面啟用「班級經營與每日數位聯絡簿系統」！\n請您點擊下方專屬連結或前往家長端登入查閱今日各科作業缺交與聯絡事項：\n\n📌 家長端專屬登入網址：${parentUrl}\n🔑 家長登入帳號：${tAcc.replace('_teacher', '_parent')}\n🔒 初始密碼：${pPass}\n班級代碼：${curClass.accessCode || '無'}\n\n每日放學後請上線查閱並完成電子簽章，感謝您的配合！`;
+            const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(pAcc)}`;
+            const noticeText = `【${curClass.name} 家長通知函】
+親愛的家長您好：
+本班已啟用「班級經營與每日數位聯絡簿系統」！
+家長端採「免密碼直達」，請點擊專屬連結或輸入班級代碼即可查閱今日各科作業缺交與聯絡事項：
+
+📌 家長免密碼直達網址：${parentUrl}
+🏫 班級代碼：${pAcc}
+
+※ 提醒：家長端瀏覽聯絡簿與作業點收完全無需密碼；進行「線上電子簽章」及「個人成績查詢」時，請輸入貴子弟專屬之座號認證碼（學生 PIN 碼）。
+請家長每日放學後上線查閱並完成簽章，感謝您的配合！`;
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(noticeText).then(() => {
-                    showToast('已複製家長開學登入通知函文案至剪貼簿！', 'success');
+                    showToast('已複製家長免密碼直達通知函至剪貼簿！', 'success');
                 });
             }
+        });
+    }
+
+    // 自動與雲端學校管理端同步 PIN 碼檢查
+    curClass.studentPins = curClass.studentPins || {};
+    const pinKeys = Object.keys(curClass.studentPins);
+    if (pinKeys.length === 0 && !curClass._isSyncingPins) {
+        curClass._isSyncingPins = true;
+        fetchClassStudentPinsFromCloud(curClass).then(cloudPins => {
+            curClass._isSyncingPins = false;
+            if (cloudPins && Object.keys(cloudPins).length > 0) {
+                curClass.studentPins = { ...cloudPins };
+                if (window.saveData) window.saveData();
+                renderClassCredentialsSection();
+                console.log(`已自動為【${curClass.name}】同步學校管理端 ${Object.keys(cloudPins).length} 位學生 PIN 碼`);
+            }
+        }).catch(() => {
+            curClass._isSyncingPins = false;
         });
     }
 
@@ -315,7 +337,6 @@ export function renderClassCredentialsSection() {
         pinsContainer.innerHTML = '';
         const maxSeat = curClass.lastMaxSeat || 30;
         const skipped = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
-        curClass.studentPins = curClass.studentPins || {};
 
         let arePinsRevealed = window._pinsAreRevealed || false;
 
@@ -354,7 +375,7 @@ export function renderClassCredentialsSection() {
 
         // 綁定個別座號編輯按鈕
         pinsContainer.querySelectorAll('.btn-quick-edit-pin').forEach(btn => {
-            btn.onclick = (e) => {
+            btn.onclick = async (e) => {
                 e.stopPropagation();
                 const seat = parseInt(btn.dataset.seat);
                 const oldPin = curClass.studentPins[seat] || '';
@@ -367,8 +388,9 @@ export function renderClassCredentialsSection() {
                         curClass.studentPins[seat] = trimmed;
                     }
                     if (window.saveData) window.saveData();
+                    await syncClassStudentPinsToCloud(curClass);
                     renderClassCredentialsSection();
-                    showToast(`已更新 ${seat} 號學生 PIN 碼`, 'success');
+                    showToast(`已更新 ${seat} 號學生 PIN 碼並同步雲端`, 'success');
                 }
             };
         });
@@ -384,16 +406,30 @@ export function renderClassCredentialsSection() {
             };
         }
 
-        // 綁定一鍵清除全班 PIN 碼
+        // 綁定自學校端重新同步全班 PIN 碼
         const resetAllBtn = document.getElementById('cred-reset-all-pins-btn');
         if (resetAllBtn && !resetAllBtn.dataset.bound) {
             resetAllBtn.dataset.bound = 'true';
-            resetAllBtn.onclick = () => {
-                if (confirm('確定要清除全班學生的自訂成績認證 PIN 碼？')) {
-                    curClass.studentPins = {};
-                    if (window.saveData) window.saveData();
-                    renderClassCredentialsSection();
-                    showToast('已重設全班學生成績認證碼清單', 'info');
+            resetAllBtn.onclick = async () => {
+                if (confirm('確定要自學校管理端重新同步此班級之學生成績認證碼清單？')) {
+                    showToast('正在向學校管理端同步中...', 'info');
+                    try {
+                        const cloudPins = await fetchClassStudentPinsFromCloud(curClass);
+                        if (cloudPins && Object.keys(cloudPins).length > 0) {
+                            curClass.studentPins = { ...cloudPins };
+                            if (window.saveData) window.saveData();
+                            await syncClassStudentPinsToCloud(curClass);
+                            renderClassCredentialsSection();
+                            showToast(`已成功自學校端同步 ${Object.keys(cloudPins).length} 位學生之認證碼！`, 'success');
+                        } else {
+                            curClass.studentPins = {};
+                            if (window.saveData) window.saveData();
+                            renderClassCredentialsSection();
+                            showToast('學校端目前尚未派發此班級的認證碼，已清空本地設定', 'info');
+                        }
+                    } catch(err) {
+                        showToast('同步失敗：' + err.message, 'error');
+                    }
                 }
             };
         }

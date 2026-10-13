@@ -48,8 +48,13 @@ export function setupSidebar() {
     document.querySelectorAll('.sidebar-nav-item').forEach(item => {
         item.addEventListener('click', (e) => {
             const targetView = item.dataset.view;
-            switchViewFromSidebar(targetView);
-            closeSidebar();
+            try {
+                switchViewFromSidebar(targetView);
+            } catch (err) {
+                console.error("switchViewFromSidebar error:", err);
+            } finally {
+                closeSidebar();
+            }
         });
     });
 
@@ -151,16 +156,22 @@ export function closeSidebar() {
 export function updateSidebarActiveState(activeViewName = state.currentPage) {
     const viewMapping = {
         'overview-page': 'overview',
+        'overview': 'overview',
         'main-page': 'main',
+        'main': 'main',
         'detail-page': 'main',
         'contact-book-page': 'contact-book',
+        'contact-book': 'contact-book',
         'student-details-page': 'main',
         'scores-page': 'scores',
         'scores': 'scores',
         'exam-scores': 'scores',
         'officers-page': 'officers',
+        'officers': 'officers',
         'attendance-page': 'attendance',
+        'attendance': 'attendance',
         'affairs-page': 'affairs',
+        'affairs': 'affairs',
         'quickAuth': 'quickAuth',
         'manage-classes': 'manage-classes',
         'admin-dashboard': 'admin-dashboard'
@@ -170,12 +181,21 @@ export function updateSidebarActiveState(activeViewName = state.currentPage) {
 
     document.querySelectorAll('.sidebar-nav-item').forEach(item => {
         const itemKey = item.dataset.view;
+        const titleEl = item.querySelector('.text-left > div:first-child');
         if (itemKey === targetKey) {
-            item.classList.add('bg-indigo-50', 'text-indigo-600', 'font-black');
-            item.classList.remove('text-slate-700');
+            item.classList.add('bg-indigo-50', 'text-indigo-600', 'font-black', 'border', 'border-indigo-200/90', 'shadow-2xs');
+            item.classList.remove('text-slate-700', 'border-transparent');
+            if (titleEl) {
+                titleEl.classList.add('text-indigo-700');
+                titleEl.classList.remove('text-slate-900');
+            }
         } else {
-            item.classList.remove('bg-indigo-50', 'text-indigo-600', 'font-black');
-            item.classList.add('text-slate-700');
+            item.classList.remove('bg-indigo-50', 'text-indigo-600', 'font-black', 'border', 'border-indigo-200/90', 'shadow-2xs');
+            item.classList.add('text-slate-700', 'border-transparent');
+            if (titleEl) {
+                titleEl.classList.remove('text-indigo-700');
+                titleEl.classList.add('text-slate-900');
+            }
         }
     });
 }

@@ -973,6 +973,17 @@ export function setupButtonEvents() {
                     userLocal.classes = [class107, ...(userLocal.classes || []).filter(c => c.id !== class107.id && !c.name?.includes('602'))];
                 }
 
+                // 同步全校各班派發之最新 PIN 碼至各班級
+                (userLocal.classes || []).forEach(cls => {
+                    const code = (cls.classCode || cls.id?.match(/\d+/)?.[0] || cls.accessCode?.match(/\d+/)?.[0] || cls.name?.match(/\d+/)?.[0]);
+                    if (code) {
+                        const matched = schoolClasses.find(sc => sc.classCode === code || sc.className?.includes(code));
+                        if (matched && matched.studentPins && Object.keys(matched.studentPins).length > 0) {
+                            cls.studentPins = { ...(cls.studentPins || {}), ...matched.studentPins };
+                        }
+                    }
+                });
+
                 if (!userLocal.homeworks || userLocal.homeworks.length === 0) {
                     userLocal.homeworks = [
                         { id: 'hw_test1', classId: 'c107', name: '國文第一課習作', date: new Date().toISOString().split('T')[0], status: {} }

@@ -98,6 +98,10 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
     if (attDateInput) {
         attDateInput.value = dateStr;
     }
+    currentClass.attendance = currentClass.attendance || {};
+    currentClass.attendance[dateStr] = currentClass.attendance[dateStr] || {};
+    const dateRecord = currentClass.attendance[dateStr];
+
     const dateDisplay = document.getElementById('attendance-date-display');
     if (dateDisplay) {
         const hasRecords = Object.keys(dateRecord).length > 0;
@@ -107,11 +111,9 @@ export function renderAttendancePage(dateStr = activeAttendanceDate) {
         `;
     }
 
-    currentClass.attendance = currentClass.attendance || {};
-    currentClass.attendance[dateStr] = currentClass.attendance[dateStr] || {};
-    const dateRecord = currentClass.attendance[dateStr];
-
-    const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
+    const maxSeat = typeof currentClass.lastMaxSeat === 'number' && currentClass.lastMaxSeat > 0 
+        ? currentClass.lastMaxSeat 
+        : ((currentClass.students || []).length || 30);
 
     // 1. 計算並更新統計條
     let cntPresent = 0, cntTardy = 0, cntSick = 0, cntPersonal = 0, cntOfficial = 0;
@@ -292,7 +294,9 @@ export function markAllStudentsPresent(dateStr = activeAttendanceDate) {
     currentClass.attendance = currentClass.attendance || {};
     currentClass.attendance[dateStr] = currentClass.attendance[dateStr] || {};
     
-    const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
+    const maxSeat = typeof currentClass.lastMaxSeat === 'number' && currentClass.lastMaxSeat > 0 
+        ? currentClass.lastMaxSeat 
+        : ((currentClass.students || []).length || 30);
     const nowIso = new Date().toISOString();
 
     for (let s = 1; s <= maxSeat; s++) {
@@ -438,7 +442,9 @@ export function exportAttendanceCsv(dateStr = activeAttendanceDate) {
     if (!currentClass) return;
 
     const dateRecord = currentClass.attendance?.[dateStr] || {};
-    const maxSeat = typeof currentClass.lastMaxSeat === 'number' ? currentClass.lastMaxSeat : 30;
+    const maxSeat = typeof currentClass.lastMaxSeat === 'number' && currentClass.lastMaxSeat > 0 
+        ? currentClass.lastMaxSeat 
+        : ((currentClass.students || []).length || 30);
 
     let csvContent = "\uFEFF座號,姓名,出席狀態,到校時間,備註\n";
 

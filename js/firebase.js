@@ -1152,33 +1152,157 @@ export async function deleteMyAccount() {
 }
 
 export async function syncClassStudentPinsToCloud(classObj) {
-    if (!fbDb || !classObj || !classObj.accessCode) return;
+    if (!classObj) return;
     try {
-        const code = String(classObj.accessCode).trim();
-        const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
-        await setDoc(parentDocRef, {
-            studentPins: classObj.studentPins || {},
-            updatedAt: new Date().toISOString()
-        }, { merge: true });
+        const rawCode = String(classObj.accessCode || classObj.id || '').trim();
+        const numCode = (String(classObj.classCode || '').match(/\d+/) || rawCode.match(/\d+/) || String(classObj.name || '').match(/\d+/))?.[0] || rawCode;
+        const codes = [rawCode, numCode, `SHS_${numCode}`, `shs_${numCode}`, `shs_${numCode}_parent`].filter(Boolean);
 
-        // Update userProfiles for each configured seat
-        if (classObj.studentPins) {
-            for (const [seat, pin] of Object.entries(classObj.studentPins)) {
-                if (pin) {
-                    const studentDocId = `studentScores_${code}_seat${seat}`;
-                    const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', studentDocId);
-                    await setDoc(profileDocRef, {
-                        classCode: code,
-                        seat: String(seat),
-                        parentPin: String(pin),
-                        updatedAt: new Date().toISOString()
-                    }, { merge: true }).catch(() => {});
+        // 寫入 parentClasses 多別名
+        if (fbDb) {
+            for (const pc of [...new Set(codes)]) {
+                const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', pc);
+                await setDoc(parentDocRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: classObj.studentPins || {},
+                    updatedAt: new Date().toISOString()
+                }, { merge: true }).catch(() => {});
+            }
+
+            // 同步寫入學校專屬 PIN 碼通道 sch_pins_{numCode}
+            if (numCode) {
+                const pinDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_pins_${numCode}`);
+                await setDoc(pinDocRef, {
+                    classCode: numCode,
+                    studentPins: classObj.studentPins || {},
+                    updatedAt: new Date().toISOString()
+                }, { merge: true }).catch(() => {});
+            }
+
+            // Update userProfiles for each configured seat
+            if (classObj.studentPins) {
+                for (const [seat, pin] of Object.entries(classObj.studentPins)) {
+                    if (pin) {
+                        const studentDocId = `studentScores_${numCode}_seat${seat}`;
+                        const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', studentDocId);
+                        await setDoc(profileDocRef, {
+                            classCode: numCode,
+                            seat: String(seat),
+                            parentPin: String(pin),
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true }).catch(() => {});
+                    }
                 }
             }
         }
     } catch (e) {
         console.warn("syncClassStudentPinsToCloud error:", e);
     }
+}
+
+/**
+ * 自學校端雲端中樞或本地快取即時拉取該班最新學生 PIN 碼清冊
+ */
+export async function fetchClassStudentPinsFromCloud(classObj) {
+    if (!classObj) return null;
+    
+    // 提取可能的班級代碼（例如 702、701 等）
+    const candidates = [];
+    if (classObj.classCode) candidates.push(String(classObj.classCode).trim());
+    const digitsInId = String(classObj.id || '').match(/\d+/);
+    if (digitsInId) candidates.push(digitsInId[0]);
+    const digitsInAccess = String(classObj.accessCode || '').match(/\d+/);
+    if (digitsInAccess) candidates.push(digitsInAccess[0]);
+    const digitsInName = String(classObj.name || '').match(/\d+/);
+    if (digitsInName) candidates.push(digitsInName[0]);
+    if (classObj.accessCode) candidates.push(String(classObj.accessCode).trim());
+    if (classObj.parentAccessCode) candidates.push(String(classObj.parentAccessCode).trim());
+    if (classObj.teacherUsername) {
+        const d = String(classObj.teacherUsername).match(/\d+/);
+        if (d) candidates.push(d[0]);
+    }
+    const uniqueCodes = [...new Set(candidates.filter(Boolean))];
+
+    // 1. 優先從本地多校暫存讀取 (跨分頁即時支援，保證同瀏覽器設定即生效)
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('school_classes_') || k.startsWith('school_admin_classes_'))) {
+                const list = JSON.parse(localStorage.getItem(k) || '[]');
+                if (Array.isArray(list)) {
+                    for (const sc of list) {
+                        if (uniqueCodes.includes(sc.classCode) || uniqueCodes.some(c => sc.className?.includes(c))) {
+                            if (sc.studentPins && Object.keys(sc.studentPins).length > 0) {
+                                return sc.studentPins;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {}
+
+    // 2. 自雲端專屬通道讀取 (Firestore)
+    if (fbDb) {
+        for (const code of uniqueCodes) {
+            // A. userProfiles/sch_pins_{code}
+            try {
+                const pinRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_pins_${code}`);
+                const snap = await getDoc(pinRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+
+            // B. schoolClasses/{code}
+            try {
+                const scRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', code);
+                const snap = await getDoc(scRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+
+            // C. schoolClasses/school_default_{code}
+            try {
+                const scDefRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', `school_default_${code}`);
+                const snap = await getDoc(scDefRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+
+            // D. parentClasses/SHS_{code}
+            try {
+                const pShsRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', `SHS_${code}`);
+                const snap = await getDoc(pShsRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+
+            // E. parentClasses/{code}
+            try {
+                const pRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', code);
+                const snap = await getDoc(pRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+
+            // F. boundAccounts/shs_{code}_teacher
+            try {
+                const bRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'boundAccounts', `shs_${code}_teacher`);
+                const snap = await getDoc(bRef);
+                if (snap.exists() && snap.data()?.studentPins && Object.keys(snap.data().studentPins).length > 0) {
+                    return snap.data().studentPins;
+                }
+            } catch(e) {}
+        }
+    }
+
+    return null;
 }
 
 export async function syncClassExamsToCloud(classObj) {

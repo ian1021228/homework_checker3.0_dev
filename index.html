@@ -483,7 +483,7 @@
                                 </span>
                                 <div>
                                     <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.5.1 • 2026/10/13</span>
+                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.5.3 • 2026/10/13</span>
                                 </div>
                             </div>
                             <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
@@ -492,20 +492,20 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.5.1 核心更新亮點：</span>
+                                <span>v4.5.3 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-shield-halved text-indigo-600 mt-0.5"></i> <span><b>學校端認證中樞與導航權限隔離</b>：精簡為單一學校專屬登入，登入前強制嚴格隱藏晨間出缺席、行政核章等導航列。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-user-check text-sky-600 mt-0.5"></i> <span><b>多校租戶帳號即時授權比對</b>：支援多租戶帳密即時雲端比對與重新載入機制，確保各校派發管理員 100% 順暢登入。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-arrow-right-from-bracket text-rose-600 mt-0.5"></i> <span><b>教師端安全登出流程修復</b>：採用自訂安全確認視窗替代原生彈窗，修復登出觸發流程並安全返回首頁。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-window-maximize text-teal-600 mt-0.5"></i> <span><b>校園連線狀態修正與寬螢幕設定頁面</b>：修正學校帳號雲端連線狀態顯示，設定視窗大幅加寬為大氣雙欄響應式版面。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bars text-indigo-600 mt-0.5"></i> <span><b>選單列精簡管理班級入口</b>：移除上方重複的管理班級按鈕，僅保留最下方專屬導覽入口，選單清爽俐落。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-emerald-600 mt-0.5"></i> <span><b>家長端全面落實「免密碼直達」</b>：徹底移除家長登入密碼，改為免密碼直達模式與專屬直達連結一鍵複製。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-key text-amber-600 mt-0.5"></i> <span><b>批量設定成績認證碼行號編輯器</b>：左側不可編輯灰色固定座號編號、空號留白支援、一鍵清除空白行與隔行空白。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-teal-600 mt-0.5"></i> <span><b>學校管理端與教師端 PIN 碼雙向即時同步</b>：學校派發之學生 PIN 碼即時同步至導師端，支援自動拉取與回寫。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.1)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.3)</span>
                             </button>
                         </div>
                     </div>
@@ -1512,19 +1512,9 @@
 
         <!-- 選單項目 (10大核心功能) -->
         <nav class="p-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
-            <!-- 0. 管理班級 (自首頁移入側邊欄) -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="manage-classes">
-                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-school text-lg"></i>
-                </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">管理班級</div>
-                    <div class="text-[11px] text-slate-400 font-medium">切換、新增、班級改名與代碼</div>
-                </div>
-            </button>
 
             <!-- 1. 總覽 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="overview">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="overview">
                 <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-gauge-high text-lg"></i>
                 </div>
@@ -1535,7 +1525,7 @@
             </button>
 
             <!-- 2. 作業點收 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="main">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="main">
                 <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-clipboard-check text-lg"></i>
                 </div>
@@ -1546,7 +1536,7 @@
             </button>
 
             <!-- 3. 聯絡簿 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="contact-book">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="contact-book">
                 <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-chalkboard-user text-lg"></i>
                 </div>
@@ -1557,7 +1547,7 @@
             </button>
 
             <!-- 4. 成績 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="scores">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="scores">
                 <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-chart-line text-lg"></i>
                 </div>
@@ -1568,7 +1558,7 @@
             </button>
 
             <!-- 5. 幹部及值日生 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="officers">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="officers">
                 <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-user-shield text-lg"></i>
                 </div>
@@ -1579,7 +1569,7 @@
             </button>
 
             <!-- 6. 簽到及遲到 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="attendance">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="attendance">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-user-check text-lg"></i>
                 </div>
@@ -1590,7 +1580,7 @@
             </button>
 
             <!-- 7. 班級事務 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="affairs">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="affairs">
                 <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-folder-open text-lg"></i>
                 </div>
@@ -1601,7 +1591,7 @@
             </button>
 
             <!-- 8. 快速登入授權 (自首頁移入側邊欄) -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="quickAuth">
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="quickAuth">
                 <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-bolt text-lg text-amber-500"></i>
                 </div>
@@ -1612,7 +1602,7 @@
             </button>
 
             <!-- 9. 管理班級 (自首頁移入側邊欄) -->
-            <button type="button" id="sidebar-manage-classes-nav-btn" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 transition-all active:scale-[0.98] cursor-pointer group" data-view="manage-classes">
+            <button type="button" id="sidebar-manage-classes-nav-btn" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="manage-classes">
                 <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
                     <i class="fa-solid fa-chalkboard-user text-lg"></i>
                 </div>
@@ -3258,17 +3248,19 @@
                                 <span class="text-[10px] text-slate-500 font-bold block mb-1 whitespace-nowrap">家長登入代碼</span>
                                 <div class="flex items-center justify-between">
                                     <span id="cred-parent-account" class="font-mono font-black text-slate-900 text-sm sm:text-base whitespace-nowrap">載入中...</span>
-                                    <button type="button" id="copy-parent-acc-btn" class="text-xs text-emerald-600 hover:text-emerald-800 p-1" title="複製帳號"><i class="fa-solid fa-copy"></i></button>
+                                    <button type="button" id="copy-parent-acc-btn" class="text-xs text-emerald-600 hover:text-emerald-800 p-1 cursor-pointer" title="複製家長代碼"><i class="fa-solid fa-copy"></i></button>
                                 </div>
                             </div>
                             <div class="bg-white p-3 rounded-xl border border-emerald-100 shadow-2xs">
-                                <span class="text-[10px] text-slate-500 font-bold block mb-1 whitespace-nowrap">家長登入密碼</span>
+                                <span class="text-[10px] text-slate-500 font-bold block mb-1 whitespace-nowrap">家長登入模式</span>
                                 <div class="flex items-center justify-between">
-                                    <span id="cred-parent-pass" class="font-mono font-black text-slate-900 text-sm sm:text-base whitespace-nowrap">••••••</span>
-                                    <div class="flex items-center gap-1">
-                                        <button type="button" id="toggle-parent-pass-btn" class="text-xs text-emerald-600 hover:text-emerald-800 p-1" title="顯示/隱藏密碼"><i class="fa-regular fa-eye"></i></button>
-                                        <button type="button" id="copy-parent-pass-btn" class="text-xs text-emerald-600 hover:text-emerald-800 p-1" title="複製密碼"><i class="fa-solid fa-copy"></i></button>
-                                    </div>
+                                    <span class="font-bold text-emerald-700 text-xs sm:text-sm flex items-center gap-1.5 whitespace-nowrap">
+                                        <i class="fa-solid fa-bolt text-amber-500"></i> 免密碼直達（無需密碼）
+                                    </span>
+                                    <button type="button" id="copy-parent-link-btn" class="text-xs text-emerald-600 hover:text-emerald-800 p-1 flex items-center gap-1 font-bold cursor-pointer" title="複製家長免密碼直達連結">
+                                        <i class="fa-solid fa-link"></i>
+                                        <span class="text-[10px] whitespace-nowrap">複製連結</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -4194,11 +4186,69 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕設定版面升級 -->
+                    <!-- v4.5.3 選單精簡、家長免密碼直達、批量PIN行號編輯器與雙端PIN即時同步 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕版面升級</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.3 選單精簡、家長免密碼直達與批量 PIN 編輯器</span>
+                                <span class="text-xs font-bold text-indigo-950">選單列保留單一管理班級、家長端免密碼直達、不可編輯灰色座號編輯器、空白行為空號、一鍵清除空白行、學校端與教師端雙向 PIN 碼同步</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>選單列精簡管理班級入口</b>：移除側邊抽屜選單頂部重複的管理班級按鈕，僅保留最下方專屬導覽入口，消弭重複認知並維持介面乾淨。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>家長端全面落實「免密碼直達」規範</b>：教師端管理班級頁面徹底移除家長登入密碼方塊，改為「免密碼直達（無需密碼）」提示與一鍵複製直達連結，通報函文案同步更新。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>批量設定成績認證碼專業行號文字編輯器</b>：左側自動帶出不可編輯的灰色座號編號（1..N），輸入 Enter 即時新增一行、刪除即時消失，支援內容留空作為「空號 / 缺號」標記。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>一鍵清除空白行與隔行空白工具</b>：編輯器下方新增「一鍵清除空白行 (連號對齊)」與「一鍵清除隔行空白」，自動修復由 Excel 試算表貼上時產生的雙重換行與多餘空行。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>學校管理端與教師端學生 PIN 碼雙向即時同步</b>：打通多校管理中心與班級導師端之 PIN 碼通道，教師端自動偵測並自雲端拉取學校派發之 PIN 碼清冊，支援隨時重新同步與自訂編輯即時回寫。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.2 簽到點名座號矩陣修復、選單自動收合與醒目標示升級 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.2 簽到點名座號矩陣修復、選單自動收合與醒目標示升級</span>
+                                <span class="text-xs font-bold text-slate-800">變數初始化順序校正、座號矩陣正常渲染、抽屜選單點選後 100% 自動收合</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>簽到及遲到座號矩陣修復</b>：修復 <code>dateRecord</code> 初始化作用域問題，徹底解決學生座號卡片空白與未顯示問題，點名統計與到校時間 24H 滾輪功能全數恢復正常運作。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>側邊選單 100% 自動收合</b>：點選側邊欄任何導覽項目（包含簽到及遲到、幹部及值日生等）時，採用保證機制確保選單列於頁面切換後立即自動收合關閉。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>當前功能區塊醒目標示升級</b>：強化側邊欄與各分頁當前所在區塊之選中標記（深色邊框 <code>border-indigo-200</code>、標題藍字強調），位置反饋清晰明確。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕設定版面升級 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.1 學校管理端認證中樞優化、安全登出與寬螢幕版面升級</span>
                                 <span class="text-xs font-bold text-indigo-950">單一學校認證、多校租戶授權比對、自訂安全登出彈窗、設定視窗寬螢幕雙欄化</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
