@@ -492,20 +492,20 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.5.3 核心更新亮點：</span>
+                                <span>v4.5.4 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bars text-indigo-600 mt-0.5"></i> <span><b>選單列精簡管理班級入口</b>：移除上方重複的管理班級按鈕，僅保留最下方專屬導覽入口，選單清爽俐落。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-emerald-600 mt-0.5"></i> <span><b>家長端全面落實「免密碼直達」</b>：徹底移除家長登入密碼，改為免密碼直達模式與專屬直達連結一鍵複製。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-key text-amber-600 mt-0.5"></i> <span><b>批量設定成績認證碼行號編輯器</b>：左側不可編輯灰色固定座號編號、空號留白支援、一鍵清除空白行與隔行空白。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-teal-600 mt-0.5"></i> <span><b>學校管理端與教師端 PIN 碼雙向即時同步</b>：學校派發之學生 PIN 碼即時同步至導師端，支援自動拉取與回寫。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-indigo-600 mt-0.5"></i> <span><b>學校與教師端 PIN 碼全雙向即時同步</b>：解決多端認證碼不一致，老師修改學校端即刻同步，學校端調整教師端秒級響應。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-cloud-arrow-down text-teal-600 mt-0.5"></i> <span><b>全校班級與 PIN 碼雲端中樞直連</b>：跨裝置登入自動向 Firestore 拉取最新全校班級清冊與專屬 PIN 碼，不遺漏任何班級。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bars text-slate-600 mt-0.5"></i> <span><b>選單列精簡管理班級入口</b>：僅保留最下方專屬導覽入口，消弭重複操作。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-emerald-600 mt-0.5"></i> <span><b>家長端全面免密碼直達</b>：徹底移除家長登入密碼，改為專屬直達連結與座號個人 PIN 碼簽章/查分。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.3)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.4)</span>
                             </button>
                         </div>
                     </div>
@@ -4186,12 +4186,37 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.5.3 選單精簡、家長免密碼直達、批量PIN行號編輯器與雙端PIN即時同步 -->
+                    <!-- v4.5.4 學校端與教師端學生 PIN 碼雙向即時同步全面打通 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.3 選單精簡、家長免密碼直達與批量 PIN 編輯器</span>
-                                <span class="text-xs font-bold text-indigo-950">選單列保留單一管理班級、家長端免密碼直達、不可編輯灰色座號編輯器、空白行為空號、一鍵清除空白行、學校端與教師端雙向 PIN 碼同步</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.4 學校端與教師端雙向 PIN 碼即時同步</span>
+                                <span class="text-xs font-bold text-indigo-950">消弭雙端 PIN 碼不一致、老師修改學校端即刻同步、學校修改教師端秒級響應、全校班級 Firestore 雲端中樞直連</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>消弭學校端與教師端認證碼不一致</b>：重構教師端憑證區載入邏輯，優先直連 Firestore 學校學生 PIN 碼專屬通道（<code>sch_pins_{classCode}</code>），全面淘汰舊版隨機示範碼，確保兩端 100% 呈現同一套最新資料源。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>老師修改學校端即刻同步（雙向即時聯動）</b>：教師端在班級憑證區自訂或修改學生座號 PIN 碼時，不僅寫入學生個人成績通道，更同步更新全校班級清冊（<code>sch_classes_{schoolId}</code>）與本地多校暫存，並派發跨頁籤 <code>storage</code> 同步事件，學校端查看清冊彈窗與表格即時無縫反映最新值。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>全校班級雲端中樞自動載入</b>：登入教師端時自動從雲端中樞拉取全校各班級帳密清冊（如 701、702、703 等），自動配賦各班專屬認證碼，跨裝置免重新匯入。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.3 選單精簡、家長免密碼直達、批量PIN行號編輯器 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.3 選單精簡、家長免密碼直達與批量 PIN 編輯器</span>
+                                <span class="text-xs font-bold text-indigo-950">選單列保留單一管理班級、家長端免密碼直達、不可編輯灰色座號編輯器、空白行為空號、一鍵清除空白行</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>
                         </div>

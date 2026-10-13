@@ -1157,6 +1157,8 @@ export async function syncClassStudentPinsToCloud(classObj) {
         const rawCode = String(classObj.accessCode || classObj.id || '').trim();
         const numCode = (String(classObj.classCode || '').match(/\d+/) || rawCode.match(/\d+/) || String(classObj.name || '').match(/\d+/))?.[0] || rawCode;
         const codes = [rawCode, numCode, `SHS_${numCode}`, `shs_${numCode}`, `shs_${numCode}_parent`].filter(Boolean);
+        const currentPins = classObj.studentPins || {};
+        const nowIso = new Date().toISOString();
 
         // 寫入 parentClasses 多別名
         if (fbDb) {
@@ -1165,8 +1167,8 @@ export async function syncClassStudentPinsToCloud(classObj) {
                 await setDoc(parentDocRef, {
                     classCode: numCode,
                     className: classObj.name || `${numCode}班`,
-                    studentPins: classObj.studentPins || {},
-                    updatedAt: new Date().toISOString()
+                    studentPins: currentPins,
+                    updatedAt: nowIso
                 }, { merge: true }).catch(() => {});
             }
 
@@ -1175,9 +1177,42 @@ export async function syncClassStudentPinsToCloud(classObj) {
                 const pinDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_pins_${numCode}`);
                 await setDoc(pinDocRef, {
                     classCode: numCode,
-                    studentPins: classObj.studentPins || {},
-                    updatedAt: new Date().toISOString()
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso,
+                    updatedBy: 'teacher'
                 }, { merge: true }).catch(() => {});
+
+                // 同步寫入 schoolClasses/{numCode}
+                const scDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', numCode);
+                await setDoc(scDocRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso
+                }, { merge: true }).catch(() => {});
+            }
+
+            // 同步更新學校全校班級清冊 userProfiles/sch_classes_{schoolId}
+            for (const schId of ['shs', 'test_school']) {
+                try {
+                    const schListRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_classes_${schId}`);
+                    const snap = await getDoc(schListRef);
+                    if (snap.exists() && Array.isArray(snap.data()?.list)) {
+                        const list = snap.data().list;
+                        let found = false;
+                        for (const sc of list) {
+                            if (sc.classCode === numCode || String(sc.className || '').includes(numCode)) {
+                                sc.studentPins = { ...currentPins };
+                                sc.updatedAt = nowIso;
+                                found = true;
+                            }
+                        }
+                        if (found) {
+                            await setDoc(schListRef, { list, updatedAt: nowIso }, { merge: true });
+                        }
+                    }
+                } catch(e) {}
             }
 
             // Update userProfiles for each configured seat
@@ -1190,12 +1225,48 @@ export async function syncClassStudentPinsToCloud(classObj) {
                             classCode: numCode,
                             seat: String(seat),
                             parentPin: String(pin),
-                            updatedAt: new Date().toISOString()
+                            updatedAt: nowIso
                         }, { merge: true }).catch(() => {});
                     }
                 }
             }
         }
+
+        // 同步更新本地瀏覽器 localStorage 中的學校班級暫存 (同網域即時互通)
+        try {
+            for (let i = 0; i < localStorage.length; i++) {
+                const k = localStorage.key(i);
+                if (k && (k.startsWith('school_classes_') || k.startsWith('school_admin_classes_'))) {
+                    const raw = localStorage.getItem(k);
+                    if (raw) {
+                        const list = JSON.parse(raw);
+                        if (Array.isArray(list)) {
+                            let updated = false;
+                            for (const sc of list) {
+                                if (sc.classCode === numCode || String(sc.className || '').includes(numCode)) {
+                                    sc.studentPins = { ...currentPins };
+                                    sc.updatedAt = nowIso;
+                                    updated = true;
+                                }
+                            }
+                            if (updated) {
+                                localStorage.setItem(k, JSON.stringify(list));
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 發送跨頁籤雙向即時同步事件
+            localStorage.setItem('school_pins_sync_event', JSON.stringify({
+                classCode: numCode,
+                studentPins: currentPins,
+                timestamp: Date.now()
+            }));
+            window.dispatchEvent(new CustomEvent('class_pins_updated', {
+                detail: { classCode: numCode, studentPins: currentPins }
+            }));
+        } catch(e) {}
     } catch (e) {
         console.warn("syncClassStudentPinsToCloud error:", e);
     }
@@ -1224,26 +1295,7 @@ export async function fetchClassStudentPinsFromCloud(classObj) {
     }
     const uniqueCodes = [...new Set(candidates.filter(Boolean))];
 
-    // 1. 優先從本地多校暫存讀取 (跨分頁即時支援，保證同瀏覽器設定即生效)
-    try {
-        for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i);
-            if (k && (k.startsWith('school_classes_') || k.startsWith('school_admin_classes_'))) {
-                const list = JSON.parse(localStorage.getItem(k) || '[]');
-                if (Array.isArray(list)) {
-                    for (const sc of list) {
-                        if (uniqueCodes.includes(sc.classCode) || uniqueCodes.some(c => sc.className?.includes(c))) {
-                            if (sc.studentPins && Object.keys(sc.studentPins).length > 0) {
-                                return sc.studentPins;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    } catch (e) {}
-
-    // 2. 自雲端專屬通道讀取 (Firestore)
+    // 1. 優先自雲端專屬通道讀取最新 PIN 碼 (Firestore 即時中樞)
     if (fbDb) {
         for (const code of uniqueCodes) {
             // A. userProfiles/sch_pins_{code}
@@ -1301,6 +1353,25 @@ export async function fetchClassStudentPinsFromCloud(classObj) {
             } catch(e) {}
         }
     }
+
+    // 2. 本地多校暫存後備讀取 (離線或無雲端時之 Fallback)
+    try {
+        for (let i = 0; i < localStorage.length; i++) {
+            const k = localStorage.key(i);
+            if (k && (k.startsWith('school_classes_') || k.startsWith('school_admin_classes_'))) {
+                const list = JSON.parse(localStorage.getItem(k) || '[]');
+                if (Array.isArray(list)) {
+                    for (const sc of list) {
+                        if (uniqueCodes.includes(sc.classCode) || uniqueCodes.some(c => sc.className?.includes(c))) {
+                            if (sc.studentPins && Object.keys(sc.studentPins).length > 0) {
+                                return sc.studentPins;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } catch (e) {}
 
     return null;
 }

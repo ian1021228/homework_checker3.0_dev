@@ -311,18 +311,21 @@ export function renderClassCredentialsSection() {
         });
     }
 
-    // 自動與雲端學校管理端同步 PIN 碼檢查
+    // 自動與雲端學校管理端同步 PIN 碼檢查（保證與學校端資料中樞保持一致）
     curClass.studentPins = curClass.studentPins || {};
-    const pinKeys = Object.keys(curClass.studentPins);
-    if (pinKeys.length === 0 && !curClass._isSyncingPins) {
+    if (!curClass._isSyncingPins) {
         curClass._isSyncingPins = true;
         fetchClassStudentPinsFromCloud(curClass).then(cloudPins => {
             curClass._isSyncingPins = false;
             if (cloudPins && Object.keys(cloudPins).length > 0) {
-                curClass.studentPins = { ...cloudPins };
-                if (window.saveData) window.saveData();
-                renderClassCredentialsSection();
-                console.log(`已自動為【${curClass.name}】同步學校管理端 ${Object.keys(cloudPins).length} 位學生 PIN 碼`);
+                const curStr = JSON.stringify(curClass.studentPins || {});
+                const cloudStr = JSON.stringify(cloudPins);
+                if (curStr !== cloudStr) {
+                    curClass.studentPins = { ...cloudPins };
+                    if (window.saveData) window.saveData();
+                    renderClassCredentialsSection();
+                    console.log(`已自動為【${curClass.name}】同步學校管理端最新學生 PIN 碼 (${Object.keys(cloudPins).length} 筆)`);
+                }
             }
         }).catch(() => {
             curClass._isSyncingPins = false;
@@ -390,7 +393,7 @@ export function renderClassCredentialsSection() {
                     if (window.saveData) window.saveData();
                     await syncClassStudentPinsToCloud(curClass);
                     renderClassCredentialsSection();
-                    showToast(`已更新 ${seat} 號學生 PIN 碼並同步雲端`, 'success');
+                    showToast(`已更新 ${seat} 號學生 PIN 碼並即時同步至學校管理端與雲端！`, 'success');
                 }
             };
         });
@@ -1124,3 +1127,37 @@ export function reRenderCurrentPage(showMainPageFn, showDetailPageFn) {
     }
     updateDataManagementUI();
 }
+
+// 跨頁籤雙向即時同步監聽（學校端或教師端在其他頁籤更新 PIN 碼時即刻反映）
+window.addEventListener('storage', (e) => {
+    if (e.key === 'school_pins_sync_event' && e.newValue) {
+        try {
+            const data = JSON.parse(e.newValue);
+            const curClass = state.appData?.classes?.find(c => c.id === state.selectedClassId);
+            if (curClass && data.studentPins) {
+                const match1 = String(curClass.accessCode || '').match(/\d+/)?.[0];
+                const match2 = String(curClass.name || '').match(/\d+/)?.[0];
+                if (match1 === data.classCode || match2 === data.classCode || curClass.classCode === data.classCode) {
+                    curClass.studentPins = { ...data.studentPins };
+                    if (window.saveData) window.saveData();
+                    renderClassCredentialsSection();
+                }
+            }
+        } catch(err) {}
+    }
+});
+window.addEventListener('class_pins_updated', (e) => {
+    try {
+        const data = e.detail;
+        const curClass = state.appData?.classes?.find(c => c.id === state.selectedClassId);
+        if (curClass && data?.studentPins) {
+            const match1 = String(curClass.accessCode || '').match(/\d+/)?.[0];
+            const match2 = String(curClass.name || '').match(/\d+/)?.[0];
+            if (match1 === data.classCode || match2 === data.classCode || curClass.classCode === data.classCode) {
+                curClass.studentPins = { ...data.studentPins };
+                if (window.saveData) window.saveData();
+                renderClassCredentialsSection();
+            }
+        }
+    } catch(err) {}
+});

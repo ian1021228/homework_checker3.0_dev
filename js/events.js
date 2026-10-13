@@ -47,6 +47,7 @@ import {
     applyActionCode,
     doc,
     setDoc,
+    getDoc,
     getDocs,
     collection,
     isGoogleAdmin,
@@ -923,7 +924,7 @@ export function setupButtonEvents() {
                 const userKey = getUserStorageKey(userObj);
                 let userLocal = loadLocalDataForUser(userObj) || { classes: [], homeworks: [], homeworkTypes: safeClone(DEFAULT_TYPES) };
 
-                // 搜尋是否有學校管理端設定好的 701 / 107 班級與 PIN 碼
+                // 搜尋是否有學校管理端設定好的班級與 PIN 碼（優先結合本地與雲端全校清冊）
                 let schoolClasses = [];
                 for (let i = 0; i < localStorage.length; i++) {
                     const k = localStorage.key(i);
@@ -934,6 +935,31 @@ export function setupButtonEvents() {
                         } catch(e) {}
                     }
                 }
+
+                // 自雲端中樞讀取全校班級清冊與最新 PIN 碼
+                if (fbDb) {
+                    try {
+                        for (const schId of ['shs', 'test_school']) {
+                            const schDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_classes_${schId}`);
+                            const snap = await getDoc(schDocRef);
+                            if (snap.exists() && Array.isArray(snap.data()?.list)) {
+                                const cloudList = snap.data().list;
+                                cloudList.forEach(cl => {
+                                    const existingSc = schoolClasses.find(sc => sc.classCode === cl.classCode);
+                                    if (!existingSc) {
+                                        schoolClasses.push(cl);
+                                    } else {
+                                        if (cl.studentPins && Object.keys(cl.studentPins).length > 0) {
+                                            existingSc.studentPins = { ...(existingSc.studentPins || {}), ...cl.studentPins };
+                                        }
+                                    }
+                                });
+                                localStorage.setItem(`school_classes_${schId}`, JSON.stringify(cloudList));
+                            }
+                        }
+                    } catch(e) {}
+                }
+
                 const matched701 = schoolClasses.find(c => c.classCode === '701' || c.className?.includes('7年1班') || c.className?.includes('107'));
 
                 const syncedPins = (matched701 && matched701.studentPins && Object.keys(matched701.studentPins).length > 0)
@@ -973,13 +999,36 @@ export function setupButtonEvents() {
                     userLocal.classes = [class107, ...(userLocal.classes || []).filter(c => c.id !== class107.id && !c.name?.includes('602'))];
                 }
 
-                // 同步全校各班派發之最新 PIN 碼至各班級
-                (userLocal.classes || []).forEach(cls => {
-                    const code = (cls.classCode || cls.id?.match(/\d+/)?.[0] || cls.accessCode?.match(/\d+/)?.[0] || cls.name?.match(/\d+/)?.[0]);
-                    if (code) {
-                        const matched = schoolClasses.find(sc => sc.classCode === code || sc.className?.includes(code));
-                        if (matched && matched.studentPins && Object.keys(matched.studentPins).length > 0) {
-                            cls.studentPins = { ...(cls.studentPins || {}), ...matched.studentPins };
+                // 同步全校各班派發之班級與最新 PIN 碼至班級清單中
+                schoolClasses.forEach(sc => {
+                    if (!sc || !sc.classCode) return;
+                    const existing = (userLocal.classes || []).find(c => 
+                        c.classCode === sc.classCode || 
+                        c.id === sc.classCode || 
+                        c.id === `c${sc.classCode}` || 
+                        c.name?.includes(sc.classCode)
+                    );
+                    if (!existing) {
+                        userLocal.classes.push({
+                            id: `c${sc.classCode}`,
+                            classCode: sc.classCode,
+                            name: sc.className || `${sc.classCode}班`,
+                            studentCount: sc.studentCount || 30,
+                            missingSeats: sc.missingSeats || [],
+                            skippedSeats: sc.missingSeats || [],
+                            lastMaxSeat: sc.studentCount || 30,
+                            hasConfiguredMaxSeat: true,
+                            accessCode: sc.parentAccessCode || `SHS_${sc.classCode}`,
+                            parentAccessCode: sc.parentAccessCode || `SHS_${sc.classCode}`,
+                            parentUsername: sc.parentAccessCode || `SHS_${sc.classCode}`,
+                            parentPassword: sc.parentPassword || '',
+                            teacherUsername: sc.teacherUsername || `t${sc.classCode}_shs`,
+                            teacherPassword: sc.teacherPassword || '',
+                            studentPins: sc.studentPins || {}
+                        });
+                    } else {
+                        if (sc.studentPins && Object.keys(sc.studentPins).length > 0) {
+                            existing.studentPins = { ...sc.studentPins };
                         }
                     }
                 });
