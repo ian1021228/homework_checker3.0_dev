@@ -123,6 +123,9 @@ export function hideAllPages() {
     if (window.closePhoneQrScannerModal) {
         try { window.closePhoneQrScannerModal(); } catch(e) {}
     }
+    if (window.stopPhoneQuickAuth) {
+        try { window.stopPhoneQuickAuth(); } catch(e) {}
+    }
     updateGuestHomeBtnVisibility();
 }
 

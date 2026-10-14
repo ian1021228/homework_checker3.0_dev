@@ -492,20 +492,20 @@
                         <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
                             <div class="font-bold text-emerald-950 flex items-center gap-1.5">
                                 <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.5.4 核心更新亮點：</span>
+                                <span>v4.5.5 核心更新亮點：</span>
                             </div>
                             <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-indigo-600 mt-0.5"></i> <span><b>學校與教師端 PIN 碼全雙向即時同步</b>：解決多端認證碼不一致，老師修改學校端即刻同步，學校端調整教師端秒級響應。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-cloud-arrow-down text-teal-600 mt-0.5"></i> <span><b>全校班級與 PIN 碼雲端中樞直連</b>：跨裝置登入自動向 Firestore 拉取最新全校班級清冊與專屬 PIN 碼，不遺漏任何班級。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-bars text-slate-600 mt-0.5"></i> <span><b>選單列精簡管理班級入口</b>：僅保留最下方專屬導覽入口，消弭重複操作。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-emerald-600 mt-0.5"></i> <span><b>家長端全面免密碼直達</b>：徹底移除家長登入密碼，改為專屬直達連結與座號個人 PIN 碼簽章/查分。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-camera text-indigo-600 mt-0.5"></i> <span><b>快速授權相機畫面全黑修復</b>：清除全螢幕未定義函式調用錯誤，加入多層鏡頭自動適配（後置/前置/可用鏡頭降級容錯）與重啟相機提示。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-key text-amber-600 mt-0.5"></i> <span><b>一次性認證碼按鈕動態切換</b>：進入頁面預設呈現「產生代碼」按鈕與待命狀態，點擊後生成安全碼並動態切換為「重新產生新代碼」。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-emerald-600 mt-0.5"></i> <span><b>學校與教師端 PIN 碼全雙向即時同步</b>：解決多端認證碼不一致，老師修改學校端即刻同步，學校端調整教師端秒級響應。</span></li>
+                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-teal-600 mt-0.5"></i> <span><b>家長端全面免密碼直達</b>：徹底移除家長登入密碼，改為專屬直達連結與座號個人 PIN 碼簽章/查分。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
                             <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
                                 <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.4)</span>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.5)</span>
                             </button>
                         </div>
                     </div>
@@ -3479,15 +3479,15 @@
                 </div>
 
                 <div class="flex items-center justify-center gap-3">
-                    <button type="button" id="otp-phone-refresh-btn" class="py-3 px-6 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-black transition-all flex items-center gap-2 cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap">
-                        <i class="fa-solid fa-arrows-rotate"></i>
-                        <span>重新產生新代碼</span>
+                    <button type="button" id="otp-phone-refresh-btn" class="py-3 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black transition-all flex items-center gap-2 cursor-pointer shadow-sm shadow-indigo-500/20 active:scale-95 whitespace-nowrap">
+                        <i class="fa-solid fa-key"></i>
+                        <span>產生代碼</span>
                     </button>
                 </div>
 
-                <div id="otp-phone-status-notice" class="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-bold text-emerald-800 flex items-center justify-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                    <span class="whitespace-nowrap">等待公用電腦輸入登入中...</span>
+                <div id="otp-phone-status-notice" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-circle-info text-indigo-500"></i>
+                    <span class="whitespace-nowrap">點擊下方「產生代碼」即可建立 6 位數一次性登入碼</span>
                 </div>
 
                 <!-- 安全說明須知 -->
@@ -4186,11 +4186,36 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.5.4 學校端與教師端學生 PIN 碼雙向即時同步全面打通 -->
+                    <!-- v4.5.5 快速授權相機視窗修復與一次性認證碼按鈕動態切換 -->
                     <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.4 學校端與教師端雙向 PIN 碼即時同步</span>
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.5 快速授權相機畫面全黑修復與認證碼按鈕優化</span>
+                                <span class="text-xs font-bold text-indigo-950">排除未定義函式調用、相機多層鏡頭自動適配與容錯、重啟提示、認證碼按鈕動態切換（產生代碼 ➔ 重新產生新代碼）</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-400">2026-10-14</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>修復掃描相機畫面全黑異常</b>：徹底清除全螢幕快速授權視圖中未定義函式調用（<code>startOtpPhoneMode</code> 參照錯誤），確保相機元件初始化流程順利執行；加入鏡頭降級容錯機制（依序嘗試後置鏡頭、前置視訊鏡頭與可用設備），全面相容電腦筆電與行動裝置。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>相機即時載入狀態與重試引導</b>：在相機鏡頭載入期間提供旋轉載入動畫，若權限未就緒或設備忙碌時自動展示友善診斷卡片與「重新開啟相機」按鈕，不再呈現無反饋黑屏。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>一次性認證碼（OTP）按鈕動態狀態切換</b>：進入授權頁面預設顯示「產生代碼」按鈕與待命指引，點擊後即時生成 6 位數安全碼並啟動倒數，按鈕自動變更為「重新產生新代碼」；離開頁面時自動釋放鏡頭資源並重置安全狀態。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.4 學校端與教師端學生 PIN 碼雙向即時同步全面打通 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-slate-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.4 學校端與教師端雙向 PIN 碼即時同步</span>
                                 <span class="text-xs font-bold text-indigo-950">消弭雙端 PIN 碼不一致、老師修改學校端即刻同步、學校修改教師端秒級響應、全校班級 Firestore 雲端中樞直連</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-13</span>

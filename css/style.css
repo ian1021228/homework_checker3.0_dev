@@ -284,9 +284,19 @@ input, textarea {
 
     /* 7. QR 相機掃描視窗在手機螢幕完全置中且不變形 */
     #qr-scanner-viewport video {
+        width: 100% !important;
+        height: 100% !important;
         object-fit: cover !important;
-        border-radius: 1rem !important;
+        border-radius: 1.25rem !important;
     }
+}
+
+/* QR 相機掃描視窗全域自適應樣式（桌機與手機） */
+#qr-scanner-viewport video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 1.25rem !important;
 }
 
 /* 雙螢幕模式自適應排版：聯絡簿佔右側 1/3，左側作業卡片流暢對齊不擠壓 */

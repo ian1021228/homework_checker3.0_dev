@@ -426,42 +426,166 @@ export async function closePhoneQrScannerModal() {
 }
 
 /**
+ * 重設手機端 OTP 一次性認證碼介面為初始狀態（「產生代碼」按鈕與預設待命提示）
+ */
+export function resetPhoneOtpUI() {
+    stopPhoneOtpSession();
+
+    const codeDisplay = document.getElementById('otp-phone-display-code');
+    const countdownEl = document.getElementById('otp-phone-countdown');
+    const noticeEl = document.getElementById('otp-phone-status-notice');
+    const refreshBtn = document.getElementById('otp-phone-refresh-btn');
+
+    if (codeDisplay) {
+        codeDisplay.textContent = '------';
+    }
+    if (countdownEl) {
+        countdownEl.innerHTML = `<i class="fa-regular fa-clock text-indigo-500"></i><span>有效倒數時間：05:00</span>`;
+    }
+    if (noticeEl) {
+        noticeEl.className = "p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 flex items-center justify-center gap-2";
+        noticeEl.innerHTML = `<i class="fa-solid fa-circle-info text-indigo-500"></i><span class="whitespace-nowrap">點擊下方「產生代碼」即可建立 6 位數一次性登入碼</span>`;
+    }
+    if (refreshBtn) {
+        refreshBtn.innerHTML = `<i class="fa-solid fa-key"></i><span>產生代碼</span>`;
+        refreshBtn.className = "py-3 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black transition-all flex items-center gap-2 cursor-pointer shadow-sm shadow-indigo-500/20 active:scale-95 whitespace-nowrap";
+    }
+}
+window.resetPhoneOtpUI = resetPhoneOtpUI;
+
+/**
+ * 停止全螢幕快速授權視圖中的相機取景與 OTP 監聽
+ */
+export async function stopPhoneQuickAuth() {
+    stopPhoneOtpSession();
+    resetPhoneOtpUI();
+    if (html5QrCodeScanner) {
+        try {
+            if (html5QrCodeScanner.isScanning) {
+                await html5QrCodeScanner.stop();
+            }
+            html5QrCodeScanner.clear();
+        } catch (e) {
+            console.warn("Scanner stop error:", e);
+        }
+        html5QrCodeScanner = null;
+    }
+}
+window.stopPhoneQuickAuth = stopPhoneQuickAuth;
+
+/**
  * 啟動全螢幕快速登入授權視圖 (支援相機掃描與 OTP 一次性認證碼)
  */
 export async function startPhoneQuickAuth() {
-    startOtpPhoneMode();
+    resetPhoneOtpUI();
+
+    const viewportEl = document.getElementById('qr-scanner-viewport');
+    if (!viewportEl) return;
+
     if (!window.Html5Qrcode) {
+        viewportEl.innerHTML = `
+            <div class="flex flex-col items-center justify-center p-6 text-center text-white h-full space-y-3">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-400"></i>
+                <span class="text-xs font-bold text-slate-300">相機元件載入中，請稍候...</span>
+            </div>
+        `;
+        setTimeout(() => {
+            if (window.Html5Qrcode) startPhoneQuickAuth();
+        }, 800);
         return;
     }
-    const viewportEl = document.getElementById('qr-scanner-viewport');
-    if (viewportEl) viewportEl.innerHTML = '';
+
     try {
-        if (!html5QrCodeScanner) {
-            html5QrCodeScanner = new window.Html5Qrcode("qr-scanner-viewport");
+        if (html5QrCodeScanner) {
+            try {
+                if (html5QrCodeScanner.isScanning) {
+                    await html5QrCodeScanner.stop();
+                }
+                html5QrCodeScanner.clear();
+            } catch (e) {
+                console.warn("Scanner cleanup error:", e);
+            }
+            html5QrCodeScanner = null;
         }
-        if (html5QrCodeScanner.isScanning) {
-            await html5QrCodeScanner.stop();
-        }
+
+        viewportEl.innerHTML = `
+            <div class="flex flex-col items-center justify-center p-6 text-center text-white h-full space-y-3">
+                <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-400"></i>
+                <span class="text-xs font-bold text-slate-300">正在啟動相機鏡頭...</span>
+            </div>
+        `;
+
+        html5QrCodeScanner = new window.Html5Qrcode("qr-scanner-viewport");
+
         const config = {
             fps: 15,
             qrbox: { width: 250, height: 250 },
             aspectRatio: 1.0
         };
-        await html5QrCodeScanner.start(
-            { facingMode: "environment" },
-            config,
-            async (decodedText) => {
-                const challengeId = parseChallengeId(decodedText);
-                if (challengeId) {
-                    await promptAuthorizeChallenge(challengeId);
+
+        const onScanSuccess = async (decodedText) => {
+            const challengeId = parseChallengeId(decodedText);
+            if (challengeId) {
+                await promptAuthorizeChallenge(challengeId);
+            } else {
+                showAlertModal("無法辨識的 QR Code", "此 QR Code 並非班級經營系統的登入碼，請對準電腦螢幕上的登入 QR Code 再次掃描。");
+            }
+        };
+
+        const onScanFailure = () => {};
+
+        // 優先嘗試手機環境後置鏡頭，若無（例如筆電或前置鏡頭）則降級使用前置鏡頭或第一個可用鏡頭
+        try {
+            await html5QrCodeScanner.start(
+                { facingMode: "environment" },
+                config,
+                onScanSuccess,
+                onScanFailure
+            );
+        } catch (envErr) {
+            console.warn("Camera facingMode: environment failed, trying user camera...", envErr);
+            try {
+                await html5QrCodeScanner.start(
+                    { facingMode: "user" },
+                    config,
+                    onScanSuccess,
+                    onScanFailure
+                );
+            } catch (userErr) {
+                console.warn("Camera facingMode: user failed, querying getCameras...", userErr);
+                const cameras = await window.Html5Qrcode.getCameras().catch(() => []);
+                if (cameras && cameras.length > 0) {
+                    await html5QrCodeScanner.start(
+                        cameras[0].id,
+                        config,
+                        onScanSuccess,
+                        onScanFailure
+                    );
                 } else {
-                    showAlertModal("無法辨識的 QR Code", "此 QR Code 並非班級經營系統的登入碼，請對準電腦螢幕上的登入 QR Code 再次掃描。");
+                    throw userErr;
                 }
-            },
-            () => {}
-        );
+            }
+        }
     } catch (err) {
         console.warn("Camera start error in full-screen quickAuth view:", err);
+        if (viewportEl) {
+            viewportEl.innerHTML = `
+                <div class="flex flex-col items-center justify-center p-6 text-center text-white h-full space-y-3">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-rose-400 text-xl shadow-inner">
+                        <i class="fa-solid fa-camera"></i>
+                    </div>
+                    <div class="text-sm font-black text-slate-100">相機啟動中或尚未取得畫面</div>
+                    <p class="text-xs text-slate-400 max-w-[240px] leading-relaxed">請確認瀏覽器已允許使用相機鏡頭，或改用右側「產生一次性認證碼」直接登入。</p>
+                    <button type="button" id="qr-retry-camera-btn" class="mt-2 py-2 px-4 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                        <span>重新開啟相機</span>
+                    </button>
+                </div>
+            `;
+            document.getElementById('qr-retry-camera-btn')?.addEventListener('click', () => {
+                startPhoneQuickAuth();
+            });
+        }
     }
 }
 window.startPhoneQuickAuth = startPhoneQuickAuth;
@@ -806,11 +930,16 @@ export async function generatePhoneOtpCode() {
     const codeDisplay = document.getElementById('otp-phone-display-code');
     const countdownEl = document.getElementById('otp-phone-countdown');
     const noticeEl = document.getElementById('otp-phone-status-notice');
+    const refreshBtn = document.getElementById('otp-phone-refresh-btn');
 
     if (codeDisplay) codeDisplay.textContent = otpCode.substring(0, 3) + ' ' + otpCode.substring(3);
     if (noticeEl) {
-        noticeEl.className = "p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-xs font-bold text-emerald-800 flex items-center justify-center gap-1.5";
-        noticeEl.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span><span>等待公用電腦輸入登入中...</span>`;
+        noticeEl.className = "p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs sm:text-sm font-bold text-emerald-800 flex items-center justify-center gap-2";
+        noticeEl.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span><span class="whitespace-nowrap">等待公用電腦輸入登入中...</span>`;
+    }
+    if (refreshBtn) {
+        refreshBtn.innerHTML = `<i class="fa-solid fa-arrows-rotate"></i><span>重新產生新代碼</span>`;
+        refreshBtn.className = "py-3 px-6 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-sm font-black transition-all flex items-center gap-2 cursor-pointer shadow-2xs active:scale-95 whitespace-nowrap";
     }
 
     // 取得 Auth Session 與 密碼
@@ -855,7 +984,7 @@ export async function generatePhoneOtpCode() {
         const updateCountdown = () => {
             const mins = String(Math.floor(remainingSeconds / 60)).padStart(2, '0');
             const secs = String(remainingSeconds % 60).padStart(2, '0');
-            if (countdownEl) countdownEl.innerHTML = `<i class="fa-regular fa-clock"></i><span>有效時間：${mins}:${secs}</span>`;
+            if (countdownEl) countdownEl.innerHTML = `<i class="fa-regular fa-clock text-indigo-500"></i><span>有效倒數時間：${mins}:${secs}</span>`;
         };
         updateCountdown();
 
@@ -865,8 +994,8 @@ export async function generatePhoneOtpCode() {
                 clearInterval(activePhoneOtpCountdownInterval);
                 activePhoneOtpCountdownInterval = null;
                 if (noticeEl) {
-                    noticeEl.className = "p-2.5 rounded-xl bg-rose-50 border border-rose-200 text-xs font-bold text-rose-700 flex items-center justify-center gap-1.5";
-                    noticeEl.innerHTML = `<span>認證碼已過期，請點擊重新產生</span>`;
+                    noticeEl.className = "p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs sm:text-sm font-bold text-rose-700 flex items-center justify-center gap-2";
+                    noticeEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-rose-500"></i><span class="whitespace-nowrap">認證碼已過期，請點擊重新產生</span>`;
                 }
             } else {
                 updateCountdown();
@@ -879,8 +1008,8 @@ export async function generatePhoneOtpCode() {
             const data = snap.data();
             if (data.status === 'consumed') {
                 if (noticeEl) {
-                    noticeEl.className = "p-2.5 rounded-xl bg-emerald-100 border border-emerald-300 text-xs font-black text-emerald-900 flex items-center justify-center gap-1.5";
-                    noticeEl.innerHTML = `<span>公用電腦已成功登入！</span>`;
+                    noticeEl.className = "p-3.5 rounded-2xl bg-emerald-100 border border-emerald-300 text-xs sm:text-sm font-black text-emerald-900 flex items-center justify-center gap-2";
+                    noticeEl.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-600"></i><span class="whitespace-nowrap">公用電腦已成功登入！</span>`;
                 }
                 showToast("恭喜！目標電腦已成功完成認證碼登入。", "success");
                 stopPhoneOtpSession();
