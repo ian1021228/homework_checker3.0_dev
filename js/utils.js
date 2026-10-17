@@ -95,33 +95,56 @@ export function sanitizeAppData(data) {
             }
         }
         return {
+            ...c,
             id: String(c.id || generateId()),
             name: String(c.name || '未命名班級'),
             accessCode: typeof c.accessCode === 'string' ? c.accessCode.trim() : (typeof c.accessCode === 'number' ? String(c.accessCode) : ''),
             lastMaxSeat: typeof c.lastMaxSeat === 'number' ? c.lastMaxSeat : (parseInt(c.lastMaxSeat, 10) || 30),
             lastMissingSeats: typeof c.lastMissingSeats === 'string' ? c.lastMissingSeats : '',
+            skippedSeats: Array.isArray(c.skippedSeats) ? c.skippedSeats : [],
             studentBarcodes: cleanBarcodes,
             contactBook: cleanContact,
             studentPins: c.studentPins && typeof c.studentPins === 'object' ? c.studentPins : {},
             exams: Array.isArray(c.exams) ? c.exams : [],
+            attendance: c.attendance && typeof c.attendance === 'object' ? c.attendance : {},
+            officers: c.officers && typeof c.officers === 'object' ? c.officers : {},
+            affairs: Array.isArray(c.affairs) ? c.affairs : [],
             hasConfiguredMaxSeat: Boolean(c.hasConfiguredMaxSeat)
         };
     }).filter(Boolean) : [];
 
+    const classMap = new Map(cleanClasses.map(c => [c.id, c]));
+
     const cleanHomeworks = Array.isArray(data.homeworks) ? data.homeworks.map(h => {
         if (!h || typeof h !== 'object') return null;
-        const cleanStudents = Array.isArray(h.students) ? h.students.map(s => {
+        let cleanStudents = Array.isArray(h.students) ? h.students.map(s => {
             if (!s || typeof s !== 'object') return null;
             return {
                 seat: typeof s.seat === 'number' ? s.seat : (parseInt(s.seat, 10) || 1),
                 status: String(s.status || 'not-submitted')
             };
         }).filter(Boolean) : [];
+
+        if (cleanStudents.length === 0) {
+            const cls = classMap.get(String(h.classId || '')) || cleanClasses[0];
+            const maxSeat = (typeof h.studentCount === 'number' && h.studentCount > 0)
+                ? h.studentCount
+                : (cls?.lastMaxSeat || 30);
+            const skippedSet = new Set(Array.isArray(cls?.skippedSeats) ? cls.skippedSeats.map(Number) : []);
+            const seatStatusObj = (h.seatStatus && typeof h.seatStatus === 'object') ? h.seatStatus : {};
+            for (let s = 1; s <= maxSeat; s++) {
+                if (skippedSet.has(s)) continue;
+                const rawSt = seatStatusObj[s];
+                const mappedStatus = (rawSt === 1 || rawSt === 'completed') ? 'completed' : 'not-submitted';
+                cleanStudents.push({ seat: s, status: mappedStatus });
+            }
+        }
+
         return {
             id: String(h.id || generateId()),
             classId: String(h.classId || ''),
             name: String(h.name || '未命名作業'),
-            studentCount: typeof h.studentCount === 'number' ? h.studentCount : cleanStudents.length,
+            studentCount: cleanStudents.length,
             typeId: String(h.typeId || 'default'),
             createdAt: h.createdAt ? (h.createdAt instanceof Date ? h.createdAt.toISOString() : String(h.createdAt)) : new Date().toISOString(),
             students: cleanStudents

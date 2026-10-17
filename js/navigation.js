@@ -147,7 +147,9 @@ export function updateMobileNavVisibility(pageName) {
     const fabAdd = document.getElementById('mobile-fab-add');
     if (!bottomNav) return;
 
-    if (pageName === 'portal') {
+    // 全螢幕獨立視圖與入口頁：隱藏底部導航欄與懸浮新增按鈕，防止手機版遮擋操作區
+    const hideNavPages = ['portal', 'scores', 'manage-classes', 'quickAuth'];
+    if (hideNavPages.includes(pageName)) {
         bottomNav.classList.add('hidden');
         if (fabAdd) fabAdd.classList.add('hidden');
         return;
@@ -159,8 +161,14 @@ export function updateMobileNavVisibility(pageName) {
     // 切換底部導航欄 active 樣式
     const tabMap = {
         'main': 'mobile-nav-homework',
+        'detail': 'mobile-nav-homework',
         'contact-book': 'mobile-nav-contact',
-        'student-details': 'mobile-nav-stats'
+        'student-details': 'mobile-nav-stats',
+        'overview': 'mobile-nav-more',
+        'officers': 'mobile-nav-more',
+        'attendance': 'mobile-nav-more',
+        'affairs': 'mobile-nav-more',
+        'homework-types': 'mobile-nav-more'
     };
     ['mobile-nav-homework', 'mobile-nav-contact', 'mobile-nav-stats', 'mobile-nav-more'].forEach(btnId => {
         const btn = document.getElementById(btnId);
@@ -301,6 +309,7 @@ export function showOverviewPage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'overview' }, '#overview');
     renderOverviewPage();
     restoreScroll('overview-page');
+    updateMobileNavVisibility('overview');
     updateSidebarActiveState('overview-page');
 }
 
@@ -311,6 +320,7 @@ export function showOfficersPage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'officers' }, '#officers');
     renderOfficersPage();
     restoreScroll('officers-page');
+    updateMobileNavVisibility('officers');
     updateSidebarActiveState('officers-page');
 }
 
@@ -321,6 +331,7 @@ export function showAttendancePage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'attendance' }, '#attendance');
     renderAttendancePage();
     restoreScroll('attendance-page');
+    updateMobileNavVisibility('attendance');
     updateSidebarActiveState('attendance-page');
 }
 
@@ -331,6 +342,7 @@ export function showAffairsPage(fromHistory = false) {
     if (!fromHistory) pushPageState({ page: 'affairs' }, '#affairs');
     renderAffairsPage();
     restoreScroll('affairs-page');
+    updateMobileNavVisibility('affairs');
     updateSidebarActiveState('affairs-page');
 }
 
@@ -350,6 +362,7 @@ export function showExamScoresPage(fromHistory = false) {
     state.currentPage = 'scores-page';
     renderExamScoresView();
     restoreScroll('scores-page');
+    updateMobileNavVisibility('scores');
     updateSidebarActiveState('scores-page');
 }
 
@@ -367,6 +380,7 @@ export function showManageClassesPage(fromHistory = false) {
         window.renderClassCredentialsSection();
     }
     restoreScroll('manage-classes-fullscreen-view');
+    updateMobileNavVisibility('manage-classes');
     updateSidebarActiveState('manage-classes-fullscreen-view');
 }
 
@@ -383,6 +397,7 @@ export function showQuickAuthPage(fromHistory = false) {
         window.startPhoneQuickAuth();
     }
     restoreScroll('qr-auth-fullscreen-view');
+    updateMobileNavVisibility('quickAuth');
     updateSidebarActiveState('quickAuth');
 }
 

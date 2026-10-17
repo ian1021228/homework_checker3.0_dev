@@ -628,10 +628,10 @@ export function startRealtimeCloudSync() {
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !fbDb) return;
     if (state.currentUser?.isDevMode) return;
     
-    // 必須在 Firebase Auth 驗證完成後或存在 QR 授權 Session 時才啟動即時監聽
-    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    // 必須在 Firebase Auth 驗證完成後或存在有效教師/管理員 Session 時才啟動即時監聽
+    const isQrAuth = Boolean((state.currentUser?.uid && !state.currentUser?.isGuest) || sessionStorage.getItem('qr_authorized_session'));
     const authUser = fbAuth?.currentUser;
-    const targetUid = authUser?.uid || (isQrAuth ? state.currentUser?.uid : null);
+    const targetUid = (isQrAuth && state.currentUser?.uid) ? state.currentUser.uid : (authUser?.uid || null);
     if (!targetUid) return;
 
     if (unsubAppData) {
@@ -708,7 +708,7 @@ export function startRealtimeCloudSync() {
     };
 
     try {
-        if (authUser?.uid) {
+        if (authUser?.uid && !isQrAuth) {
             const docRef = doc(fbDb, 'artifacts', globalAppId, 'users', targetUid, 'appData', 'mainDoc');
             unsubAppData = onSnapshot(docRef, { includeMetadataChanges: false }, (docSnap) => {
                 if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true') return;
@@ -765,17 +765,20 @@ if (typeof window !== 'undefined') {
 }
 
 export async function syncDataToCloud() {
-    const isQrAuth = Boolean(state.currentUser?.isQrAuthorized || sessionStorage.getItem('qr_authorized_session'));
+    const isCustomSession = Boolean(state.currentUser?.isQrAuthorized || state.currentUser?.isSchoolAssigned || state.currentUser?.isDevMode || (state.currentUser?.uid && !state.currentUser?.isGuest) || sessionStorage.getItem('qr_authorized_session'));
     if (state.adminViewModeUserId || sessionStorage.getItem('app_is_guest_mode') === 'true' || !state.currentUser || !fbDb) return;
-    if (!fbAuth?.currentUser && !isQrAuth) return;
+    if (!fbAuth?.currentUser && !isCustomSession) return;
 
     try {
+        if (!fbAuth?.currentUser && fbAuth && isCustomSession) {
+            try { await signInAnonymously(fbAuth); } catch (anonErr) { console.warn("Anon auth notice:", anonErr?.message || anonErr); }
+        }
         const authUid = fbAuth?.currentUser?.uid;
-        const targetUid = authUid || (isQrAuth ? state.currentUser.uid : null);
+        const targetUid = (state.currentUser?.uid && !state.currentUser?.isGuest) ? state.currentUser.uid : (authUid || null);
         if (!targetUid) return;
 
         // 嚴格身分校驗：防止切換帳號過渡期非同步調用導致前一帳號資料寫入新帳號之雲端
-        if (authUid && state.currentUser.uid && state.currentUser.uid !== authUid && !state.currentUser.isDevMode && !isQrAuth) {
+        if (authUid && state.currentUser.uid && state.currentUser.uid !== authUid && !state.currentUser.isDevMode && !isCustomSession) {
             console.warn("UID mismatch in syncDataToCloud, aborting sync to prevent overwrite:", state.currentUser.uid, authUid);
             return;
         }
@@ -892,11 +895,18 @@ export async function syncDataToCloud() {
                         inspectionStamps: cloudInspectionStamps,
                         latestInspection: cloudLatestInspection
                     };
-                    await setDoc(parentDocRef, {
-                        ...parentPayload,
-                        data: safeStringify(parentPayload),
-                        updatedAt: new Date().toISOString()
-                    });
+                    try {
+                        localStorage.setItem('parent_class_cache_' + code.toUpperCase(), safeStringify(parentPayload));
+                    } catch (lsErr) {}
+                    try {
+                        await setDoc(parentDocRef, {
+                            ...parentPayload,
+                            data: safeStringify(parentPayload),
+                            updatedAt: new Date().toISOString()
+                        });
+                    } catch (parentWriteErr) {
+                        console.warn("ParentDoc write notice:", parentWriteErr?.message || parentWriteErr);
+                    }
 
                     // 同步晨間出缺席通報至學校學務處 (若今日有出缺席紀錄)
                     const todayStr = new Date().toISOString().split('T')[0];
@@ -1156,84 +1166,23 @@ export async function syncClassStudentPinsToCloud(classObj) {
     try {
         const rawCode = String(classObj.accessCode || classObj.id || '').trim();
         const numCode = (String(classObj.classCode || '').match(/\d+/) || rawCode.match(/\d+/) || String(classObj.name || '').match(/\d+/))?.[0] || rawCode;
-        const codes = [rawCode, numCode, `SHS_${numCode}`, `shs_${numCode}`, `shs_${numCode}_parent`].filter(Boolean);
-        const currentPins = classObj.studentPins || {};
+        const codes = [...new Set([rawCode, numCode, `SHS_${numCode}`, `shs_${numCode}`, `shs_${numCode}_parent`].filter(Boolean))];
+        const currentPins = { ...(classObj.studentPins || {}) };
         const nowIso = new Date().toISOString();
 
-        // 寫入 parentClasses 多別名
-        if (fbDb) {
-            for (const pc of [...new Set(codes)]) {
-                const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', pc);
-                await setDoc(parentDocRef, {
-                    classCode: numCode,
-                    className: classObj.name || `${numCode}班`,
-                    studentPins: currentPins,
-                    updatedAt: nowIso
-                }, { merge: true }).catch(() => {});
-            }
-
-            // 同步寫入學校專屬 PIN 碼通道 sch_pins_{numCode}
-            if (numCode) {
-                const pinDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_pins_${numCode}`);
-                await setDoc(pinDocRef, {
-                    classCode: numCode,
-                    className: classObj.name || `${numCode}班`,
-                    studentPins: currentPins,
-                    updatedAt: nowIso,
-                    updatedBy: 'teacher'
-                }, { merge: true }).catch(() => {});
-
-                // 同步寫入 schoolClasses/{numCode}
-                const scDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', numCode);
-                await setDoc(scDocRef, {
-                    classCode: numCode,
-                    className: classObj.name || `${numCode}班`,
-                    studentPins: currentPins,
-                    updatedAt: nowIso
-                }, { merge: true }).catch(() => {});
-            }
-
-            // 同步更新學校全校班級清冊 userProfiles/sch_classes_{schoolId}
-            for (const schId of ['shs', 'test_school']) {
-                try {
-                    const schListRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_classes_${schId}`);
-                    const snap = await getDoc(schListRef);
-                    if (snap.exists() && Array.isArray(snap.data()?.list)) {
-                        const list = snap.data().list;
-                        let found = false;
-                        for (const sc of list) {
-                            if (sc.classCode === numCode || String(sc.className || '').includes(numCode)) {
-                                sc.studentPins = { ...currentPins };
-                                sc.updatedAt = nowIso;
-                                found = true;
-                            }
-                        }
-                        if (found) {
-                            await setDoc(schListRef, { list, updatedAt: nowIso }, { merge: true });
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // Update userProfiles for each configured seat
-            if (classObj.studentPins) {
-                for (const [seat, pin] of Object.entries(classObj.studentPins)) {
-                    if (pin) {
-                        const studentDocId = `studentScores_${numCode}_seat${seat}`;
-                        const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', studentDocId);
-                        await setDoc(profileDocRef, {
-                            classCode: numCode,
-                            seat: String(seat),
-                            parentPin: String(pin),
-                            updatedAt: nowIso
-                        }, { merge: true }).catch(() => {});
-                    }
+        // 1. 優先同步更新本地瀏覽器 localStorage 中的學校班級與家長端快取 (0ms 即時生效)
+        try {
+            for (const cKey of codes) {
+                const cacheKey = 'parent_class_cache_' + cKey;
+                const existingRaw = localStorage.getItem(cacheKey);
+                if (existingRaw) {
+                    const parsed = JSON.parse(existingRaw);
+                    parsed.studentPins = { ...currentPins };
+                    parsed.updatedAt = nowIso;
+                    localStorage.setItem(cacheKey, JSON.stringify(parsed));
                 }
             }
-        }
 
-        // 同步更新本地瀏覽器 localStorage 中的學校班級暫存 (同網域即時互通)
-        try {
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
                 if (k && (k.startsWith('school_classes_') || k.startsWith('school_admin_classes_'))) {
@@ -1257,7 +1206,6 @@ export async function syncClassStudentPinsToCloud(classObj) {
                 }
             }
 
-            // 發送跨頁籤雙向即時同步事件
             localStorage.setItem('school_pins_sync_event', JSON.stringify({
                 classCode: numCode,
                 studentPins: currentPins,
@@ -1267,10 +1215,90 @@ export async function syncClassStudentPinsToCloud(classObj) {
                 detail: { classCode: numCode, studentPins: currentPins }
             }));
         } catch(e) {}
+
+        // 2. 平行寫入雲端 Firestore 多端點，避免逐筆串列等待阻塞介面
+        if (fbDb) {
+            const writePromises = [];
+
+            for (const pc of codes) {
+                const parentDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'parentClasses', pc);
+                writePromises.push(setDoc(parentDocRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso
+                }, { merge: true }).catch(() => {}));
+            }
+
+            if (numCode) {
+                const pinDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_pins_${numCode}`);
+                writePromises.push(setDoc(pinDocRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso,
+                    updatedBy: 'teacher'
+                }, { merge: true }).catch(() => {}));
+
+                const scDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', numCode);
+                writePromises.push(setDoc(scDocRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso
+                }, { merge: true }).catch(() => {}));
+
+                const scDefRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'schoolClasses', `school_default_${numCode}`);
+                writePromises.push(setDoc(scDefRef, {
+                    classCode: numCode,
+                    className: classObj.name || `${numCode}班`,
+                    studentPins: currentPins,
+                    updatedAt: nowIso
+                }, { merge: true }).catch(() => {}));
+            }
+
+            await Promise.allSettled(writePromises);
+
+            // 背景非阻塞更新學校全校清冊與個別學生分數檔
+            Promise.allSettled([
+                ...['shs', 'test_school'].map(async (schId) => {
+                    try {
+                        const schListRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', `sch_classes_${schId}`);
+                        const snap = await getDoc(schListRef);
+                        if (snap.exists() && Array.isArray(snap.data()?.list)) {
+                            const list = snap.data().list;
+                            let found = false;
+                            for (const sc of list) {
+                                if (sc.classCode === numCode || String(sc.className || '').includes(numCode)) {
+                                    sc.studentPins = { ...currentPins };
+                                    sc.updatedAt = nowIso;
+                                    found = true;
+                                }
+                            }
+                            if (found) {
+                                await setDoc(schListRef, { list, updatedAt: nowIso }, { merge: true });
+                            }
+                        }
+                    } catch(e) {}
+                }),
+                ...Object.entries(currentPins).map(([seat, pin]) => {
+                    if (!pin) return Promise.resolve();
+                    const studentDocId = `studentScores_${numCode}_seat${seat}`;
+                    const profileDocRef = doc(fbDb, 'artifacts', globalAppId, 'public', 'data', 'userProfiles', studentDocId);
+                    return setDoc(profileDocRef, {
+                        classCode: numCode,
+                        seat: String(seat),
+                        parentPin: String(pin),
+                        updatedAt: nowIso
+                    }, { merge: true }).catch(() => {});
+                })
+            ]).catch(() => {});
+        }
     } catch (e) {
         console.warn("syncClassStudentPinsToCloud error:", e);
     }
 }
+
 
 /**
  * 自學校端雲端中樞或本地快取即時拉取該班最新學生 PIN 碼清冊

@@ -289,17 +289,16 @@ export function renderClassCredentialsSection() {
 
     // 家長端開學通知函（落實家長免密碼直達原則）
     const copyNoticeBtn = document.getElementById('copy-class-parent-notice-btn');
-    if (copyNoticeBtn && !copyNoticeBtn.dataset.bound) {
-        copyNoticeBtn.dataset.bound = 'true';
-        copyNoticeBtn.addEventListener('click', () => {
+    if (copyNoticeBtn) {
+        copyNoticeBtn.onclick = () => {
             const parentUrl = `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(pAcc)}`;
             const noticeText = `【${curClass.name} 家長通知函】
 親愛的家長您好：
 本班已啟用「班級經營與每日數位聯絡簿系統」！
 家長端採「免密碼直達」，請點擊專屬連結或輸入班級代碼即可查閱今日各科作業缺交與聯絡事項：
 
-📌 家長免密碼直達網址：${parentUrl}
-🏫 班級代碼：${pAcc}
+・家長免密碼直達網址：${parentUrl}
+・班級代碼：${pAcc}
 
 ※ 提醒：家長端瀏覽聯絡簿與作業點收完全無需密碼；進行「線上電子簽章」及「個人成績查詢」時，請輸入貴子弟專屬之座號認證碼（學生 PIN 碼）。
 請家長每日放學後上線查閱並完成簽章，感謝您的配合！`;
@@ -308,15 +307,30 @@ export function renderClassCredentialsSection() {
                     showToast('已複製家長免密碼直達通知函至剪貼簿！', 'success');
                 });
             }
-        });
+        };
     }
 
-    // 自動與雲端學校管理端同步 PIN 碼檢查（保證與學校端資料中樞保持一致）
+    // 確保每個有效座號皆具備預設 6 位數 PIN 碼 (100000 + 座號)，避免空白無法查看
+    const maxSeatNum = curClass.lastMaxSeat || 30;
+    const skippedArr = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
     curClass.studentPins = curClass.studentPins || {};
-    if (!curClass._isSyncingPins) {
+    if (!curClass._pinsInitialized && Object.keys(curClass.studentPins).length === 0) {
+        for (let s = 1; s <= maxSeatNum; s++) {
+            if (!skippedArr.includes(s)) {
+                curClass.studentPins[s] = String(100000 + s);
+            }
+        }
+        curClass._pinsInitialized = true;
+        if (window.saveData) window.saveData();
+    }
+
+    // 自動與雲端學校管理端同步 PIN 碼檢查（僅於初次載入且導師尚未手動修改時同步，避免覆蓋導師剛修改的 PIN）
+    if (!curClass._isSyncingPins && !curClass._pinsSyncedFromCloud && !curClass._pinsEditedByTeacher) {
         curClass._isSyncingPins = true;
         fetchClassStudentPinsFromCloud(curClass).then(cloudPins => {
             curClass._isSyncingPins = false;
+            curClass._pinsSyncedFromCloud = true;
+            if (curClass._pinsEditedByTeacher) return;
             if (cloudPins && Object.keys(cloudPins).length > 0) {
                 const curStr = JSON.stringify(curClass.studentPins || {});
                 const cloudStr = JSON.stringify(cloudPins);
@@ -333,119 +347,220 @@ export function renderClassCredentialsSection() {
     }
 
     // ==========================================
-    // 渲染學生成績 6 位數專屬 PIN 碼網格 (導師檢視、自訂修改與一鍵重設)
+    // 渲染學生成績 6 位數專屬 PIN 碼網格 (支援單一學生獨立查看、行內直接修改與一鍵重設)
     // ==========================================
     const pinsContainer = document.getElementById('cred-pins-grid-container');
     if (pinsContainer) {
         pinsContainer.innerHTML = '';
-        const maxSeat = curClass.lastMaxSeat || 30;
-        const skipped = Array.isArray(curClass.skippedSeats) ? curClass.skippedSeats : [];
+        window._revealedPinSeats = window._revealedPinSeats || new Set();
+        const areAllPinsRevealed = Boolean(window._pinsAreRevealed);
+        const editingSeat = window._editingPinSeat || null;
 
-        let arePinsRevealed = window._pinsAreRevealed || false;
-
-        for (let seat = 1; seat <= maxSeat; seat++) {
-            const isSkipped = skipped.includes(seat);
-            const hasPin = Boolean(curClass.studentPins[seat] && String(curClass.studentPins[seat]).trim());
-            const currentPin = hasPin ? curClass.studentPins[seat] : '未設定';
+        for (let seat = 1; seat <= maxSeatNum; seat++) {
+            const isSkipped = skippedArr.includes(seat);
+            const rawPin = curClass.studentPins[seat] ?? curClass.studentPins[String(seat)] ?? '';
+            const hasPin = Boolean(rawPin && String(rawPin).trim());
+            const currentPin = hasPin ? String(rawPin).trim() : '';
+            const isSeatRevealed = areAllPinsRevealed || window._revealedPinSeats.has(seat);
+            const isEditingThisSeat = !isSkipped && editingSeat === seat;
 
             const card = document.createElement('div');
+            card.dataset.seat = String(seat);
             card.className = `p-2.5 rounded-xl border transition-all flex flex-col justify-between space-y-1.5 ${
                 isSkipped 
                     ? 'bg-slate-100/50 border-slate-200 opacity-40' 
-                    : (hasPin ? 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs hover:shadow-xs' : 'bg-slate-50 border-slate-200/70')
+                    : (isEditingThisSeat
+                        ? 'bg-indigo-50/40 border-indigo-500 ring-2 ring-indigo-500/20 shadow-xs'
+                        : (hasPin ? 'bg-white border-slate-200 hover:border-indigo-400 shadow-2xs hover:shadow-xs' : 'bg-slate-50 border-slate-200/70'))
             }`;
 
-            card.innerHTML = `
-                <div class="flex items-center justify-between text-xs">
-                    <span class="font-mono font-black text-indigo-700">${seat} 號</span>
-                    <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-500' : (hasPin ? 'text-emerald-600' : 'text-slate-400')}">
-                        ${isSkipped ? '缺號' : (hasPin ? '已開通認證碼' : '學校尚未派發')}
-                    </span>
-                </div>
-                <div class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
-                    <span class="pin-display-text font-mono font-black text-xs sm:text-sm text-slate-900 select-all" data-pin="${currentPin}">
-                        ${isSkipped ? '---' : (!hasPin ? '尚未開通' : (arePinsRevealed ? currentPin : '••••••'))}
-                    </span>
-                    ${!isSkipped ? `
-                        <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-indigo-600 p-0.5 cursor-pointer transition-colors" data-seat="${seat}" title="自訂/修改此座號 PIN 碼">
-                            <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+            if (isEditingThisSeat) {
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-mono font-black text-indigo-700">${seat} 號</span>
+                        <span class="text-[9px] font-bold text-indigo-600">輸入新 PIN 碼</span>
+                    </div>
+                    <div class="flex items-center gap-1 bg-white px-1.5 py-1 rounded-lg border border-indigo-400">
+                        <input type="text" maxlength="16" class="inline-pin-input font-mono font-black text-xs text-slate-900 w-full min-w-0 bg-transparent focus:outline-none uppercase tabular-nums" data-seat="${seat}" value="${currentPin}" placeholder="輸入PIN碼">
+                        <button type="button" class="btn-save-inline-pin w-6 h-6 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center shrink-0 cursor-pointer transition-colors" data-seat="${seat}" title="儲存 ${seat} 號 PIN 碼">
+                            <i class="fa-solid fa-check text-[10px]"></i>
                         </button>
-                    ` : ''}
-                </div>
-            `;
+                        <button type="button" class="btn-cancel-inline-pin w-6 h-6 rounded-md bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center shrink-0 cursor-pointer transition-colors" data-seat="${seat}" title="取消修改">
+                            <i class="fa-solid fa-xmark text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                card.innerHTML = `
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="font-mono font-black text-indigo-700">${seat} 號</span>
+                        <span class="text-[9px] font-bold ${isSkipped ? 'text-rose-500' : (hasPin ? 'text-emerald-600' : 'text-slate-400')}">
+                            ${isSkipped ? '缺號' : (hasPin ? '已開通認證碼' : '尚未開通')}
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between gap-1 bg-slate-50 px-2 py-1 rounded-lg border border-slate-200">
+                        <span class="pin-display-text font-mono font-black text-xs sm:text-sm ${hasPin ? 'text-slate-900' : 'text-slate-400'} select-all truncate tabular-nums" data-seat="${seat}" data-pin="${currentPin || '未設定'}">
+                            ${isSkipped ? '---' : (!hasPin ? '尚未開通' : (isSeatRevealed ? currentPin : '••••••'))}
+                        </span>
+                        ${!isSkipped ? `
+                            <div class="flex items-center gap-0.5 shrink-0">
+                                <button type="button" class="btn-toggle-single-pin ${isSeatRevealed ? 'text-indigo-600 bg-indigo-50 border border-indigo-200/80' : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-200/60'} w-6 h-6 rounded-md flex items-center justify-center cursor-pointer transition-colors" data-seat="${seat}" title="${isSeatRevealed ? `隱藏 ${seat} 號 PIN 碼` : `單獨查看 ${seat} 號 PIN 碼`}">
+                                    <i class="fa-regular ${isSeatRevealed ? 'fa-eye-slash' : 'fa-eye'} text-[11px]"></i>
+                                </button>
+                                <button type="button" class="btn-quick-edit-pin text-slate-400 hover:text-indigo-600 hover:bg-slate-200/60 w-6 h-6 rounded-md flex items-center justify-center cursor-pointer transition-colors" data-seat="${seat}" title="修改 ${seat} 號 PIN 碼">
+                                    <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
             pinsContainer.appendChild(card);
         }
 
-        // 綁定個別座號編輯按鈕
-        pinsContainer.querySelectorAll('.btn-quick-edit-pin').forEach(btn => {
-            btn.onclick = async (e) => {
-                e.stopPropagation();
-                const seat = parseInt(btn.dataset.seat);
-                const oldPin = curClass.studentPins[seat] || '';
-                const input = prompt(`請輸入 ${seat} 號學生的成績認證 PIN 碼（若留空則清除）：`, oldPin);
-                if (input !== null) {
-                    const trimmed = input.trim().toUpperCase();
+        // 若正處於行內編輯模式，自動聚焦輸入框
+        if (editingSeat !== null) {
+            const activeInput = pinsContainer.querySelector(`.inline-pin-input[data-seat="${editingSeat}"]`);
+            if (activeInput) {
+                activeInput.focus();
+                activeInput.select();
+                const commitInlinePin = () => {
+                    const seat = parseInt(activeInput.dataset.seat, 10);
+                    const trimmed = activeInput.value.trim().toUpperCase();
                     if (!trimmed) {
                         delete curClass.studentPins[seat];
+                        delete curClass.studentPins[String(seat)];
                     } else {
                         curClass.studentPins[seat] = trimmed;
+                        curClass.studentPins[String(seat)] = trimmed;
+                    }
+                    curClass._pinsEditedByTeacher = true;
+                    curClass._pinsSyncedFromCloud = true;
+                    window._editingPinSeat = null;
+                    if (trimmed) {
+                        window._revealedPinSeats.add(seat);
                     }
                     if (window.saveData) window.saveData();
-                    await syncClassStudentPinsToCloud(curClass);
                     renderClassCredentialsSection();
-                    showToast(`已更新 ${seat} 號學生 PIN 碼並即時同步至學校管理端與雲端！`, 'success');
+                    showToast(trimmed ? `已更新 ${seat} 號學生 PIN 碼為 ${trimmed}！` : `已清除 ${seat} 號學生 PIN 碼`, 'success');
+                    syncClassStudentPinsToCloud(curClass);
+                };
+                activeInput.addEventListener('keydown', (ev) => {
+                    if (ev.key === 'Enter') {
+                        ev.preventDefault();
+                        commitInlinePin();
+                    } else if (ev.key === 'Escape') {
+                        ev.preventDefault();
+                        window._editingPinSeat = null;
+                        renderClassCredentialsSection();
+                    }
+                });
+                const saveBtn = pinsContainer.querySelector(`.btn-save-inline-pin[data-seat="${editingSeat}"]`);
+                if (saveBtn) {
+                    saveBtn.onclick = (ev) => {
+                        ev.stopPropagation();
+                        commitInlinePin();
+                    };
                 }
+                const cancelBtn = pinsContainer.querySelector(`.btn-cancel-inline-pin[data-seat="${editingSeat}"]`);
+                if (cancelBtn) {
+                    cancelBtn.onclick = (ev) => {
+                        ev.stopPropagation();
+                        window._editingPinSeat = null;
+                        renderClassCredentialsSection();
+                    };
+                }
+            }
+        }
+
+        // 綁定單一學生 PIN 碼顯示/隱藏按鈕 (單獨查看單一學生 PIN)
+        pinsContainer.querySelectorAll('.btn-toggle-single-pin').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const seat = parseInt(btn.dataset.seat, 10);
+                window._revealedPinSeats = window._revealedPinSeats || new Set();
+                if (window._pinsAreRevealed) {
+                    // 若原本處於「顯示全班」狀態，點擊單一學生眼睛則只隱藏該學生，其餘維持顯示
+                    window._pinsAreRevealed = false;
+                    for (let s = 1; s <= maxSeatNum; s++) {
+                        if (!skippedArr.includes(s) && s !== seat) {
+                            window._revealedPinSeats.add(s);
+                        }
+                    }
+                    window._revealedPinSeats.delete(seat);
+                    const visLabel = document.getElementById('cred-pins-vis-label');
+                    if (visLabel) visLabel.textContent = '顯示 PIN 碼';
+                } else {
+                    if (window._revealedPinSeats.has(seat)) {
+                        window._revealedPinSeats.delete(seat);
+                    } else {
+                        window._revealedPinSeats.add(seat);
+                    }
+                }
+                renderClassCredentialsSection();
+            };
+        });
+
+        // 綁定個別座號編輯按鈕 (直接切換為行內編輯輸入框，不依賴 window.prompt)
+        pinsContainer.querySelectorAll('.btn-quick-edit-pin').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const seat = parseInt(btn.dataset.seat, 10);
+                window._editingPinSeat = seat;
+                renderClassCredentialsSection();
             };
         });
 
         // 綁定顯示/隱藏全班 PIN 碼
         const toggleVisBtn = document.getElementById('cred-toggle-pins-visibility-btn');
-        if (toggleVisBtn && !toggleVisBtn.dataset.bound) {
-            toggleVisBtn.dataset.bound = 'true';
+        if (toggleVisBtn) {
             toggleVisBtn.onclick = () => {
                 window._pinsAreRevealed = !window._pinsAreRevealed;
-                document.getElementById('cred-pins-vis-label').textContent = window._pinsAreRevealed ? '隱藏 PIN 碼' : '顯示 PIN 碼';
+                window._revealedPinSeats = new Set();
+                const visLabel = document.getElementById('cred-pins-vis-label');
+                if (visLabel) visLabel.textContent = window._pinsAreRevealed ? '隱藏 PIN 碼' : '顯示 PIN 碼';
                 renderClassCredentialsSection();
             };
         }
 
-        // 綁定自學校端重新同步全班 PIN 碼
+        // 綁定重設為學校預設 PIN 碼 (100000 + 座號 或自學校端同步)
         const resetAllBtn = document.getElementById('cred-reset-all-pins-btn');
-        if (resetAllBtn && !resetAllBtn.dataset.bound) {
-            resetAllBtn.dataset.bound = 'true';
+        if (resetAllBtn) {
             resetAllBtn.onclick = async () => {
-                if (confirm('確定要自學校管理端重新同步此班級之學生成績認證碼清單？')) {
-                    showToast('正在向學校管理端同步中...', 'info');
-                    try {
-                        const cloudPins = await fetchClassStudentPinsFromCloud(curClass);
-                        if (cloudPins && Object.keys(cloudPins).length > 0) {
-                            curClass.studentPins = { ...cloudPins };
-                            if (window.saveData) window.saveData();
-                            await syncClassStudentPinsToCloud(curClass);
-                            renderClassCredentialsSection();
-                            showToast(`已成功自學校端同步 ${Object.keys(cloudPins).length} 位學生之認證碼！`, 'success');
-                        } else {
-                            curClass.studentPins = {};
-                            if (window.saveData) window.saveData();
-                            renderClassCredentialsSection();
-                            showToast('學校端目前尚未派發此班級的認證碼，已清空本地設定', 'info');
+                showToast('正在重設並同步學生成績認證碼...', 'info');
+                try {
+                    const cloudPins = await fetchClassStudentPinsFromCloud(curClass);
+                    if (cloudPins && Object.keys(cloudPins).length > 0) {
+                        curClass.studentPins = { ...cloudPins };
+                    } else {
+                        curClass.studentPins = {};
+                        for (let s = 1; s <= maxSeatNum; s++) {
+                            if (!skippedArr.includes(s)) {
+                                curClass.studentPins[s] = String(100000 + s);
+                            }
                         }
-                    } catch(err) {
-                        showToast('同步失敗：' + err.message, 'error');
                     }
+                    curClass._pinsEditedByTeacher = false;
+                    curClass._pinsSyncedFromCloud = true;
+                    window._editingPinSeat = null;
+                    if (window.saveData) window.saveData();
+                    renderClassCredentialsSection();
+                    syncClassStudentPinsToCloud(curClass);
+                    showToast(`已成功重設全班學生之認證碼！`, 'success');
+                } catch (err) {
+                    showToast('重設失敗：' + err.message, 'error');
                 }
             };
         }
 
         // 綁定複製清冊
         const copyAllBtn = document.getElementById('cred-copy-all-pins-btn');
-        if (copyAllBtn && !copyAllBtn.dataset.bound) {
-            copyAllBtn.dataset.bound = 'true';
+        if (copyAllBtn) {
             copyAllBtn.onclick = () => {
                 let lines = [`【${curClass.name} 學生小考成績查詢 PIN 碼清冊】`];
-                for (let seat = 1; seat <= maxSeat; seat++) {
-                    if (skipped.includes(seat)) continue;
-                    const pin = curClass.studentPins[seat] || '（尚未開通）';
+                for (let seat = 1; seat <= maxSeatNum; seat++) {
+                    if (skippedArr.includes(seat)) continue;
+                    const pin = curClass.studentPins[seat] || curClass.studentPins[String(seat)] || '（尚未開通）';
                     lines.push(`${seat}號\tPIN: ${pin}`);
                 }
                 navigator.clipboard.writeText(lines.join('\n')).then(() => {
@@ -482,7 +597,149 @@ export function renderAllDoneList(studentsOrSeats, containerId) {
     });
 }
 
+export function renderDailyCommandBar() {
+    const bar = document.getElementById('daily-command-bar');
+    if (!bar) return;
+
+    const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
+    if (!currentClass) {
+        bar.innerHTML = '';
+        return;
+    }
+
+    const classHomeworks = (state.appData?.homeworks || []).filter(hw => hw.classId === state.currentClassId);
+    const maxSeat = typeof currentClass.lastMaxSeat === 'number' && currentClass.lastMaxSeat > 0
+        ? currentClass.lastMaxSeat
+        : 30;
+    const skippedSet = new Set((Array.isArray(currentClass.skippedSeats) ? currentClass.skippedSeats : []).map(Number));
+
+    // 1. 待收作業與缺交人次計算
+    let uncompletedHwCount = 0;
+    let totalMissingEntries = 0;
+    classHomeworks.forEach(hw => {
+        const typeId = hw.typeId || 'default';
+        const students = hw.students || [];
+        const missingInHw = students.filter(s => !skippedSet.has(Number(s.seat)) && !isStudentCompleted(s, typeId)).length;
+        if (missingInHw > 0) uncompletedHwCount++;
+        totalMissingEntries += missingInHw;
+    });
+
+    // 2. 今日出缺席計算
+    const todayStr = formatDate(new Date());
+    const attRecord = currentClass.attendance?.[todayStr] || {};
+    let activeTotal = 0;
+    let presentCount = 0;
+    let tardyOrLeaveCount = 0;
+    for (let s = 1; s <= maxSeat; s++) {
+        if (skippedSet.has(s)) continue;
+        activeTotal++;
+        const st = attRecord[s]?.status || 'present';
+        if (st === 'present') presentCount++;
+        else tardyOrLeaveCount++;
+    }
+
+    // 3. 今日聯絡簿事項數
+    const todayContactItems = Array.isArray(currentClass.contactBook?.[todayStr])
+        ? currentClass.contactBook[todayStr].filter(item => item && String(item).trim() !== '')
+        : [];
+
+    // 4. 全勤榮譽學生人數
+    let allDoneStudentCount = 0;
+    if (classHomeworks.length > 0) {
+        for (let s = 1; s <= maxSeat; s++) {
+            if (skippedSet.has(s)) continue;
+            const isAllDone = classHomeworks.every(hw => {
+                const stObj = (hw.students || []).find(st => Number(st.seat) === s);
+                return stObj ? isStudentCompleted(stObj, hw.typeId || 'default') : true;
+            });
+            if (isAllDone) allDoneStudentCount++;
+        }
+    }
+
+    bar.innerHTML = `
+        <!-- 1. 作業點收進度 -->
+        <button type="button" data-command-target="student-details" class="command-bar-card text-left bg-white hover:bg-slate-50/90 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 shadow-2xs transition-all flex items-center justify-between gap-2.5 cursor-pointer group">
+            <div class="min-w-0">
+                <span class="text-[11px] font-semibold text-slate-500 tracking-wider block truncate">待完成作業 / 待交人次</span>
+                <div class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mt-1">
+                    <span id="cmd-bar-hw-value" class="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums">${uncompletedHwCount}</span>
+                    <span class="text-xs font-semibold text-slate-500">項</span>
+                    <span class="text-slate-300 mx-0.5">/</span>
+                    <span class="text-xs sm:text-sm font-bold ${totalMissingEntries > 0 ? 'text-rose-600' : 'text-emerald-600'} tabular-nums whitespace-nowrap">${totalMissingEntries} 人次未交</span>
+                </div>
+            </div>
+            <div class="w-9 h-9 rounded-lg ${totalMissingEntries > 0 ? 'bg-rose-50 text-rose-600 border-rose-200/70' : 'bg-emerald-50 text-emerald-600 border-emerald-200/70'} border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i class="fa-solid ${totalMissingEntries > 0 ? 'fa-clipboard-question' : 'fa-clipboard-check'} text-sm"></i>
+            </div>
+        </button>
+
+        <!-- 2. 今日出缺席狀態 -->
+        <button type="button" data-command-target="attendance" class="command-bar-card text-left bg-white hover:bg-slate-50/90 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 shadow-2xs transition-all flex items-center justify-between gap-2.5 cursor-pointer group">
+            <div class="min-w-0">
+                <span class="text-[11px] font-semibold text-slate-500 tracking-wider block truncate">今日出席簽到 (${todayStr.slice(5)})</span>
+                <div class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mt-1">
+                    <span id="cmd-bar-att-value" class="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums">${presentCount}<span class="text-xs font-semibold text-slate-400">/${activeTotal}</span></span>
+                    <span class="text-xs font-bold ${tardyOrLeaveCount > 0 ? 'text-amber-600' : 'text-emerald-600'} tabular-nums whitespace-nowrap">
+                        ${tardyOrLeaveCount > 0 ? `請假/遲到 ${tardyOrLeaveCount} 人` : '全班到齊'}
+                    </span>
+                </div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-600 border border-indigo-200/70 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-user-clock text-sm"></i>
+            </div>
+        </button>
+
+        <!-- 3. 今日聯絡簿事項 -->
+        <button type="button" data-command-target="contact-book" class="command-bar-card text-left bg-white hover:bg-slate-50/90 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 shadow-2xs transition-all flex items-center justify-between gap-2.5 cursor-pointer group">
+            <div class="min-w-0">
+                <span class="text-[11px] font-semibold text-slate-500 tracking-wider block truncate">今日聯絡簿事項</span>
+                <div class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mt-1">
+                    <span id="cmd-bar-cb-value" class="text-xl sm:text-2xl font-extrabold text-slate-900 tabular-nums">${todayContactItems.length}</span>
+                    <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">則事項</span>
+                    <span class="hidden sm:inline text-xs font-semibold text-indigo-600 ml-0.5 group-hover:underline whitespace-nowrap">點擊編輯 →</span>
+                </div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-book-open text-sm"></i>
+            </div>
+        </button>
+
+        <!-- 4. 全勤榮譽學生 -->
+        <button type="button" data-command-target="all-done-modal" class="command-bar-card text-left bg-white hover:bg-slate-50/90 border border-slate-200/90 rounded-xl p-3.5 sm:p-4 shadow-2xs transition-all flex items-center justify-between gap-2.5 cursor-pointer group">
+            <div class="min-w-0">
+                <span class="text-[11px] font-semibold text-slate-500 tracking-wider block truncate">作業全勤榮譽榜</span>
+                <div class="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mt-1">
+                    <span id="cmd-bar-affair-value" class="text-xl sm:text-2xl font-extrabold text-emerald-600 tabular-nums">${allDoneStudentCount}</span>
+                    <span class="text-xs font-semibold text-slate-500 whitespace-nowrap">位全勤</span>
+                    <span class="hidden sm:inline text-xs font-semibold text-slate-400 ml-0.5 whitespace-nowrap">檢視名單</span>
+                </div>
+            </div>
+            <div class="w-9 h-9 rounded-lg bg-amber-50 text-amber-600 border border-amber-200/70 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <i class="fa-solid fa-trophy text-sm"></i>
+            </div>
+        </button>
+    `;
+}
+
 export function renderHomeworkList() {
+    const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
+    // 確保此班級所有作業皆具備完整學生座號陣列
+    if (currentClass && Array.isArray(state.appData.homeworks)) {
+        const maxSeat = currentClass.lastMaxSeat || 30;
+        const skippedSet = new Set(Array.isArray(currentClass.skippedSeats) ? currentClass.skippedSeats.map(Number) : []);
+        state.appData.homeworks.forEach(hw => {
+            if (hw.classId === state.currentClassId && (!Array.isArray(hw.students) || hw.students.length === 0)) {
+                const hydrated = [];
+                for (let s = 1; s <= maxSeat; s++) {
+                    if (skippedSet.has(s)) continue;
+                    hydrated.push({ seat: s, status: 'not-submitted' });
+                }
+                hw.students = hydrated;
+                hw.studentCount = hydrated.length;
+            }
+        });
+    }
+    renderDailyCommandBar();
     const homeworkList = document.getElementById('homework-list'); 
     if (!homeworkList) return;
     let filteredHomeworks = state.appData.homeworks.filter(hw => hw.classId === state.currentClassId);
@@ -516,7 +773,7 @@ export function renderHomeworkList() {
 
     const sortMethod = document.getElementById('sort-homework') ? document.getElementById('sort-homework').value : 'time';
     filteredHomeworks.sort((a, b) => {
-        if (sortMethod === 'time') return (b.createdAt || new Date(0)).getTime() - (a.createdAt || new Date(0)).getTime();
+        if (sortMethod === 'time') return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
         if (sortMethod === 'name') return a.name.localeCompare(b.name, 'zh-Hant');
         if (sortMethod === 'missing') return ((b.students || []).filter(s => !isStudentCompleted(s, b.typeId || 'default')).length) - ((a.students || []).filter(s => !isStudentCompleted(s, a.typeId || 'default')).length);
         return 0;
@@ -524,51 +781,63 @@ export function renderHomeworkList() {
 
     homeworkList.innerHTML = '';
     if (filteredHomeworks.length === 0) {
-        homeworkList.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 px-4"><div class="w-20 h-20 bg-gradient-to-tr from-indigo-50 to-rose-50 rounded-3xl flex items-center justify-center mb-4 border border-white/60 shadow-lg shadow-indigo-500/10 animate-[bounce_3s_infinite]"><svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg></div><p class="text-center text-slate-400 font-semibold tracking-wide text-xs">目前的班級沒有點收項目，請點擊右上角「新增作業」按鈕</p></div>`;
+        homeworkList.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-16 px-4 bg-white rounded-2xl border border-slate-200/80"><div class="w-14 h-14 bg-slate-100 rounded-2xl flex items-center justify-center mb-3 border border-slate-200/80"><i class="fa-solid fa-folder-plus text-slate-400 text-xl"></i></div><p class="text-center text-slate-600 font-bold text-sm">目前此班級尚無作業點收項目</p><p class="text-center text-slate-400 font-medium text-xs mt-1">請點擊右上角「新增作業」按鈕建立第一筆作業</p></div>`;
     } else {
         filteredHomeworks.forEach(hw => {
             const typeId = hw.typeId || 'default'; 
             const typeConfig = getHomeworkType(typeId);
+            const totalStudents = (hw.students || []).length;
             const statusCounts = (hw.students || []).reduce((acc, student) => { 
                 acc[student.status] = (acc[student.status] || 0) + 1; 
                 return acc; 
             }, {});
             const completedCount = (hw.students || []).filter(s => isStudentCompleted(s, typeId)).length;
+            const completionPct = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 100) : 0;
+
             let summaryHtml = '';
-            if (completedCount === (hw.students || []).length && (hw.students || []).length > 0) {
-                summaryHtml = `<div class="text-emerald-600 font-black bg-emerald-50/70 border border-emerald-200/50 px-4 py-2 rounded-2xl text-base inline-flex items-center gap-1"><i class="fa-solid fa-circle-check mr-1 text-emerald-600"></i> 全班已到齊</div>`;
+            if (completedCount === totalStudents && totalStudents > 0) {
+                summaryHtml = `<div class="text-emerald-700 font-bold bg-emerald-50/90 border border-emerald-200/80 px-3 py-1 rounded-lg text-xs inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-check text-emerald-600"></i> 全班已收齊</div>`;
             } else {
                 summaryHtml = typeConfig.statuses.filter(s => statusCounts[s.key] > 0).map(s => {
-                    let textClass = 'text-slate-600 bg-slate-100/80';
-                    if(s.color.includes('blue')) textClass = 'text-blue-600 bg-blue-50/60 border-blue-100/50';
-                    else if(s.color.includes('emerald') || s.color.includes('green')) textClass = 'text-emerald-600 bg-emerald-50/60 border-emerald-100/50';
-                    else if(s.color.includes('yellow') || s.color.includes('amber')) textClass = 'text-amber-700 bg-amber-50/80 border-amber-100/50';
-                    else if(s.color.includes('red') || s.color.includes('rose')) textClass = 'text-rose-600 bg-rose-50/60 border-rose-100/50';
-                    else if(s.color.includes('purple')) textClass = 'text-purple-600 bg-purple-50/60 border-purple-100/50';
-                    return `<span class="inline-flex items-center text-base font-black border border-transparent px-4 py-2 rounded-2xl ${textClass}">${s.text}<span class="ml-1 opacity-80 font-black">${statusCounts[s.key]}</span></span>`;
+                    let textClass = 'text-slate-700 bg-slate-100 border-slate-200/80';
+                    if(s.color.includes('blue')) textClass = 'text-blue-700 bg-blue-50/80 border-blue-200/70';
+                    else if(s.color.includes('emerald') || s.color.includes('green')) textClass = 'text-emerald-700 bg-emerald-50/80 border-emerald-200/70';
+                    else if(s.color.includes('yellow') || s.color.includes('amber')) textClass = 'text-amber-800 bg-amber-50/90 border-amber-200/80';
+                    else if(s.color.includes('red') || s.color.includes('rose')) textClass = 'text-rose-700 bg-rose-50/90 border-rose-200/80';
+                    else if(s.color.includes('purple')) textClass = 'text-purple-700 bg-purple-50/80 border-purple-200/70';
+                    return `<span class="inline-flex items-center text-xs font-bold border px-2.5 py-1 rounded-lg tabular-nums ${textClass}">${s.text}<span class="ml-1.5 font-extrabold">${statusCounts[s.key]}</span></span>`;
                 }).join('');
             }
 
             const hwItem = document.createElement('div');
-            hwItem.className = 'glass-card rounded-3xl border border-slate-200/70 p-5 sm:p-6 cursor-pointer shadow-md hover:shadow-2xl hover:shadow-indigo-500/10 hover:-translate-y-1 hover:border-indigo-300/80 transition-all duration-500 group relative overflow-hidden active:scale-[0.99] hover-shimmer';
+            hwItem.className = 'bg-white rounded-2xl border border-slate-200/90 p-5 cursor-pointer shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-200 group relative overflow-hidden active:scale-[0.995] flex flex-col justify-between';
             hwItem.dataset.id = hw.id;
             
-            const createdDate = (hw.createdAt instanceof Date) ? hw.createdAt.toLocaleDateString('zh-TW') : 'N/A';
+            const parsedDate = hw.createdAt ? new Date(hw.createdAt) : null;
+            const createdDate = (parsedDate && !isNaN(parsedDate.getTime())) ? parsedDate.toLocaleDateString('zh-TW') : '今日';
             hwItem.innerHTML = `
-                <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-purple-500/5 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div><div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full shimmer-bar pointer-events-none z-10"></div>
-                <div class="flex justify-between items-start relative z-10">
-                    <div class="flex items-center gap-2 flex-grow min-w-0">
-                         <span class="text-sm font-black bg-slate-100 text-slate-400 tracking-wider px-2.5 py-1 rounded-xl whitespace-nowrap uppercase">${typeConfig.name}</span>
-                        <h2 class="text-2xl font-black text-slate-800 truncate tracking-tight group-hover:text-indigo-600 transition-colors" title="${hw.name}">${hw.name}</h2>
+                <div>
+                    <div class="flex justify-between items-start gap-2">
+                        <div class="flex items-center gap-2 flex-grow min-w-0">
+                            <span class="text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200/80 px-2 py-0.5 rounded-md whitespace-nowrap">${typeConfig.name}</span>
+                            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 truncate tracking-tight group-hover:text-indigo-600 transition-colors" title="${hw.name}">${hw.name}</h2>
+                        </div>
+                        <div class="flex items-center gap-0.5 flex-shrink-0">
+                            <button type="button" data-id="${hw.id}" class="copy-defaulters-btn text-slate-400 hover:text-amber-600 p-2 rounded-lg hover:bg-amber-50 transition-colors cursor-pointer" title="一鍵複製未交名單（純文字）"><i class="fa-solid fa-bullhorn text-sm pointer-events-none"></i></button>
+                            <button type="button" data-id="${hw.id}" class="edit-hw-btn hide-on-admin-view text-slate-400 hover:text-indigo-600 p-2 rounded-lg hover:bg-indigo-50 transition-colors cursor-pointer" title="編輯作業名稱"><i class="fa-solid fa-pen text-sm pointer-events-none"></i></button>
+                            <button type="button" data-id="${hw.id}" class="delete-hw-btn hide-on-admin-view text-slate-400 hover:text-rose-600 p-2 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer" title="刪除作業"><i class="fa-solid fa-trash-can text-sm pointer-events-none"></i></button>
+                        </div>
                     </div>
-                    <div class="flex items-center gap-1 flex-shrink-0 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-                        <button type="button" data-id="${hw.id}" class="copy-defaulters-btn text-slate-400 hover:text-amber-600 p-2.5 rounded-2xl hover:bg-amber-50 transition-all cursor-pointer" title="一鍵複製未交名單（純文字）"><i class="fa-solid fa-bullhorn text-base pointer-events-none"></i></button>
-                        <button type="button" data-id="${hw.id}" class="edit-hw-btn hide-on-admin-view text-slate-400 hover:text-indigo-600 p-2.5 rounded-2xl hover:bg-indigo-50 transition-all cursor-pointer" title="編輯作業名稱"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg></button>
-                        <button type="button" data-id="${hw.id}" class="delete-hw-btn hide-on-admin-view text-slate-400 hover:text-rose-600 p-2.5 rounded-2xl hover:bg-rose-50 transition-all cursor-pointer" title="刪除作業"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm4 0a1 1 0 012 0v6a1 1 0 11-2 0V8z" clip-rule="evenodd" /></svg></button>
+                    <div class="flex justify-between items-center text-xs font-semibold text-slate-400 mt-2.5 tabular-nums">
+                        <span><i class="fa-regular fa-calendar mr-1"></i>${createdDate}</span>
+                        <span>收齊進度 <strong class="text-slate-700">${completedCount}/${totalStudents}</strong> (${completionPct}%)</span>
+                    </div>
+                    <!-- 精準進度條 -->
+                    <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden mt-2">
+                        <div class="h-full ${completionPct === 100 ? 'bg-emerald-500' : 'bg-indigo-600'} rounded-full transition-all duration-300" style="width: ${completionPct}%"></div>
                     </div>
                 </div>
-                <div class="flex justify-between items-center text-sm font-bold text-slate-400 mt-4 tracking-wider relative z-10"><span><i class="fa-solid fa-users mr-1"></i> 名單 ${(hw.students || []).length} 人</span><span><i class="fa-regular fa-calendar mr-1"></i> ${createdDate}</span></div>
-                <div class="mt-5 flex flex-wrap gap-2 relative z-10">${summaryHtml}</div>
+                <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-1.5">${summaryHtml}</div>
             `;
             homeworkList.appendChild(hwItem);
         });
@@ -653,13 +922,13 @@ export function renderStudentGrid(homeworkId) {
         const studentBtn = document.createElement('button');
         const ringColor = (statusInfo.color || '').replace('bg-', 'ring-').replace('-500', '-200').replace('-400', '-200');
         studentBtn.id = `btn-seat-${student.seat}`;
-        studentBtn.className = `disable-on-admin-view student-btn rounded-2xl shadow-sm text-center transition-all duration-300 transform hover:scale-[1.05] active:scale-90 ${statusInfo.color} ${statusInfo.textColor} flex flex-col items-center justify-center border-2 border-transparent aspect-square overflow-hidden cursor-pointer w-full h-full ring-4 ring-offset-1 ring-transparent hover:${ringColor} focus:outline-none focus:${ringColor}`;
+        studentBtn.className = `disable-on-admin-view student-btn rounded-xl shadow-xs text-center transition-all duration-200 transform hover:scale-[1.03] active:scale-95 ${statusInfo.color} ${statusInfo.textColor} flex flex-col items-center justify-center border border-black/5 aspect-square overflow-hidden cursor-pointer w-full h-full ring-2 ring-offset-1 ring-transparent hover:${ringColor} focus:outline-none focus:${ringColor}`;
         studentBtn.dataset.seat = student.seat;
         const fontSizeNum = Math.max(12, bestBoxSize * 0.35); 
         const fontSizeText = Math.max(9, bestBoxSize * 0.15); 
         studentBtn.innerHTML = `
-            <span class="font-black leading-none tracking-tighter select-none" style="font-size: ${fontSizeNum}px; pointer-events: none;">${student.seat}</span>
-            <span class="font-bold leading-tight mt-1 opacity-90 truncate w-full px-1 select-none" style="font-size: ${fontSizeText}px; pointer-events: none;">${statusInfo.text}</span>
+            <span class="font-extrabold leading-none tracking-tight select-none tabular-nums" style="font-size: ${fontSizeNum}px; pointer-events: none;">${student.seat}</span>
+            <span class="font-semibold leading-tight mt-1 opacity-95 truncate w-full px-1 select-none" style="font-size: ${fontSizeText}px; pointer-events: none;">${statusInfo.text}</span>
         `;
         studentGrid.appendChild(studentBtn);
     });
@@ -680,12 +949,49 @@ export function renderStudentDetailsPage() {
     const studentDetailsList = document.getElementById('student-details-list'); 
     if (!studentDetailsList) return;
     studentDetailsList.innerHTML = '';
+    const currentClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId);
     const filteredHomeworks = state.appData.homeworks.filter(hw => hw.classId === state.currentClassId);
 
     if (filteredHomeworks.length === 0) { 
-        studentDetailsList.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10 font-bold text-sm glass-card rounded-3xl m-2">目前此班級尚無登錄作業。</div>'; 
+        studentDetailsList.innerHTML = '<div class="col-span-full text-center text-slate-500 py-12 font-semibold text-sm bg-white rounded-2xl border border-slate-200/80">目前此班級尚無登錄作業。</div>'; 
         return; 
     }
+
+    // 建立座號對應的幹部職稱索引
+    const seatRolesMap = {};
+    if (currentClass && currentClass.officers) {
+        const rolesList = Array.isArray(currentClass.officerRoles) && currentClass.officerRoles.length > 0
+            ? currentClass.officerRoles
+            : [
+                { key: 'president', title: '班長' },
+                { key: 'vicePresident', title: '副班長' },
+                { key: 'discipline', title: '風紀股長' },
+                { key: 'study', title: '學藝股長' },
+                { key: 'hygiene', title: '衛生股長' },
+                { key: 'sports', title: '體育股長' },
+                { key: 'counsel', title: '輔導股長' },
+                { key: 'general', title: '總務股長' },
+                { key: 'library', title: '圖書股長' },
+                { key: 'info', title: '資訊股長' }
+            ];
+        rolesList.forEach(r => {
+            const assignedSeat = Number(currentClass.officers[r.key]?.seat);
+            if (assignedSeat > 0) {
+                if (!seatRolesMap[assignedSeat]) seatRolesMap[assignedSeat] = [];
+                seatRolesMap[assignedSeat].push(r.title);
+            }
+        });
+    }
+
+    const todayStr = formatDate(new Date());
+    const todayAttMap = currentClass?.attendance?.[todayStr] || {};
+    const attLabels = {
+        present: { text: '今日出席', cls: 'bg-emerald-50 text-emerald-700 border-emerald-200/80' },
+        tardy: { text: '今日遲到', cls: 'bg-amber-50 text-amber-700 border-amber-200/80' },
+        sick: { text: '今日病假', cls: 'bg-rose-50 text-rose-700 border-rose-200/80' },
+        personal: { text: '今日事假', cls: 'bg-blue-50 text-blue-700 border-blue-200/80' },
+        official: { text: '今日公假', cls: 'bg-purple-50 text-purple-700 border-purple-200/80' }
+    };
 
     const studentData = []; 
     let maxStudentCount = 0;
@@ -715,7 +1021,7 @@ export function renderStudentDetailsPage() {
                         hwName: hw.name, 
                         hwId: hw.id, 
                         statusText: statusInfo.text, 
-                        colorClass: statusInfo.textColor.includes('white') ? (statusInfo.color || '').replace('bg-', 'text-') : 'text-slate-600' 
+                        colorClass: statusInfo.textColor.includes('white') ? (statusInfo.color || '').replace('bg-', 'text-') : 'text-slate-700' 
                     });
                 }
             }
@@ -726,27 +1032,94 @@ export function renderStudentDetailsPage() {
     const sortMethod = document.getElementById('sort-student-detail') ? document.getElementById('sort-student-detail').value : 'number';
     studentData.sort((a, b) => sortMethod === 'number' ? a.seat - b.seat : b.issues.length - a.issues.length);
 
+    window._revealed360PinSeats = window._revealed360PinSeats || new Set();
+    const editing360Seat = window._editing360PinSeat || null;
+    if (currentClass) {
+        currentClass.studentPins = currentClass.studentPins || {};
+    }
+
     let hasIssues = false;
     studentData.forEach(data => {
         if (data.issues.length === 0) return;
         hasIssues = true;
+        const seat = data.seat;
         const studentCard = document.createElement('div');
-        studentCard.className = 'glass-card rounded-3xl shadow-sm border border-slate-200/60 p-6 sm:p-8 hover:shadow-md transition-all';
-        studentCard.dataset.seat = data.seat;
-        studentCard.id = `student-card-seat-${data.seat}`;
-        const issuesHtml = data.issues.map(issue => `<span class="mr-2 inline-block bg-slate-50 border border-slate-200/40 rounded-xl px-3 py-1.5 mb-2 text-sm"><span class="homework-link font-black ${issue.colorClass} cursor-pointer hover:underline" data-id="${issue.hwId}">${issue.hwName}</span> <span class="text-xs font-bold opacity-50 ml-1">(${issue.statusText})</span></span>`).join('');
+        studentCard.className = 'bg-white rounded-2xl shadow-2xs border border-slate-200/90 p-5 flex flex-col justify-between hover:shadow-md hover:border-slate-300 transition-all';
+        studentCard.dataset.seat = seat;
+        studentCard.id = `student-card-seat-${seat}`;
+
+        const officerRoles = seatRolesMap[seat] || [];
+        const officerHtml = officerRoles.map(title => `<span class="text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 px-2 py-0.5 rounded-md"><i class="fa-solid fa-id-badge mr-1 text-[10px]"></i>${title}</span>`).join('');
+
+        const attStatusKey = todayAttMap[seat]?.status || 'present';
+        const attInfo = attLabels[attStatusKey] || attLabels.present;
+        const attBadgeHtml = `<span class="text-[11px] font-semibold border px-2 py-0.5 rounded-md ${attInfo.cls}">${attInfo.text}</span>`;
+
+        const issuesHtml = data.issues.map(issue => `<span class="inline-flex items-center bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-1 text-xs"><span class="homework-link font-bold ${issue.colorClass} cursor-pointer hover:underline" data-id="${issue.hwId}">${issue.hwName}</span><span class="text-[11px] font-semibold text-slate-400 ml-1">(${issue.statusText})</span></span>`).join('');
+
+        const rawPin = currentClass?.studentPins?.[seat] ?? currentClass?.studentPins?.[String(seat)] ?? String(100000 + seat);
+        const currentPin = String(rawPin).trim() || String(100000 + seat);
+        const isPinRevealed = window._revealed360PinSeats.has(seat);
+        const isEditingPin = editing360Seat === seat;
+
+        const pinControlHtml = isEditingPin ? `
+            <div class="flex items-center gap-1.5 bg-indigo-50/50 border border-indigo-400 rounded-lg px-2.5 py-1">
+                <span class="text-[11px] font-bold text-indigo-700 shrink-0"><i class="fa-solid fa-key mr-1 text-[10px]"></i>PIN:</span>
+                <input type="text" maxlength="16" data-seat="${seat}" class="student-360-pin-input font-mono font-black text-xs text-slate-900 bg-white border border-indigo-300 rounded px-2 py-0.5 w-24 focus:outline-none uppercase tabular-nums" value="${currentPin}">
+                <button type="button" data-seat="${seat}" class="student-360-save-pin-btn px-2 py-0.5 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-bold cursor-pointer transition-colors" title="儲存 PIN 碼">儲存</button>
+                <button type="button" data-seat="${seat}" class="student-360-cancel-pin-btn px-1.5 py-0.5 rounded bg-slate-200 hover:bg-slate-300 text-slate-600 text-[11px] font-bold cursor-pointer transition-colors" title="取消">取消</button>
+            </div>
+        ` : `
+            <div class="flex items-center justify-between bg-slate-50 border border-slate-200/80 rounded-lg px-2.5 py-1.5 text-xs">
+                <div class="flex items-center gap-1.5">
+                    <i class="fa-solid fa-key text-amber-500 text-[11px]"></i>
+                    <span class="text-[11px] font-semibold text-slate-500">學生 PIN 碼：</span>
+                    <span class="student-360-pin-text font-mono font-black text-slate-900 tabular-nums select-all" data-seat="${seat}">${isPinRevealed ? currentPin : '••••••'}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                    <button type="button" data-seat="${seat}" class="student-360-toggle-pin-btn ${isPinRevealed ? 'text-indigo-600 bg-indigo-50 border border-indigo-200/80' : 'text-slate-400 hover:text-indigo-600 hover:bg-slate-200/60'} w-6 h-6 rounded-md flex items-center justify-center cursor-pointer transition-colors" title="${isPinRevealed ? `隱藏 ${seat} 號 PIN 碼` : `單獨查看 ${seat} 號 PIN 碼`}">
+                        <i class="fa-regular ${isPinRevealed ? 'fa-eye-slash' : 'fa-eye'} text-[11px]"></i>
+                    </button>
+                    <button type="button" data-seat="${seat}" class="student-360-edit-pin-btn text-slate-400 hover:text-indigo-600 hover:bg-slate-200/60 w-6 h-6 rounded-md flex items-center justify-center cursor-pointer transition-colors" title="修改 ${seat} 號 PIN 碼">
+                        <i class="fa-solid fa-pen-to-square text-[11px]"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
         studentCard.innerHTML = `
-            <h3 class="text-xl font-black text-slate-800 flex justify-between items-center mb-4">
-                <span class="bg-slate-100 px-3 py-1.5 rounded-xl">${data.seat} 號</span>
-                <span class="text-sm font-bold text-rose-500 bg-rose-50 px-3 py-1.5 rounded-xl border border-rose-100">未完成: ${data.issues.length}</span>
-            </h3>
-            <div class="mt-1 flex flex-wrap">${issuesHtml}</div>
+            <div>
+                <div class="flex justify-between items-center gap-2 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="bg-slate-900 text-white font-extrabold text-sm px-2.5 py-1 rounded-lg tabular-nums">${seat} 號</span>
+                        ${officerHtml}
+                        ${attBadgeHtml}
+                    </div>
+                    <span class="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-lg border border-rose-200/80 tabular-nums shrink-0">待交 ${data.issues.length} 項</span>
+                </div>
+                <div class="mt-3 flex flex-wrap gap-1.5">${issuesHtml}</div>
+            </div>
+            <div class="mt-4 pt-3 border-t border-slate-100 space-y-2">
+                ${pinControlHtml}
+                <button type="button" data-seat="${seat}" class="copy-student-summary-btn text-xs font-semibold text-slate-600 hover:text-indigo-600 bg-slate-50 hover:bg-indigo-50/70 border border-slate-200/80 hover:border-indigo-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer w-full justify-center">
+                    <i class="fa-regular fa-copy"></i>
+                    <span>複製家長通知摘要</span>
+                </button>
+            </div>
         `;
         studentDetailsList.appendChild(studentCard);
     });
+
+    if (editing360Seat !== null) {
+        const inp = studentDetailsList.querySelector(`.student-360-pin-input[data-seat="${editing360Seat}"]`);
+        if (inp) {
+            inp.focus();
+            inp.select();
+        }
+    }
     
     if (!hasIssues) {
-        studentDetailsList.innerHTML = `<div class="col-span-full bg-emerald-50 border border-emerald-100 rounded-3xl p-8 text-center shadow-inner"><div class="text-3xl mb-2 text-amber-500"><i class="fa-solid fa-trophy"></i></div><p class="text-emerald-700 font-extrabold text-base">全班所有作業均已準時點收完成！</p></div>`;
+        studentDetailsList.innerHTML = `<div class="col-span-full bg-emerald-50/80 border border-emerald-200/80 rounded-2xl p-8 text-center"><div class="text-2xl mb-2 text-amber-500"><i class="fa-solid fa-trophy"></i></div><p class="text-emerald-800 font-extrabold text-sm">全班所有作業均已準時點收完成！</p></div>`;
     }
 }
 
@@ -1133,12 +1506,13 @@ window.addEventListener('storage', (e) => {
     if (e.key === 'school_pins_sync_event' && e.newValue) {
         try {
             const data = JSON.parse(e.newValue);
-            const curClass = state.appData?.classes?.find(c => c.id === state.selectedClassId);
+            const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId) || state.appData?.classes?.[0];
             if (curClass && data.studentPins) {
                 const match1 = String(curClass.accessCode || '').match(/\d+/)?.[0];
                 const match2 = String(curClass.name || '').match(/\d+/)?.[0];
                 if (match1 === data.classCode || match2 === data.classCode || curClass.classCode === data.classCode) {
                     curClass.studentPins = { ...data.studentPins };
+                    curClass._pinsSyncedFromCloud = true;
                     if (window.saveData) window.saveData();
                     renderClassCredentialsSection();
                 }
@@ -1149,15 +1523,17 @@ window.addEventListener('storage', (e) => {
 window.addEventListener('class_pins_updated', (e) => {
     try {
         const data = e.detail;
-        const curClass = state.appData?.classes?.find(c => c.id === state.selectedClassId);
+        const curClass = (state.appData?.classes || []).find(c => c.id === state.currentClassId) || state.appData?.classes?.[0];
         if (curClass && data?.studentPins) {
             const match1 = String(curClass.accessCode || '').match(/\d+/)?.[0];
             const match2 = String(curClass.name || '').match(/\d+/)?.[0];
             if (match1 === data.classCode || match2 === data.classCode || curClass.classCode === data.classCode) {
                 curClass.studentPins = { ...data.studentPins };
+                curClass._pinsSyncedFromCloud = true;
                 if (window.saveData) window.saveData();
                 renderClassCredentialsSection();
             }
         }
     } catch(err) {}
 });
+

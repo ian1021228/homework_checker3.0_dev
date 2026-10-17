@@ -1050,6 +1050,7 @@ export function setupButtonEvents() {
                 document.getElementById('admin-btn')?.classList.remove('hidden');
 
                 showToast(isSuperAdmin ? "登入成功！歡迎 系統管理員 (ianantigravity)" : "登入成功！已為您載入【107班 (七年一班)】", "success");
+                await syncDataToCloud().catch(e => console.warn('Initial sync notice:', e));
                 proceedIntoSystem();
                 return;
             }
@@ -1189,6 +1190,7 @@ export function setupButtonEvents() {
                     localStorage.setItem('currentClassId', state.currentClassId);
 
                     showToast(`登入成功！已為您載入【${matchedSchoolClass.className}】`, "success");
+                    await syncDataToCloud().catch(e => console.warn('Initial sync notice:', e));
                     proceedIntoSystem();
                     return;
                 } else {
@@ -2692,6 +2694,25 @@ export function setupButtonEvents() {
         });
     }
 
+    // 今日班級工作台快覽列 (Daily Command Bar) 快速跳轉
+    const dailyCommandBarEl = document.getElementById('daily-command-bar');
+    if (dailyCommandBarEl) {
+        dailyCommandBarEl.addEventListener('click', (e) => {
+            const card = e.target.closest('[data-command-target]');
+            if (!card) return;
+            const target = card.dataset.commandTarget;
+            if (target === 'student-details') {
+                showStudentDetailsPage();
+            } else if (target === 'attendance') {
+                showAttendancePage();
+            } else if (target === 'contact-book') {
+                showContactBookPage();
+            } else if (target === 'all-done-modal') {
+                document.getElementById('show-overall-all-done-btn')?.click();
+            }
+        });
+    }
+
     // 班級清單操作
     const classListEl = document.getElementById('class-list');
     if (classListEl) {
@@ -2993,47 +3014,64 @@ export function setupButtonEvents() {
         container.innerHTML = '';
 
         const maxSeat = typeof cls.lastMaxSeat === 'number' && cls.lastMaxSeat > 0 ? cls.lastMaxSeat : 30;
+        const skippedArr = Array.isArray(cls.skippedSeats) ? cls.skippedSeats : [];
         cls.studentPins = cls.studentPins || {};
+        if (!cls._pinsInitialized && Object.keys(cls.studentPins).length === 0) {
+            for (let s = 1; s <= maxSeat; s++) {
+                if (!skippedArr.includes(s)) {
+                    cls.studentPins[s] = String(100000 + s);
+                }
+            }
+            cls._pinsInitialized = true;
+        }
+
+        window._modalRevealedPinSeats = window._modalRevealedPinSeats || new Set();
+        const isAllRevealed = Boolean(window._modalAllPinsRevealed);
 
         let enabledCount = 0;
-        const baseCode = String(cls.accessCode || '').trim();
 
         for (let seat = 1; seat <= maxSeat; seat++) {
-            const pin = cls.studentPins[seat] || '';
-            const isEnabled = Boolean(pin && String(pin).trim().length > 0);
+            const rawPin = cls.studentPins[seat] ?? cls.studentPins[String(seat)] ?? '';
+            const pin = String(rawPin).trim();
+            const isEnabled = Boolean(pin.length > 0);
             if (isEnabled) enabledCount++;
+            const isRowRevealed = isAllRevealed || window._modalRevealedPinSeats.has(seat);
 
             const row = document.createElement('div');
             row.className = `p-3 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
-                isEnabled ? 'bg-white border-slate-200/90 shadow-2xs hover:border-amber-300' : 'bg-slate-50/70 border-slate-200/60'
+                isEnabled ? 'bg-white border-slate-200/90 shadow-2xs hover:border-indigo-300' : 'bg-slate-50/70 border-slate-200/60'
             }`;
 
             row.innerHTML = `
                 <div class="flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-xl ${isEnabled ? 'bg-amber-100 text-amber-900' : 'bg-slate-200 text-slate-600'} font-black text-xs flex items-center justify-center shrink-0">
+                    <span class="w-8 h-8 rounded-xl ${isEnabled ? 'bg-indigo-50 text-indigo-700 border border-indigo-200/80' : 'bg-slate-200 text-slate-600'} font-black text-xs flex items-center justify-center shrink-0 tabular-nums">
                         ${seat}號
                     </span>
                     <div>
                         <div class="flex items-center gap-2">
                             <span class="text-xs font-bold text-slate-800">${seat} 號學生</span>
                             <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                                isEnabled ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+                                isEnabled ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-200 text-slate-600'
                             }">
-                                ${isEnabled ? '學校已派發開通' : '未開通 / 學校尚未派發'}
+                                ${isEnabled ? '已開通認證碼' : '尚未開通'}
                             </span>
                         </div>
                     </div>
                 </div>
 
                 <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                    <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:border-amber-500 focus-within:ring-2 focus-within:ring-amber-500/20 shadow-2xs">
+                    <div class="flex items-center gap-1 bg-white border border-slate-200 rounded-xl px-2.5 py-1.5 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/20 shadow-2xs">
                         <span class="text-[10px] font-bold text-slate-400">PIN:</span>
-                        <input type="password" maxlength="32" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-amber-900 tracking-wider w-24 bg-transparent focus:outline-none uppercase" placeholder="尚未派發" value="${pin}">
-                        <button type="button" class="btn-toggle-row-pin-eye p-0.5 text-slate-400 hover:text-slate-600 cursor-pointer" title="查看/隱藏 PIN 碼">
-                            <i class="fa-regular fa-eye text-[11px]"></i>
+                        <input type="${isRowRevealed ? 'text' : 'password'}" maxlength="32" data-seat="${seat}" class="student-pin-input font-mono font-black text-xs text-slate-900 tracking-wider w-24 bg-transparent focus:outline-none uppercase tabular-nums" placeholder="輸入PIN碼" value="${pin}">
+                        <button type="button" data-seat="${seat}" class="btn-toggle-row-pin-eye p-1 rounded-md ${isRowRevealed ? 'text-indigo-600 bg-indigo-50' : 'text-slate-400 hover:text-indigo-600'} cursor-pointer transition-colors" title="單獨查看/隱藏此座號 PIN 碼">
+                            <i class="fa-regular ${isRowRevealed ? 'fa-eye-slash' : 'fa-eye'} text-[11px]"></i>
                         </button>
                     </div>
-                    <button type="button" data-seat="${seat}" class="btn-copy-seat-notice px-2.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="複製此座號家長通知文案">
+                    <button type="button" data-seat="${seat}" class="btn-save-seat-pin px-2.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer shadow-2xs" title="立即儲存此座號 PIN 碼">
+                        <i class="fa-solid fa-check text-[10px]"></i>
+                        <span>儲存</span>
+                    </button>
+                    <button type="button" data-seat="${seat}" class="btn-copy-seat-notice px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors flex items-center gap-1 cursor-pointer" title="複製此座號家長通知文案">
                         <i class="fa-regular fa-copy text-[10px]"></i>
                         <span>複製通知</span>
                     </button>
@@ -3042,7 +3080,7 @@ export function setupButtonEvents() {
                             清除
                         </button>
                     ` : `
-                        <button type="button" data-seat="${seat}" class="btn-enable-seat-pin px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer" title="設定此座號認證碼">
+                        <button type="button" data-seat="${seat}" class="btn-enable-seat-pin px-2.5 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-bold transition-colors cursor-pointer" title="一鍵開通預設認證碼">
                             開通
                         </button>
                     `}
@@ -3086,13 +3124,12 @@ export function setupButtonEvents() {
 
         // Toggle all PINs visibility in modal
         document.getElementById('btn-batch-random-pins')?.addEventListener('click', () => {
-            const inputs = studentPinsModal.querySelectorAll('.student-pin-input');
-            const isCurrentlyPassword = inputs[0] ? inputs[0].type === 'password' : false;
-            inputs.forEach(inp => {
-                inp.type = isCurrentlyPassword ? 'text' : 'password';
-            });
+            window._modalAllPinsRevealed = !window._modalAllPinsRevealed;
+            window._modalRevealedPinSeats = new Set();
+            const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
+            if (cls) renderStudentPinsList(cls);
             const btnSpan = document.querySelector('#btn-batch-random-pins span');
-            if (btnSpan) btnSpan.textContent = isCurrentlyPassword ? '隱藏全部 PIN 碼' : '顯示全部 PIN 碼';
+            if (btnSpan) btnSpan.textContent = window._modalAllPinsRevealed ? '隱藏全部 PIN 碼' : '顯示全部 PIN 碼';
         });
 
         // Copy roster
@@ -3104,14 +3141,14 @@ export function setupButtonEvents() {
             cls.studentPins = cls.studentPins || {};
             let rosterText = `【${cls.name}】學生成績認證碼 (PIN) 派發通知表：\n班級代碼：${code || '未設定'}\n------------------------------------\n`;
             for (let s = 1; s <= maxSeat; s++) {
-                const p = cls.studentPins[s] ? cls.studentPins[s] : '（學校尚未開通）';
+                const p = cls.studentPins[s] || cls.studentPins[String(s)] || '（尚未開通）';
                 rosterText += `座號 ${String(s).padStart(2, ' ')} 號：${p}\n`;
             }
             rosterText += `------------------------------------\n※ 成績認證碼由學校統一設定派發，導師可查看與個別修改。\n※ 家長端查閱網址：https://ian1021228.github.io/parent_dashboard_dev/?code=${code}`;
             await safeCopyToClipboard(rosterText, "已複製全班成績認證碼清單至剪貼簿！");
         });
 
-        // Seat row click delegation (Disable, Enable, Copy Seat Notice, Toggle Eye)
+        // Seat row click delegation (Toggle Eye, Save Single Row, Copy Seat Notice, Disable, Enable)
         const pinsListContainer = document.getElementById('student-pins-list-container');
         if (pinsListContainer) {
             pinsListContainer.addEventListener('click', async (e) => {
@@ -3119,17 +3156,52 @@ export function setupButtonEvents() {
                 if (!cls) return;
                 const code = String(cls.accessCode || '').trim();
                 cls.studentPins = cls.studentPins || {};
+                window._modalRevealedPinSeats = window._modalRevealedPinSeats || new Set();
 
                 // Toggle eye for single row
                 const eyeBtn = e.target.closest('.btn-toggle-row-pin-eye');
                 if (eyeBtn) {
                     const row = eyeBtn.closest('.flex');
                     const inp = row?.querySelector('.student-pin-input');
+                    const seatNum = parseInt(eyeBtn.dataset.seat || inp?.dataset?.seat || '0', 10);
                     if (inp) {
                         const isPwd = inp.type === 'password';
                         inp.type = isPwd ? 'text' : 'password';
+                        if (isPwd && seatNum) {
+                            window._modalRevealedPinSeats.add(seatNum);
+                            eyeBtn.classList.add('text-indigo-600', 'bg-indigo-50');
+                        } else if (seatNum) {
+                            window._modalRevealedPinSeats.delete(seatNum);
+                            eyeBtn.classList.remove('text-indigo-600', 'bg-indigo-50');
+                        }
                         eyeBtn.innerHTML = `<i class="fa-regular ${isPwd ? 'fa-eye-slash' : 'fa-eye'} text-[11px]"></i>`;
                     }
+                    return;
+                }
+
+                // Quick save single seat PIN
+                const saveSeatBtn = e.target.closest('.btn-save-seat-pin');
+                if (saveSeatBtn) {
+                    const seat = parseInt(saveSeatBtn.dataset.seat, 10);
+                    const inp = pinsListContainer.querySelector(`.student-pin-input[data-seat="${seat}"]`);
+                    const val = (inp ? inp.value : (cls.studentPins[seat] || '')).trim().toUpperCase();
+                    if (val) {
+                        cls.studentPins[seat] = val;
+                        cls.studentPins[String(seat)] = val;
+                        window._modalRevealedPinSeats.add(seat);
+                        window._revealedPinSeats = window._revealedPinSeats || new Set();
+                        window._revealedPinSeats.add(seat);
+                    } else {
+                        delete cls.studentPins[seat];
+                        delete cls.studentPins[String(seat)];
+                    }
+                    cls._pinsEditedByTeacher = true;
+                    cls._pinsSyncedFromCloud = true;
+                    saveData();
+                    renderStudentPinsList(cls);
+                    if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+                    showToast(val ? `已更新 ${seat} 號學生 PIN 碼為 ${val}！` : `已清除 ${seat} 號學生 PIN 碼`, "success");
+                    syncClassStudentPinsToCloud(cls);
                     return;
                 }
 
@@ -3137,45 +3209,83 @@ export function setupButtonEvents() {
                 const copyNoticeBtn = e.target.closest('.btn-copy-seat-notice');
                 if (copyNoticeBtn) {
                     const seat = copyNoticeBtn.dataset.seat;
-                    const pin = cls.studentPins[seat] || '';
-                    const noticeText = `【${cls.name} 家長成績查詢通知】\n學生座號：${seat} 號\n班級代碼：${code || '未設定'}\n成績認證碼：${pin || '（學校尚未開通）'}\n家長端專屬查閱網址：https://ian1021228.github.io/parent_dashboard_dev/?code=${code}&seat=${seat}`;
+                    const pin = cls.studentPins[seat] || cls.studentPins[String(seat)] || '';
+                    const noticeText = `【${cls.name} 家長成績查詢通知】\n學生座號：${seat} 號\n班級代碼：${code || '未設定'}\n成績認證碼：${pin || '（尚未開通）'}\n家長端專屬查閱網址：https://ian1021228.github.io/parent_dashboard_dev/?code=${code}&seat=${seat}`;
                     await safeCopyToClipboard(noticeText, `已複製 ${seat} 號家長通知文案！`);
                     return;
                 }
 
                 const disableBtn = e.target.closest('.btn-disable-seat-pin');
                 if (disableBtn) {
-                    const seat = disableBtn.dataset.seat;
+                    const seat = parseInt(disableBtn.dataset.seat, 10);
                     delete cls.studentPins[seat];
+                    delete cls.studentPins[String(seat)];
+                    cls._pinsEditedByTeacher = true;
+                    cls._pinsSyncedFromCloud = true;
+                    saveData();
                     renderStudentPinsList(cls);
+                    if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+                    syncClassStudentPinsToCloud(cls);
                     showToast(`已清除 ${seat} 號認證碼`, "info");
                     return;
                 }
 
                 const enableBtn = e.target.closest('.btn-enable-seat-pin');
                 if (enableBtn) {
-                    const seat = enableBtn.dataset.seat;
-                    const val = prompt(`請輸入 ${seat} 號學生的成績認證碼：`, '');
-                    if (val && val.trim()) {
-                        cls.studentPins[seat] = val.trim().toUpperCase();
-                        renderStudentPinsList(cls);
-                        showToast(`已為 ${seat} 號設定認證碼：${cls.studentPins[seat]}（請點擊儲存）`, "info");
+                    const seat = parseInt(enableBtn.dataset.seat, 10);
+                    const defaultPin = String(100000 + seat);
+                    cls.studentPins[seat] = defaultPin;
+                    cls.studentPins[String(seat)] = defaultPin;
+                    cls._pinsEditedByTeacher = true;
+                    cls._pinsSyncedFromCloud = true;
+                    window._modalRevealedPinSeats.add(seat);
+                    saveData();
+                    renderStudentPinsList(cls);
+                    if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+                    syncClassStudentPinsToCloud(cls);
+                    const inp = pinsListContainer.querySelector(`.student-pin-input[data-seat="${seat}"]`);
+                    if (inp) {
+                        inp.focus();
+                        inp.select();
                     }
+                    showToast(`已為 ${seat} 號開通認證碼：${defaultPin}（可直接輸入修改）`, "success");
                     return;
+                }
+            });
+
+            // Focus on PIN input automatically reveals that student's PIN for easy editing
+            pinsListContainer.addEventListener('focusin', (e) => {
+                if (e.target.classList.contains('student-pin-input')) {
+                    const inp = e.target;
+                    const seatNum = parseInt(inp.dataset.seat || '0', 10);
+                    if (inp.type === 'password') {
+                        inp.type = 'text';
+                        window._modalRevealedPinSeats = window._modalRevealedPinSeats || new Set();
+                        if (seatNum) window._modalRevealedPinSeats.add(seatNum);
+                        const eyeBtn = inp.parentElement?.querySelector('.btn-toggle-row-pin-eye');
+                        if (eyeBtn) {
+                            eyeBtn.classList.add('text-indigo-600', 'bg-indigo-50');
+                            eyeBtn.innerHTML = `<i class="fa-regular fa-eye-slash text-[11px]"></i>`;
+                        }
+                    }
                 }
             });
 
             pinsListContainer.addEventListener('input', (e) => {
                 if (e.target.classList.contains('student-pin-input')) {
-                    const seat = e.target.dataset.seat;
+                    const seat = parseInt(e.target.dataset.seat, 10);
                     const val = e.target.value.trim().toUpperCase();
                     const cls = state.appData.classes.find(c => c.id === currentEditingPinsClassId);
                     if (cls) {
                         cls.studentPins = cls.studentPins || {};
+                        cls._pinsEditedByTeacher = true;
+                        cls._pinsSyncedFromCloud = true;
                         if (val) {
                             cls.studentPins[seat] = val;
+                            cls.studentPins[String(seat)] = val;
                         } else {
                             delete cls.studentPins[seat];
+                            delete cls.studentPins[String(seat)];
                         }
                     }
                 }
@@ -3191,21 +3301,25 @@ export function setupButtonEvents() {
             const inputs = studentPinsModal.querySelectorAll('.student-pin-input');
             cls.studentPins = cls.studentPins || {};
             inputs.forEach(inp => {
-                const seat = inp.dataset.seat;
+                const seat = parseInt(inp.dataset.seat, 10);
                 const val = inp.value.trim().toUpperCase();
                 if (val) {
                     cls.studentPins[seat] = val;
+                    cls.studentPins[String(seat)] = val;
                 } else {
                     delete cls.studentPins[seat];
+                    delete cls.studentPins[String(seat)];
                 }
             });
+            cls._pinsEditedByTeacher = true;
+            cls._pinsSyncedFromCloud = true;
 
-            await saveData();
-            await syncClassStudentPinsToCloud(cls);
-
-            showToast("已成功儲存並同步學生 PIN 碼至雲端！學生與家長端即刻生效。", "success");
+            saveData();
             closeModal(studentPinsModal);
             renderClassList();
+            if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+            showToast("已成功儲存並同步學生 PIN 碼至雲端！學生與家長端即刻生效。", "success");
+            syncClassStudentPinsToCloud(cls);
         });
     }
 
@@ -3220,7 +3334,89 @@ export function setupButtonEvents() {
 
     const studentDetailsList = document.getElementById('student-details-list');
     if (studentDetailsList) {
-        studentDetailsList.addEventListener('click', (e) => { 
+        studentDetailsList.addEventListener('click', async (e) => {
+            const toggle360PinBtn = e.target.closest('.student-360-toggle-pin-btn');
+            if (toggle360PinBtn) {
+                e.stopPropagation();
+                const seat = parseInt(toggle360PinBtn.dataset.seat, 10);
+                window._revealed360PinSeats = window._revealed360PinSeats || new Set();
+                if (window._revealed360PinSeats.has(seat)) {
+                    window._revealed360PinSeats.delete(seat);
+                } else {
+                    window._revealed360PinSeats.add(seat);
+                }
+                renderStudentDetailsPage();
+                return;
+            }
+
+            const edit360PinBtn = e.target.closest('.student-360-edit-pin-btn');
+            if (edit360PinBtn) {
+                e.stopPropagation();
+                const seat = parseInt(edit360PinBtn.dataset.seat, 10);
+                window._editing360PinSeat = seat;
+                renderStudentDetailsPage();
+                return;
+            }
+
+            const save360PinBtn = e.target.closest('.student-360-save-pin-btn');
+            if (save360PinBtn) {
+                e.stopPropagation();
+                const seat = parseInt(save360PinBtn.dataset.seat, 10);
+                const inp = studentDetailsList.querySelector(`.student-360-pin-input[data-seat="${seat}"]`);
+                const val = (inp ? inp.value : '').trim().toUpperCase();
+                const curClass = state.appData.classes.find(c => c.id === state.currentClassId);
+                if (curClass && val) {
+                    curClass.studentPins = curClass.studentPins || {};
+                    curClass.studentPins[seat] = val;
+                    curClass.studentPins[String(seat)] = val;
+                    curClass._pinsEditedByTeacher = true;
+                    curClass._pinsSyncedFromCloud = true;
+                    window._editing360PinSeat = null;
+                    window._revealed360PinSeats = window._revealed360PinSeats || new Set();
+                    window._revealed360PinSeats.add(seat);
+                    saveData();
+                    renderStudentDetailsPage();
+                    if (window.renderClassCredentialsSection) window.renderClassCredentialsSection();
+                    showToast(`已更新 ${seat} 號學生 PIN 碼為 ${val}！`, "success");
+                    syncClassStudentPinsToCloud(curClass);
+                }
+                return;
+            }
+
+            const cancel360PinBtn = e.target.closest('.student-360-cancel-pin-btn');
+            if (cancel360PinBtn) {
+                e.stopPropagation();
+                window._editing360PinSeat = null;
+                renderStudentDetailsPage();
+                return;
+            }
+
+            const copySummaryBtn = e.target.closest('.copy-student-summary-btn');
+            if (copySummaryBtn) {
+                e.stopPropagation();
+                const seat = parseInt(copySummaryBtn.dataset.seat, 10);
+                const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
+                const classHomeworks = state.appData.homeworks.filter(hw => hw.classId === state.currentClassId);
+                const missingItems = [];
+                classHomeworks.forEach(hw => {
+                    const typeId = hw.typeId || 'default';
+                    const st = (hw.students || []).find(s => Number(s.seat) === seat);
+                    if (st && !isStudentCompleted(st, typeId)) {
+                        const typeConfig = getHomeworkType(typeId);
+                        const stInfo = typeConfig.statuses.find(s => s.key === st.status) || typeConfig.statuses[0];
+                        missingItems.push(`• ${hw.name}（${stInfo.text}）`);
+                    }
+                });
+                const todayStr = formatDate(new Date());
+                const attStatus = currentClass?.attendance?.[todayStr]?.[seat]?.status || 'present';
+                const attMap = { present: '出席正常', tardy: '遲到', sick: '病假', personal: '事假', official: '公假' };
+                const clsName = currentClass?.name || '本班';
+                const code = currentClass?.accessCode || '';
+                const parentUrl = code ? `https://ian1021228.github.io/parent_dashboard_dev/?code=${encodeURIComponent(code)}&seat=${seat}` : 'https://ian1021228.github.io/parent_dashboard_dev/';
+                const summaryText = `【${clsName} 家長個別通知摘要】\n座號：${seat} 號\n日期：${todayStr}（今日出缺席：${attMap[attStatus] || '出席正常'}）\n目前待完成/待訂正作業（共 ${missingItems.length} 項）：\n${missingItems.join('\n')}\n\n家長端即時查核連結：${parentUrl}`;
+                await safeCopyToClipboard(summaryText, `已複製 ${seat} 號學生的家長通知摘要！`);
+                return;
+            }
             if(e.target.classList.contains('homework-link')) { 
                 const studentCard = e.target.closest('[data-seat]');
                 const seat = studentCard ? parseInt(studentCard.dataset.seat, 10) : null;
@@ -3568,6 +3764,55 @@ export function setupButtonEvents() {
             renderContactBookItems(); 
             showToast("已套用！", "success"); 
         }); 
+    });
+
+    // 一鍵帶入今日已派作業至聯絡簿黑板
+    bindClick('import-today-hw-btn', async () => {
+        if (!state.currentClassId) return;
+        const currentClass = state.appData.classes.find(c => c.id === state.currentClassId);
+        if (!currentClass) return;
+        const dateStr = formatDate(state.selectedDate, 'YYYY-MM-DD');
+        const classHws = (state.appData.homeworks || []).filter(h => h.classId === state.currentClassId);
+        if (classHws.length === 0) {
+            showToast('目前此班級尚無建立作業項目可帶入', 'warning');
+            return;
+        }
+        // 優先篩選所選日期當天建立的作業，若無則帶入最近建立的前 5 項作業
+        let targetHws = classHws.filter(h => {
+            if (!h.createdAt) return false;
+            return formatDate(new Date(h.createdAt), 'YYYY-MM-DD') === dateStr;
+        });
+        if (targetHws.length === 0) {
+            targetHws = [...classHws]
+                .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())
+                .slice(0, 5);
+        }
+
+        if (!currentClass.contactBook) currentClass.contactBook = {};
+        if (!Array.isArray(currentClass.contactBook[dateStr])) currentClass.contactBook[dateStr] = [];
+
+        const existingSet = new Set(currentClass.contactBook[dateStr].map(item => String(item).trim()));
+        let addedCount = 0;
+        targetHws.forEach(hw => {
+            const hwTitle = String(hw.name || '').trim();
+            if (hwTitle && !existingSet.has(hwTitle)) {
+                currentClass.contactBook[dateStr].push(hwTitle);
+                existingSet.add(hwTitle);
+                addedCount++;
+            }
+        });
+
+        if (addedCount === 0) {
+            showToast('今日作業項目皆已在聯絡簿黑板中，無須重複帶入', 'info');
+            return;
+        }
+
+        await saveData();
+        renderContactBookItems();
+        if (typeof renderDualScreenContactBook === 'function') {
+            renderDualScreenContactBook();
+        }
+        showToast(`已成功帶入 ${addedCount} 項作業至聯絡簿！`, 'success');
     });
 
     // 日期選擇彈窗

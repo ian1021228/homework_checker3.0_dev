@@ -20,10 +20,10 @@
   <link rel="preconnect" href="https://firestore.googleapis.com">
   <link rel="preconnect" href="https://www.gstatic.com" crossorigin>
 
-  <!-- Google Fonts: Plus Jakarta Sans & Noto Sans TC -->
+  <!-- Google Fonts: Inter & Noto Sans TC -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+TC:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- FontAwesome 6.5.1 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -35,7 +35,7 @@
       theme: {
         extend: {
           fontFamily: {
-            sans: ['"Plus Jakarta Sans"', '"Noto Sans TC"', 'sans-serif'],
+            sans: ['"Inter"', '"Noto Sans TC"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
           },
           colors: {
             brand: {
@@ -72,6 +72,8 @@
     }
     body {
       font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.011em;
       touch-action: manipulation;
       -webkit-touch-callout: none;
       padding-bottom: calc(4.75rem + var(--sab));
@@ -301,44 +303,40 @@
         <button id="sync-retry-btn" class="px-3 py-1 rounded-xl bg-amber-200/80 hover:bg-amber-300 font-bold text-xs text-amber-900">重新整理</button>
       </div>
 
-      <!-- 每日摘要一覽卡片（今日親師速報） -->
-      <section id="daily-bulletin-card" class="bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-indigo-800/50 relative overflow-hidden transition-all">
-        <!-- Background subtle lighting effects -->
-        <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -left-12 -top-12 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
+      <!-- 每日摘要一覽卡片（今日親師速報 — Swiss Editorial Light Card） -->
+      <section id="daily-bulletin-card" class="bg-white text-slate-900 rounded-2xl p-5 sm:p-6 shadow-xs border border-slate-200/90 relative overflow-hidden transition-all">
         <!-- Header of Bulletin -->
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-indigo-800/50 relative z-10">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 relative z-10">
           <div class="flex items-center gap-3">
-            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-400/20 border border-amber-400/30 text-amber-300 flex items-center justify-center text-lg sm:text-xl shrink-0 shadow-inner">
-              <i class="fa-solid fa-bolt"></i>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-base shrink-0">
+              <i class="fa-solid fa-newspaper"></i>
             </div>
             <div>
-              <div class="flex items-center gap-2">
-                <h2 class="text-base sm:text-lg font-black tracking-tight text-white flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-base sm:text-lg font-bold tracking-tight text-slate-900 flex items-center gap-2">
                   <span id="bulletin-title-text">今日親師速報</span>
                 </h2>
-                <span id="bulletin-seat-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <span id="bulletin-seat-badge" class="px-2.5 py-0.5 rounded-md text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80">
                   座號 -- 號
                 </span>
-                <span id="bulletin-friday-tag" class="hidden px-2 py-0.5 rounded-full text-[11px] font-black bg-amber-400/20 text-amber-300 border border-amber-400/30">週五內容</span>
-                <span class="text-[11px] text-indigo-300 hidden sm:inline">每日摘要一覽（一眼看懂）</span>
+                <span id="bulletin-friday-tag" class="hidden px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">週五內容</span>
+                <span class="text-[11px] text-slate-400 hidden sm:inline">每日摘要一覽</span>
               </div>
-              <p class="text-xs text-indigo-200/80 mt-0.5">
-                <span id="bulletin-subtitle-desc">下班後一分鐘掌握孩子今日學習動態</span> · <span id="bulletin-date-text" class="font-mono text-indigo-200 font-semibold">--</span>
+              <p class="text-xs text-slate-500 mt-0.5">
+                <span id="bulletin-subtitle-desc">下班後一分鐘掌握孩子今日學習動態</span> · <span id="bulletin-date-text" class="font-mono text-slate-700 font-semibold">--</span>
               </p>
             </div>
           </div>
-          <div class="text-xs text-indigo-300/80 flex items-center gap-2 self-start sm:self-center font-medium">
-            <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <div class="text-xs text-slate-500 flex items-center gap-2 self-start sm:self-center font-medium bg-slate-50 px-2.5 py-1 rounded-lg border border-slate-200/70">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
             <span>即時數據彙整</span>
           </div>
         </div>
 
         <!-- Unbound state notice -->
-        <div id="bulletin-unbound-notice" class="hidden py-6 text-center text-xs sm:text-sm text-indigo-200 relative z-10">
+        <div id="bulletin-unbound-notice" class="hidden py-6 text-center text-xs sm:text-sm text-slate-600 relative z-10">
           <p class="mb-3 font-medium">您尚未綁定或選擇學生座號，請先選擇座號即可在此一眼看懂貴子弟的今日作業與聯絡簿！</p>
-          <button type="button" id="btn-bulletin-bind-seat" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-indigo-950 font-black text-xs shadow-md transition-all cursor-pointer inline-flex items-center gap-1.5 transform hover:-translate-y-0.5">
+          <button type="button" id="btn-bulletin-bind-seat" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-xs transition-all cursor-pointer inline-flex items-center gap-1.5">
             <i class="fa-solid fa-user-check"></i>
             <span>選擇學生座號</span>
           </button>
@@ -348,74 +346,74 @@
         <div id="bulletin-content-grid" class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-3 gap-3 sm:gap-3.5 pt-4 relative z-10">
           
           <!-- Metric 1: 今日作業 -->
-          <div id="bulletin-item-hw" class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至今日作業進度">
+          <div id="bulletin-item-hw" class="bg-slate-50/80 hover:bg-indigo-50/40 rounded-xl p-3.5 border border-slate-200/80 hover:border-indigo-300 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至今日作業進度">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-200 flex items-center gap-1.5">
-                <i class="fa-solid fa-clipboard-check text-emerald-400 text-sm"></i>
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i class="fa-solid fa-clipboard-check text-emerald-600 text-sm"></i>
                 <span id="bulletin-hw-title">今日作業</span>
               </span>
-              <span id="bulletin-hw-badge" class="px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+              <span id="bulletin-hw-badge" class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 --
               </span>
             </div>
-            <div id="bulletin-hw-summary" class="text-sm font-extrabold text-white leading-snug">
+            <div id="bulletin-hw-summary" class="text-sm font-bold text-slate-900 leading-snug">
               載入中...
             </div>
-            <div class="text-[10px] text-indigo-300 mt-2.5 flex items-center justify-between group-hover:text-white transition-colors">
+            <div class="text-[11px] text-slate-500 mt-2.5 flex items-center justify-between group-hover:text-indigo-600 transition-colors">
               <span>查看詳細作業</span>
               <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
           </div>
 
           <!-- Metric 2: 今日小考 (已依規範隱藏，保留節點支援日後復原) -->
-          <div id="bulletin-item-scores" class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 transition-all cursor-pointer group flex-col justify-between hidden" title="點擊切換至成績與學習分析">
+          <div id="bulletin-item-scores" class="bg-slate-50/80 hover:bg-indigo-50/40 rounded-xl p-3.5 border border-slate-200/80 hover:border-indigo-300 transition-all cursor-pointer group flex-col justify-between hidden" title="點擊切換至成績與學習分析">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-200 flex items-center gap-1.5">
-                <i class="fa-solid fa-award text-amber-400 text-sm"></i>
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i class="fa-solid fa-award text-amber-600 text-sm"></i>
                 <span id="bulletin-scores-title">今日小考</span>
               </span>
-              <span class="text-[10px] text-amber-300/80 font-bold">小考成績</span>
+              <span class="text-[10px] text-amber-700 font-semibold">小考成績</span>
             </div>
-            <div id="bulletin-scores-summary" class="text-sm font-extrabold text-white leading-snug">
+            <div id="bulletin-scores-summary" class="text-sm font-bold text-slate-900 leading-snug">
               今日無小考紀錄
             </div>
-            <div class="text-[10px] text-indigo-300 mt-2.5 flex items-center justify-between group-hover:text-white transition-colors">
+            <div class="text-[11px] text-slate-500 mt-2.5 flex items-center justify-between group-hover:text-indigo-600 transition-colors">
               <span>查閱成績表現</span>
               <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
           </div>
 
           <!-- Metric 3: 今日聯絡事項 -->
-          <div id="bulletin-item-contact" class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至聯絡簿">
+          <div id="bulletin-item-contact" class="bg-slate-50/80 hover:bg-indigo-50/40 rounded-xl p-3.5 border border-slate-200/80 hover:border-indigo-300 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至聯絡簿">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-200 flex items-center gap-1.5">
-                <i class="fa-solid fa-book-open text-sky-400 text-sm"></i>
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i class="fa-solid fa-book-open text-indigo-600 text-sm"></i>
                 <span id="bulletin-contact-title">今日聯絡事項</span>
               </span>
-              <span class="text-[10px] text-sky-300/80 font-bold">親師交代</span>
+              <span class="text-[10px] text-indigo-600 font-semibold">親師交代</span>
             </div>
-            <div id="bulletin-contact-summary" class="text-sm font-extrabold text-white leading-snug">
+            <div id="bulletin-contact-summary" class="text-sm font-bold text-slate-900 leading-snug">
               共 0 則事項
             </div>
-            <div class="text-[10px] text-indigo-300 mt-2.5 flex items-center justify-between group-hover:text-white transition-colors">
+            <div class="text-[11px] text-slate-500 mt-2.5 flex items-center justify-between group-hover:text-indigo-600 transition-colors">
               <span>閱讀聯絡簿</span>
               <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
           </div>
 
           <!-- Metric 4: 孩子今日心情 -->
-          <div id="bulletin-item-mood" class="bg-white/10 hover:bg-white/15 backdrop-blur-md rounded-2xl p-3.5 border border-white/10 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至心情日記">
+          <div id="bulletin-item-mood" class="bg-slate-50/80 hover:bg-indigo-50/40 rounded-xl p-3.5 border border-slate-200/80 hover:border-indigo-300 transition-all cursor-pointer group flex flex-col justify-between" title="點擊切換至心情日記">
             <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold text-indigo-200 flex items-center gap-1.5">
-                <i class="fa-solid fa-heart text-rose-400 text-sm"></i>
+              <span class="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
+                <i class="fa-solid fa-heart text-rose-500 text-sm"></i>
                 <span id="bulletin-mood-title">孩子今日心情</span>
               </span>
-              <span class="text-[10px] text-rose-300/80 font-bold">生活札記</span>
+              <span class="text-[10px] text-rose-600 font-semibold">生活札記</span>
             </div>
-            <div id="bulletin-mood-summary" class="text-sm font-extrabold text-white leading-snug flex items-center gap-1.5">
+            <div id="bulletin-mood-summary" class="text-sm font-bold text-slate-900 leading-snug flex items-center gap-1.5">
               尚未填寫心情
             </div>
-            <div class="text-[10px] text-indigo-300 mt-2.5 flex items-center justify-between group-hover:text-white transition-colors">
+            <div class="text-[11px] text-slate-500 mt-2.5 flex items-center justify-between group-hover:text-indigo-600 transition-colors">
               <span>深入了解生活感受</span>
               <i class="fa-solid fa-arrow-right text-[10px] group-hover:translate-x-0.5 transition-transform"></i>
             </div>
@@ -425,12 +423,12 @@
       </section>
 
       <!-- Navigation Tabs for Parent Dashboard -->
-      <nav class="bg-slate-200/80 p-1.5 rounded-2xl hidden sm:flex items-center gap-1.5 shadow-inner" id="parent-main-tabs">
+      <nav class="bg-slate-200/70 p-1 rounded-xl hidden sm:flex items-center gap-1 border border-slate-200/80" id="parent-main-tabs">
         <button
           type="button"
           id="parent-tab-hw-btn"
           data-tab="hw"
-          class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all bg-white text-indigo-700 shadow-sm flex items-center justify-center gap-1.5 cursor-pointer"
+          class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all bg-white text-indigo-700 shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <i class="fa-solid fa-clipboard-list"></i>
           <span>今日作業進度</span>
@@ -441,7 +439,7 @@
           type="button"
           id="parent-tab-scores-btn"
           data-tab="scores"
-          class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all text-slate-600 hover:text-slate-900 hidden items-center justify-center gap-1.5 cursor-pointer relative"
+          class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 hidden items-center justify-center gap-1.5 cursor-pointer relative"
         >
           <i class="fa-solid fa-chart-line text-emerald-600"></i>
           <span>成績與學習分析</span>
@@ -452,7 +450,7 @@
           type="button"
           id="parent-tab-class-btn"
           data-tab="class"
-          class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
+          class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <i class="fa-solid fa-school text-indigo-500"></i>
           <span>全班作業總覽</span>
@@ -462,7 +460,7 @@
           type="button"
           id="parent-tab-contact-btn"
           data-tab="contact"
-          class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
+          class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <i class="fa-solid fa-book-open text-teal-600"></i>
           <span>聯絡簿與心情</span>
@@ -472,7 +470,7 @@
           type="button"
           id="parent-tab-affairs-btn"
           data-tab="affairs"
-          class="flex-1 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
+          class="flex-1 py-2 px-3 rounded-lg text-xs sm:text-sm font-semibold transition-all text-slate-600 hover:text-slate-900 flex items-center justify-center gap-1.5 cursor-pointer"
         >
           <i class="fa-solid fa-folder-open text-rose-500"></i>
           <span>問卷回條</span>
@@ -484,18 +482,18 @@
       <!-- ============================================== -->
       <div id="panel-parent-hw" class="space-y-6">
         <!-- MODULE 1: STUDENT PERSONAL PROGRESS CARD -->
-        <section id="student-progress-section" class="bg-white rounded-3xl p-5 sm:p-7 shadow-sm border border-slate-200/80 transition-all">
+        <section id="student-progress-section" class="bg-white rounded-2xl p-5 sm:p-7 shadow-xs border border-slate-200/90 transition-all">
           
           <!-- State A: Student Seat Bound -->
           <div id="student-bound-view">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-100">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xl shadow-md shadow-indigo-500/20">
+                <div class="w-12 h-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-bold text-xl shadow-xs">
                   <span id="student-seat-display">?</span>
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
-                    <h2 class="text-lg sm:text-xl font-extrabold text-slate-900">座號 <span id="student-seat-title">--</span> 號 學習進度概況</h2>
+                    <h2 class="text-lg sm:text-xl font-bold text-slate-900">座號 <span id="student-seat-title">--</span> 號 學習進度概況</h2>
                     <button id="change-seat-quick-btn" class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 underline underline-offset-2">
                       更換座號
                     </button>
@@ -505,7 +503,7 @@
                     </button>
                   </div>
                   <p id="student-status-summary" class="text-xs text-slate-500 mt-0.5">點選下方標籤可快速篩選相關作業</p>
-                  <div id="student-attendance-status-box" class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <div id="student-attendance-status-box" class="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
                     <i class="fa-solid fa-user-check text-emerald-600"></i>
                     <span id="student-attendance-status-text">今日出席：正常出席</span>
                   </div>
@@ -518,6 +516,9 @@
                 <span>最後更新：<span id="card-updated-time">剛剛</span></span>
               </div>
             </div>
+
+            <!-- 常用座號快速切換列 (Recent Seats Quick Switcher) -->
+            <div id="recent-seats-bar" class="flex flex-wrap items-center gap-1.5 mt-3 pt-1"></div>
 
             <!-- KPI Metric Cards: 3 stats -->
             <div class="grid grid-cols-3 gap-3 sm:gap-4 mt-5">
@@ -2257,10 +2258,12 @@
       if (seatOverride && parseInt(seatOverride, 10) > 0) {
         state.studentSeat = parseInt(seatOverride, 10);
         if (seatKey) localStorage.setItem(seatKey, state.studentSeat.toString());
+        recordRecentSeat(cleanCode, state.studentSeat);
       } else {
         const savedSeat = seatKey ? localStorage.getItem(seatKey) : null;
         if (savedSeat && parseInt(savedSeat, 10) > 0) {
           state.studentSeat = parseInt(savedSeat, 10);
+          recordRecentSeat(cleanCode, state.studentSeat);
         } else {
           // 第一次進入該班級，絕不默認 1 號！強制為 null 以顯示座號選擇頁面
           state.studentSeat = null;
@@ -2380,8 +2383,8 @@
           showDashboardView();
           renderParentDashboard(data);
           elements.syncAlertBanner.classList.add("hidden");
-        } else {
-          // Document does not exist
+        } else if (!state.classData) {
+          // Document does not exist and no local cache available
           showLoginView();
           elements.loginErrorBox.classList.remove("hidden");
           elements.loginErrorMsg.textContent = "找不到此班級權限碼（" + cleanCode + "），請確認後重新輸入！";
@@ -2520,11 +2523,73 @@
       localStorage.removeItem(pinKey);
     }
 
+    function getRecentSeats(accessCode) {
+      if (!accessCode) return [];
+      try {
+        const raw = localStorage.getItem(`parent_recent_seats_${accessCode}`);
+        if (!raw) return [];
+        const arr = JSON.parse(raw);
+        return Array.isArray(arr) ? arr.map(Number).filter(n => n > 0) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function recordRecentSeat(accessCode, seatNumber) {
+      if (!accessCode || !seatNumber) return;
+      const s = Number(seatNumber);
+      if (!s || s <= 0) return;
+      try {
+        let list = getRecentSeats(accessCode).filter(x => x !== s);
+        list.unshift(s);
+        list = list.slice(0, 5);
+        localStorage.setItem(`parent_recent_seats_${accessCode}`, JSON.stringify(list));
+      } catch (e) {}
+    }
+
+    function renderRecentSeatsBar() {
+      const bar = document.getElementById('recent-seats-bar');
+      if (!bar || !state.accessCode) return;
+      if (state.studentSeat) {
+        recordRecentSeat(state.accessCode, state.studentSeat);
+      }
+      const recent = getRecentSeats(state.accessCode);
+      if (recent.length === 0) {
+        bar.innerHTML = '';
+        return;
+      }
+      const chipsHtml = recent.map(s => {
+        const isCurrent = s === state.studentSeat;
+        return `<button type="button" data-quick-seat="${s}" class="quick-seat-chip px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+          isCurrent
+            ? 'bg-indigo-600 text-white shadow-2xs'
+            : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/80'
+        }">${s} 號${isCurrent ? ' (目前)' : ''}</button>`;
+      }).join('');
+      bar.innerHTML = `
+        <span class="text-[11px] font-semibold text-slate-400 mr-1"><i class="fa-solid fa-clock-rotate-left mr-1"></i>常用座號切換：</span>
+        ${chipsHtml}
+        <button type="button" id="recent-bar-pick-other-btn" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-indigo-600 border border-slate-200/90 transition-all cursor-pointer">
+          <i class="fa-solid fa-sliders text-[10px] mr-1"></i>其他座號
+        </button>
+      `;
+      bar.querySelectorAll('.quick-seat-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const targetSeat = parseInt(btn.getAttribute('data-quick-seat'), 10);
+          if (targetSeat && targetSeat !== state.studentSeat) {
+            setStudentSeat(targetSeat);
+          }
+        });
+      });
+      bar.querySelector('#recent-bar-pick-other-btn')?.addEventListener('click', openSettingsModal);
+    }
+
     function setStudentSeat(seatNumber) {
       state.studentSeat = seatNumber ? parseInt(seatNumber, 10) : null;
       const seatKey = getParentSeatStorageKey(state.accessCode);
       if (state.studentSeat) {
         if (seatKey) localStorage.setItem(seatKey, state.studentSeat.toString());
+        recordRecentSeat(state.accessCode, state.studentSeat);
         showToast(`已選取學生座號：${state.studentSeat} 號`, "info");
         const currentUrl = new URL(window.location);
         currentUrl.searchParams.set("seat", state.studentSeat);
@@ -2644,13 +2709,13 @@
       if (elements.bulletinHwBadge) {
         if (totalHw === 0) {
           elements.bulletinHwBadge.textContent = "無作業";
-          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-black bg-slate-500/20 text-slate-300 border border-slate-400/30";
+          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200";
         } else if (completedCount === totalHw) {
           elements.bulletinHwBadge.textContent = "100%";
-          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-400/30";
+          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
         } else {
           elements.bulletinHwBadge.textContent = `${hwPct}%`;
-          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-black bg-amber-500/20 text-amber-300 border border-amber-400/30";
+          elements.bulletinHwBadge.className = "px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200";
         }
       }
 
@@ -2658,7 +2723,7 @@
       const isScoresUnlocked = isSeatUnlocked(seat);
       if (elements.bulletinScoresSummary) {
         if (!isScoresUnlocked) {
-          elements.bulletinScoresSummary.innerHTML = '<span class="text-xs text-amber-300 font-bold flex items-center gap-1.5"><i class="fa-solid fa-lock text-[11px]"></i> 輸入 PIN 碼解鎖查閱</span>';
+          elements.bulletinScoresSummary.innerHTML = '<span class="text-xs text-amber-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-lock text-[11px]"></i> 輸入 PIN 碼解鎖查閱</span>';
         } else {
           const allScores = getParentCombinedScores();
           const targetScores = allScores.filter(s => s.date === targetDate);
@@ -2685,28 +2750,28 @@
       // 4. 孩子心情彙整 (使用 targetDate)
       if (elements.bulletinMoodSummary) {
         if (!isScoresUnlocked) {
-          elements.bulletinMoodSummary.innerHTML = '<span class="text-xs text-amber-300 font-bold flex items-center gap-1.5"><i class="fa-solid fa-lock text-[11px]"></i> 輸入 PIN 碼解鎖查閱</span>';
+          elements.bulletinMoodSummary.innerHTML = '<span class="text-xs text-amber-700 font-semibold flex items-center gap-1.5"><i class="fa-solid fa-lock text-[11px]"></i> 輸入 PIN 碼解鎖查閱</span>';
         } else {
           const cloudData = state.cloudStudentData;
           const targetMood = cloudData?.moodJournal ? cloudData.moodJournal[targetDate] : null;
           if (targetMood && (targetMood.mood || targetMood.text)) {
             const m = String(targetMood.mood || '').trim();
-            let iconClass = 'fa-solid fa-face-smile text-emerald-400';
+            let iconClass = 'fa-solid fa-face-smile text-emerald-600';
             let moodLabel = m || '開心';
             if (m.includes('雀躍') || m.includes('開心收穫') || m.includes('衝勁十足')) {
-              iconClass = 'fa-solid fa-face-laugh-squint text-amber-400';
+              iconClass = 'fa-solid fa-face-laugh-squint text-amber-500';
               moodLabel = '雀躍';
             } else if (m.includes('開心') || m.includes('充實愉快')) {
-              iconClass = 'fa-solid fa-face-smile text-emerald-400';
+              iconClass = 'fa-solid fa-face-smile text-emerald-600';
               moodLabel = '開心';
             } else if (m.includes('普通') || m.includes('努力思考')) {
-              iconClass = 'fa-solid fa-face-meh text-sky-400';
+              iconClass = 'fa-solid fa-face-meh text-sky-600';
               moodLabel = '普通';
             } else if (m.includes('難過') || m.includes('有點疲憊')) {
-              iconClass = 'fa-solid fa-face-frown text-indigo-300';
+              iconClass = 'fa-solid fa-face-frown text-indigo-600';
               moodLabel = '難過';
             } else if (m.includes('悲傷')) {
-              iconClass = 'fa-solid fa-face-sad-tear text-rose-400';
+              iconClass = 'fa-solid fa-face-sad-tear text-rose-600';
               moodLabel = '悲傷';
             }
             elements.bulletinMoodSummary.innerHTML = `<i class="${iconClass}"></i> <span>${escapeHtml(moodLabel)}</span>`;
@@ -2725,8 +2790,9 @@
       const seat = state.studentSeat;
       const homeworks = data.homeworks || [];
 
-      // 同步更新最上方的「今日親師速報」卡片
+      // 同步更新最上方的「今日親師速報」卡片與常用座號列
       renderDailyBulletin(data);
+      renderRecentSeatsBar();
 
       if (!seat) {
         // Show unbound prompt view

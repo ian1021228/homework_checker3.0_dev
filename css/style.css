@@ -1,11 +1,31 @@
-/* 首頁與相關彈窗專用：圓潤可愛字體 (排除圖示 i 與 Font Awesome) */
+/* ============================================================== */
+/* 專業級編輯設計系統 (Swiss Editorial & Precision SaaS Design)    */
+/* ============================================================== */
+:root {
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", 'Noto Sans TC', "PingFang TC", "Microsoft JhengHei", sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --surface-bg: #f8fafc;
+    --surface-card: #ffffff;
+    --border-subtle: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --ink-primary: #0f172a;
+    --ink-secondary: #475569;
+    --ink-muted: #94a3b8;
+    --accent-primary: #4f46e5;
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+}
+
 #portal-page,
 #portal-page *:not(i):not([class*="fa-"]):not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands),
 #portal-auth-modal,
 #portal-auth-modal *:not(i):not([class*="fa-"]):not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands),
 #author-feedback-modal,
 #author-feedback-modal *:not(i):not([class*="fa-"]):not(.fa):not(.fa-solid):not(.fa-regular):not(.fa-brands) {
-    font-family: 'Zen Maru Gothic', 'M PLUS Rounded 1c', 'Nunito', 'Varela Round', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Maru Gothic ProN", "Yu Gothic UI", "Microsoft JhengHei", sans-serif !important;
+    font-family: var(--font-sans) !important;
+    letter-spacing: -0.011em;
 }
 
 /* 確保 Font Awesome 向量圖標字體優先級最高，杜絕圖示顯示為多條橫線 (Missing Glyph) */
@@ -33,12 +53,31 @@ i.fa-regular, i.far, .fa-regular, .far {
     font-weight: 400 !important;
 }
 
-/* 首頁捲動極速流暢優化 (Scroll Performance Boost) */
-.feature-card-optimized {
-    /* 使用乾淨的硬體渲染與自適應繪製，杜絕 content-visibility 重複計算導致的滾動卡頓 */
-    will-change: auto;
-    transform: translateZ(0);
+/* 數據與座號等寬對齊 (Tabular Numerals for Precision UI) */
+.student-btn, .font-mono, [id*="count"], [id*="rate"], [id*="score"], [id*="seat"], table td {
+    font-variant-numeric: tabular-nums;
 }
+
+/* Modern Web Guidance: defer-rendering-heavy-content (Below-the-fold sections) */
+.feature-card-optimized {
+    content-visibility: auto;
+    contain-intrinsic-size: auto none auto 420px;
+}
+
+/* Modern Web Guidance: interactions-in-complex-layouts (Isolate complex grid layouts for fast INP) */
+#homework-list,
+#student-details-list {
+    content-visibility: auto;
+    contain-intrinsic-size: auto none auto 360px;
+}
+@supports not (content-visibility: auto) {
+    .feature-card-optimized,
+    #homework-list,
+    #student-details-list {
+        contain: layout style paint;
+    }
+}
+
 .hardware-accelerated {
     transform: translate3d(0, 0, 0);
     backface-visibility: hidden;
@@ -50,77 +89,70 @@ i.fa-regular, i.far, .fa-regular, .far {
         opacity: 1;
     }
     50% {
-        transform: translateY(7px);
-        opacity: 0.65;
+        transform: translateY(6px);
+        opacity: 0.7;
     }
 }
 .animate-blink-arrow {
-    animation: bounceBlinkArrow 1.3s ease-in-out infinite;
+    animation: bounceBlinkArrow 1.5s ease-in-out infinite;
 }
 
-/* 縮小所有物件 20% (由預設 100% 縮小至 80%) */
 html { scroll-behavior: smooth; }
 body {
-    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+    font-family: var(--font-sans);
     padding-bottom: 40px;
-    background-color: #f6f1e8; /* 米色系高雅底色 */
+    background-color: var(--surface-bg);
+    color: var(--ink-primary);
     background-image: 
-        radial-gradient(circle at 15% 25%, rgba(217, 119, 6, 0.04), transparent 35%),
-        radial-gradient(circle at 85% 15%, rgba(180, 83, 9, 0.035), transparent 30%),
-        radial-gradient(circle at 50% 85%, rgba(245, 158, 11, 0.03), transparent 35%);
+        radial-gradient(circle at 15% 10%, rgba(79, 70, 229, 0.035), transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(14, 165, 233, 0.03), transparent 35%);
     min-height: 100vh;
     position: relative;
+    letter-spacing: -0.011em;
 }
 @media screen and (max-width: 768px) {
     input, select, textarea { font-size: 16px !important; }
 }
 
 .page-section {
-    animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 .chalk-text {
-    text-shadow: 0 0 2px rgba(255,255,255,0.25), 0 1px 1px rgba(0,0,0,0.2);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
     font-weight: 500;
-}
-
-@keyframes shimmer { 100% { transform: translateX(100%); } }
-.hover-shimmer:hover .shimmer-bar {
-    animation: shimmer 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
 }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 9999px; transition: background 0.3s ease; border: 2px solid transparent; background-clip: padding-box; }
-::-webkit-scrollbar-thumb:hover { background-color: rgba(99, 102, 241, 0.5); }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.35); border-radius: 9999px; transition: background 0.2s ease; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background-color: rgba(71, 85, 105, 0.55); }
 
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
-::selection { background: rgba(99, 102, 241, 0.25); color: #1e1b4b; }
+::selection { background: rgba(79, 70, 229, 0.16); color: #0f172a; }
 
+/* 專業級建築感卡片 (Crisp Surface & Subtle Layered Elevation) */
 .glass-card {
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(228, 220, 207, 0.85);
-    box-shadow: 0 4px 16px -2px rgba(139, 90, 43, 0.05), 0 1px 3px -1px rgba(0, 0, 0, 0.02);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.95);
+    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+    transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease;
 }
 .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 24px -4px rgba(139, 90, 43, 0.09);
-    border-color: rgba(217, 180, 140, 0.85);
+    box-shadow: 0 4px 16px -3px rgba(15, 23, 42, 0.07), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+    border-color: rgba(203, 213, 225, 0.95);
 }
 
 /* Dark Mode Overrides */
 html.dark body { background-color: #0f172a; color: #f8fafc; }
-html.dark .glass-card { background: rgba(30, 41, 59, 0.9); border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.2); }
-html.dark .glass-card:hover { background: rgba(30, 41, 59, 0.95); border-color: rgba(255, 255, 255, 0.15); }
+html.dark .glass-card { background: rgba(30, 41, 59, 0.95); border-color: rgba(255, 255, 255, 0.1); box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.25); }
+html.dark .glass-card:hover { background: rgba(30, 41, 59, 0.98); border-color: rgba(255, 255, 255, 0.16); }
 html.dark .bg-white { background-color: #1e293b !important; }
 html.dark .bg-slate-50, html.dark .bg-slate-100 { background-color: #0f172a !important; }
 html.dark .text-slate-900, html.dark .text-slate-800, html.dark .text-slate-700, html.dark .text-slate-600 { color: #f1f5f9 !important; }
@@ -132,65 +164,29 @@ html.dark .modal-content, html.dark .confirm-modal-content { background-color: #
 .student-btn {
     contain: layout paint;
     transform: translateZ(0);
-    will-change: transform;
 }
 
 #student-grid {
-    contain: layout;
+    contain: layout style;
 }
 
 .btn-glow {
     position: relative;
 }
-.btn-glow::after {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    background: inherit;
-    filter: blur(8px);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    z-index: -1;
-    border-radius: inherit;
-}
-.btn-glow:hover::after {
-    opacity: 0.5;
-}
 
+/* 去 AI 感：移除刺眼霓虹漸層動畫，改為沉穩專業字重與色澤 */
 .animated-gradient-text {
-    background-size: 200% auto;
-    animation: textGradient 6s linear infinite;
-}
-@keyframes textGradient {
-    to { background-position: 200% center; }
+    background-size: 100% auto;
+    animation: none;
 }
 
-/* Floating background elements (lightweight) */
+/* 隱藏過時背景光球，保持版面乾淨銳利 */
 .bg-orb {
-    position: absolute;
-    border-radius: 50%;
-    pointer-events: none;
-    filter: blur(40px);
-    z-index: -1;
-    opacity: 0.25;
-    transform: translateZ(0);
+    display: none;
 }
-.bg-orb-1 { width: 350px; height: 350px; top: -50px; left: -50px; background: rgba(217, 119, 6, 0.08); }
-.bg-orb-2 { width: 400px; height: 400px; top: 40%; right: -100px; background: rgba(234, 88, 12, 0.06); }
-.bg-orb-3 { width: 300px; height: 300px; bottom: -30px; left: 20%; background: rgba(245, 158, 11, 0.07); }
 
 .admin-viewing .hide-on-admin-view { display: none !important; pointer-events: none; }
 .admin-viewing .disable-on-admin-view { pointer-events: none !important; opacity: 0.7; }
-
-/* ============================================================== */
-/* 手機與各尺寸螢幕深度原生 App 化適配 (Native Mobile App Experience) */
-/* ============================================================== */
-:root {
-    --sat: env(safe-area-inset-top, 0px);
-    --sab: env(safe-area-inset-bottom, 0px);
-    --sal: env(safe-area-inset-left, 0px);
-    --sar: env(safe-area-inset-right, 0px);
-}
 
 /* 原生觸控體驗防護：禁止雙擊延遲、禁止選取 UI 標籤、流暢點擊 */
 html, body {
@@ -216,17 +212,17 @@ input, textarea {
     /* 1. 頁面內容底部留白，完美避開原生底部導航 TabBar 與 Home Indicator */
     #main-page, #detail-page, #student-details-page, #homework-types-page,
     #contact-book-page, #overview-page, #officers-page, #attendance-page, #affairs-page {
-        padding-bottom: calc(5.25rem + env(safe-area-inset-bottom, 0px)) !important;
+        padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px)) !important;
         padding-left: calc(0.75rem + env(safe-area-inset-left, 0px)) !important;
         padding-right: calc(0.75rem + env(safe-area-inset-right, 0px)) !important;
     }
 
-    /* 2. 頂部 Header 在手機上精緻緊湊化，避開左上角漢堡鈕同時保留充足閱讀寬度 */
+    /* 2. 頂部 Header 在手機上對稱緊湊化（選單按鈕已內嵌於卡片左側，無需額外左縮排） */
     header.glass-card {
-        padding-top: calc(0.85rem + env(safe-area-inset-top, 0px)) !important;
-        padding-left: calc(3.75rem + env(safe-area-inset-left, 0px)) !important;
-        padding-right: calc(0.85rem + env(safe-area-inset-right, 0px)) !important;
-        padding-bottom: 0.85rem !important;
+        padding-top: calc(0.9rem + env(safe-area-inset-top, 0px)) !important;
+        padding-left: calc(1rem + env(safe-area-inset-left, 0px)) !important;
+        padding-right: calc(1rem + env(safe-area-inset-right, 0px)) !important;
+        padding-bottom: 0.9rem !important;
         border-radius: 1.25rem !important;
         margin-bottom: 1rem !important;
     }

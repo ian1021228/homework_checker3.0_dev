@@ -121,80 +121,81 @@
         <button id="resume-sync-btn" class="bg-indigo-500 text-white px-4 py-1.5 rounded-xl font-bold hover:bg-indigo-600 transition-all shadow-md shadow-indigo-500/25 flex-shrink-0">恢復同步</button>
     </div>
 
-    <!-- 全螢幕米色系首頁 / 門戶 Landing Page -->
-    <div id="portal-page" class="min-h-screen bg-[#f6f1e8] text-stone-800 flex flex-col font-sans transition-all duration-300 relative z-30 overflow-x-hidden">
-        <!-- Ambient Warm Lighting Background Glows (Optimized for 60fps Scroll) -->
+    <!-- 全螢幕專業編輯風首頁 / 門戶 Landing Page -->
+    <div id="portal-page" class="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col font-sans transition-all duration-300 relative z-30 overflow-x-hidden">
+        <!-- Subtle Precision Grid & Ambient Lighting -->
         <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 hardware-accelerated" aria-hidden="true">
-            <div class="absolute -top-[12%] -left-[10%] w-[55vw] h-[55vw] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(245, 158, 11, 0.08) 0%, rgba(245, 158, 11, 0) 70%);"></div>
-            <div class="absolute -bottom-[12%] -right-[10%] w-[60vw] h-[60vw] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(234, 88, 12, 0.07) 0%, rgba(234, 88, 12, 0) 70%);"></div>
-            <div class="absolute top-[35%] left-[25%] w-[40vw] h-[40vw] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(99, 102, 241, 0.04) 0%, rgba(99, 102, 241, 0) 70%);"></div>
+            <div class="absolute -top-[15%] -left-[10%] w-[50vw] h-[50vw] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(79, 70, 229, 0.04) 0%, rgba(79, 70, 229, 0) 70%);"></div>
+            <div class="absolute -bottom-[15%] -right-[10%] w-[55vw] h-[55vw] rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 70%);"></div>
         </div>
 
         <!-- 頂部導覽列 (Sticky Navigation Bar) -->
-        <header class="sticky top-0 z-40 bg-[#f6f1e8]/90 backdrop-blur-md border-b border-stone-200/80 transition-all">
+        <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 transition-all">
             <div class="max-w-7xl mx-auto px-4 sm:px-10 h-16 sm:h-20 flex items-center justify-between gap-4">
                 <!-- 左側：網站 Logo 與名稱 (點擊返回首頁頂端，永不換行遮蔽) -->
                 <button id="portal-nav-logo-btn" class="flex items-center gap-2 sm:gap-3.5 cursor-pointer group select-none text-left shrink-0" title="返回首頁頂端">
-                    <img src="icon.svg" class="w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl shadow-md shadow-indigo-600/20 group-hover:scale-105 transition-transform shrink-0" alt="班級經營系統 3.0">
+                    <img src="icon.svg" class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl shadow-xs border border-slate-200/60 group-hover:scale-105 transition-transform shrink-0" alt="班級經營系統 3.0">
                     <div class="shrink-0 whitespace-nowrap">
-                        <span class="text-base sm:text-2xl font-black text-stone-900 tracking-tight block whitespace-nowrap">班級經營系統 3.0</span>
-                        <span class="text-[10px] sm:text-xs font-extrabold text-amber-700 tracking-wide block -mt-0.5 whitespace-nowrap">國一生獨立開發 · 四端連動中樞</span>
+                        <span class="text-base sm:text-xl font-extrabold text-slate-900 tracking-tight block whitespace-nowrap">班級經營系統 3.0</span>
+                        <span class="text-[10px] sm:text-xs font-semibold text-slate-500 tracking-wide block -mt-0.5 whitespace-nowrap">國一生獨立開發 · 四端雲端連動中樞</span>
                     </div>
                 </button>
 
-                <!-- 右側：輔助按鈕與登入狀態列 (隱藏直達按鈕以騰出空間) -->
-                <div class="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+                <!-- 右側：自然極簡導覽連結與登入狀態列 -->
+                <div class="flex items-center gap-1 sm:gap-2 shrink-0">
 
                     <!-- 給老師的話 按鈕 -->
-                    <button id="portal-nav-letter-btn" class="text-xs sm:text-sm font-bold text-amber-950 bg-amber-50 hover:bg-amber-100 border border-amber-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="閱讀作者給老師的話">
-                        <i class="fa-solid fa-envelope-open-text text-amber-700"></i>
+                    <button id="portal-nav-letter-btn" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" title="閱讀作者給老師的話">
+                        <i class="fa-regular fa-envelope text-slate-400"></i>
                         <span class="hidden xl:inline">給老師的話</span>
                     </button>
 
                     <!-- 提供意見 / 聯絡作者按鈕 -->
-                    <button id="portal-nav-feedback-btn" class="text-xs sm:text-sm font-bold text-amber-900 bg-amber-100/90 hover:bg-amber-200/90 border border-amber-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-xs cursor-pointer" title="聯絡作者：ianw.solar@gmail.com">
-                        <i class="fa-solid fa-comment-dots text-amber-700"></i>
+                    <button id="portal-nav-feedback-btn" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" title="聯絡作者：ianw.solar@gmail.com">
+                        <i class="fa-regular fa-comment-dots text-slate-400"></i>
                         <span class="hidden lg:inline">意見回饋</span>
                     </button>
 
                     <!-- 系統更新日誌按鈕 -->
-                    <button id="portal-nav-changelog-btn" class="text-xs sm:text-sm font-bold text-stone-800 bg-[#f7f2ea] hover:bg-[#eee7dc] border border-amber-300/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 shadow-2xs cursor-pointer" title="查看系統版本演進與更新紀錄">
-                        <i class="fa-solid fa-clock-rotate-left text-amber-600"></i>
+                    <button id="portal-nav-changelog-btn" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" title="查看系統版本演進與更新紀錄">
+                        <i class="fa-solid fa-clock-rotate-left text-slate-400 text-xs"></i>
                         <span class="hidden md:inline">更新日誌</span>
                     </button>
 
                     <!-- 完整教學影片按鈕 -->
-                    <button id="portal-nav-tutorial-btn" class="text-xs sm:text-sm font-black text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 cursor-pointer shadow-2xs" title="觀看完整使用教學影片與步驟導覽">
-                        <i class="fa-solid fa-circle-play text-indigo-600 text-xs sm:text-sm"></i>
-                        <span class="hidden sm:inline">教學影片</span>
+                    <button id="portal-nav-tutorial-btn" class="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100/80 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer" title="觀看完整使用教學影片與步驟導覽">
+                        <i class="fa-regular fa-circle-play text-slate-400"></i>
+                        <span class="hidden sm:inline">教學導覽</span>
                     </button>
 
+                    <div class="hidden sm:block h-4 w-px bg-slate-200 mx-1"></div>
+
                     <!-- 未登入狀態 -->
-                    <div id="portal-nav-guest-actions" class="flex items-center gap-1.5 sm:gap-2.5">
-                        <button id="portal-nav-qr-login-btn" class="text-xs sm:text-sm font-black text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300/80 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-full transition-all flex items-center gap-1 cursor-pointer shadow-2xs" title="快速登入（掃碼或認證碼）">
-                            <i class="fa-solid fa-bolt text-amber-500 text-xs sm:text-sm"></i>
+                    <div id="portal-nav-guest-actions" class="flex items-center gap-1.5 sm:gap-2">
+                        <button id="portal-nav-qr-login-btn" class="text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" title="快速登入（掃碼或認證碼）">
+                            <i class="fa-solid fa-qrcode text-indigo-600 text-xs"></i>
                             <span class="inline">快速登入</span>
                         </button>
-                        <button id="portal-nav-login-btn" class="text-xs sm:text-sm font-bold text-stone-700 hover:text-stone-950 px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full hover:bg-stone-200/60 transition-colors">
+                        <button id="portal-nav-login-btn" class="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-950 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer">
                             登入
                         </button>
-                        <button id="portal-nav-signup-btn" class="text-xs sm:text-sm font-bold text-white bg-slate-900 hover:bg-slate-800 px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-full shadow-sm hover:shadow transition-all">
+                        <button id="portal-nav-signup-btn" class="text-xs sm:text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg shadow-2xs transition-all cursor-pointer">
                             免費註冊
                         </button>
                     </div>
 
                     <!-- 已登入狀態 -->
-                    <div id="portal-nav-user-badge" class="hidden flex items-center gap-1.5 sm:gap-3">
-                        <button id="portal-nav-qr-scan-btn" class="text-xs sm:text-sm font-black text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300/80 px-2.5 sm:px-3.5 py-1.5 rounded-full transition-all flex items-center gap-1 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他裝置登入">
-                            <i class="fa-solid fa-bolt text-amber-500"></i>
+                    <div id="portal-nav-user-badge" class="hidden flex items-center gap-1.5 sm:gap-2.5">
+                        <button id="portal-nav-qr-scan-btn" class="text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200/90 px-2.5 sm:px-3 py-1.5 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs" title="使用手機相機掃碼或認證碼授權其他裝置登入">
+                            <i class="fa-solid fa-qrcode text-indigo-600 text-xs"></i>
                             <span class="hidden sm:inline">快速授權</span>
                         </button>
-                        <span id="portal-nav-user-name" class="text-xs sm:text-sm font-bold text-stone-700 bg-white px-2.5 sm:px-3.5 py-1.5 rounded-full border border-stone-200 shadow-sm max-w-[90px] sm:max-w-[180px] truncate"></span>
-                        <button id="portal-nav-enter-btn" class="text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-3 sm:px-5 py-1.5 sm:py-2 rounded-full shadow-md shadow-indigo-600/20 hover:shadow-indigo-600/30 transition-all flex items-center gap-1.5">
+                        <span id="portal-nav-user-name" class="text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100/80 px-2.5 sm:px-3 py-1.5 rounded-lg border border-slate-200/80 max-w-[90px] sm:max-w-[160px] truncate"></span>
+                        <button id="portal-nav-enter-btn" class="text-xs sm:text-sm font-semibold text-white bg-slate-900 hover:bg-slate-800 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-lg shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer">
                             <span>進入系統</span>
                             <i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
-                        <button id="portal-nav-logout-btn" class="text-xs font-bold text-rose-600 hover:text-rose-700 px-2 sm:px-3 py-1.5 rounded-full hover:bg-rose-50 transition-colors">
+                        <button id="portal-nav-logout-btn" class="text-xs font-semibold text-slate-500 hover:text-rose-600 px-2 sm:px-2.5 py-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer">
                             登出
                         </button>
                     </div>
@@ -205,156 +206,132 @@
         <!-- 主體內容區塊 (Main Landing Content) -->
         <main class="flex-grow relative z-10">
             <!-- 1. Hero 區塊 -->
-            <section class="max-w-7xl mx-auto px-6 sm:px-10 pt-10 sm:pt-16 pb-16 sm:pb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 pt-10 sm:pt-16 pb-14 sm:pb-20 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-10 items-center">
                 <!-- 左側文案與按鈕 -->
                 <div class="lg:col-span-7 space-y-6">
-                    <!-- 作者特色專屬徽章 -->
-                    <div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-amber-50 border border-amber-300 text-amber-950 text-xs sm:text-sm font-bold shadow-xs">
-                        <span class="px-2 py-0.5 rounded-full bg-amber-600 text-white text-[11px] font-black uppercase tracking-wide">
-                            國一生獨自打造
-                        </span>
-                        <span>歷經多版本持續更新淬鍊 • 專為現場教學痛點研發</span>
+                    <!-- 自然編輯風標籤 -->
+                    <div class="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white border border-slate-200/90 text-slate-700 text-xs sm:text-sm font-semibold shadow-2xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="font-bold text-slate-900">國一生獨立開發</span>
+                        <span class="text-slate-300">|</span>
+                        <span class="text-slate-600">專為教學現場打造的全方位班級工作台</span>
                     </div>
 
-                    <!-- 主標題 (截圖標準大字) -->
-                    <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 tracking-tight leading-[1.15]">
+                    <!-- 主標題 (自然沉穩排版) -->
+                    <h1 class="text-4xl sm:text-5xl lg:text-[52px] font-extrabold text-slate-900 tracking-tight leading-[1.16]">
                         一點，收齊作業<br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700">一連，串起親師</span>
+                        <span class="text-indigo-600">一連，串起親師</span>
                     </h1>
 
-                    <!-- 副標題說明 (針對本班級經營系統真實特色) -->
-                    <p class="text-stone-600 text-base sm:text-lg leading-relaxed max-w-xl">
-                        班級經營系統 3.0 (v3.5) 提供全方位的班級作業點收、條碼掃描辨識與雲端/本地即時同步解決方案。由國一生獨立編程設計，結合即時缺繳名單統計、親師聯絡簿整合與多元存儲，助您輕鬆搞定每日班級經營與點收作業。
+                    <!-- 副標題說明 -->
+                    <p class="text-slate-600 text-base sm:text-lg leading-relaxed max-w-xl font-normal">
+                        整合每日作業點收、條碼掃描辨識、智慧聯絡簿與親師即時查核。告別繁瑣紙本登記與重複抄寫，用最自然直覺的操作，讓導師與科任老師每天省下寶貴的班務時間。
                     </p>
 
                     <!-- 行動按鈕列 -->
-                    <div class="flex flex-wrap items-center gap-3.5 pt-2">
-                        <button id="portal-hero-start-btn" class="px-7 py-3.5 rounded-full bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-bold text-base shadow-xl shadow-indigo-600/30 hover:shadow-indigo-600/40 transform hover:-translate-y-0.5 active:translate-y-0 transition-all flex items-center gap-2.5 cursor-pointer">
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
+                        <button id="portal-hero-start-btn" class="px-6 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-semibold text-base shadow-sm hover:shadow transition-all flex items-center gap-2.5 cursor-pointer active:scale-[0.99]">
                             <span>立即開始使用</span>
-                            <i class="fa-solid fa-arrow-right text-sm"></i>
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
-                        <button id="portal-hero-guest-btn" class="px-6 py-3.5 rounded-full bg-white/90 hover:bg-white text-stone-700 border border-stone-300/90 font-bold text-base shadow-sm hover:shadow transition-all flex items-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-laptop-code text-stone-500"></i>
+                        <button id="portal-hero-guest-btn" class="px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 font-semibold text-base shadow-2xs transition-all flex items-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-compass text-slate-400"></i>
                             <span>免帳號快速體驗</span>
                         </button>
-                        <!-- 家長端直達專區按鈕 (首頁頂部已有，此處依規範隱藏) -->
-                        <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="hidden px-5 py-3.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-900 border border-indigo-200/90 font-bold text-sm shadow-xs hover:shadow transition-all items-center gap-2 cursor-pointer" title="進入家長端即時查核看板（密碼安全防護）">
-                            <i class="fa-solid fa-house-chimney-user text-indigo-600 text-base"></i>
-                            <span>家長端專區</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-indigo-400"></i>
-                        </a>
-                        <!-- 學校管理端直達專區按鈕 (首頁頂部已有，此處依規範隱藏) -->
-                        <a href="https://ian1021228.github.io/school_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="hidden px-5 py-3.5 rounded-full bg-sky-50 hover:bg-sky-100 text-sky-950 border border-sky-300/90 font-bold text-sm shadow-xs hover:shadow transition-all items-center gap-2 cursor-pointer" title="進入學校管理與行政中心（多校租戶與批量帳密）">
-                            <i class="fa-solid fa-shield-halved text-sky-600 text-base"></i>
-                            <span>管理端專區</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-sky-600"></i>
-                        </a>
-                        <!-- 完整教學影片按鈕 (首頁頂部已有，此處依規範隱藏) -->
-                        <button id="portal-hero-tutorial-btn" class="hidden px-5 py-3.5 rounded-full bg-indigo-50 hover:bg-indigo-100 text-indigo-950 border border-indigo-200/90 font-bold text-sm shadow-xs hover:shadow transition-all items-center gap-2 cursor-pointer" title="觀看完整使用教學影片與步驟導覽">
-                            <i class="fa-solid fa-circle-play text-indigo-600 text-base"></i>
-                            <span>完整教學影片</span>
-                        </button>
-                        <!-- 系統更新紀錄按鈕 (首頁頂部已有，此處依規範隱藏) -->
-                        <button id="portal-hero-changelog-btn" class="hidden px-5 py-3.5 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 border border-amber-300/90 font-bold text-sm shadow-xs hover:shadow transition-all items-center gap-2 cursor-pointer" title="查看系統版本演進與歷次更新紀錄">
-                            <i class="fa-solid fa-clock-rotate-left text-amber-700"></i>
-                            <span>更新紀錄 <span class="bg-amber-600 text-white text-[10px] font-black px-1.5 py-0.5 rounded-full ml-0.5">v4.2.0</span></span>
-                        </button>
-                        <!-- 提供意見 / 聯絡作者 (首頁頂部已有，此處依規範隱藏) -->
-                        <button id="portal-hero-feedback-btn" class="hidden px-4 py-3.5 rounded-full bg-stone-100/90 hover:bg-stone-200 text-stone-700 font-bold text-sm shadow-2xs hover:shadow transition-all items-center gap-1.5 cursor-pointer" title="寫信給作者 ianw.solar@gmail.com">
-                            <i class="fa-solid fa-envelope text-stone-500"></i>
-                            <span class="hidden sm:inline">聯絡作者</span>
-                        </button>
+                        <!-- 隱藏備用連結以相容既有事件綁定 -->
+                        <a href="https://ian1021228.github.io/ian_homework_checker2.0_online_parent_dashboard/" target="_blank" rel="noopener noreferrer" class="hidden">家長端專區</a>
+                        <a href="https://ian1021228.github.io/school_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="hidden">管理端專區</a>
+                        <button id="portal-hero-tutorial-btn" class="hidden">完整教學影片</button>
+                        <button id="portal-hero-changelog-btn" class="hidden">更新紀錄</button>
+                        <button id="portal-hero-feedback-btn" class="hidden">聯絡作者</button>
                     </div>
 
                     <!-- 信任指標 / 特色微標籤 -->
-                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-semibold text-stone-500 pt-2">
+                    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs sm:text-sm font-medium text-slate-500 pt-2">
                         <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check text-emerald-500"></i> 支援 USB / 藍牙條碼掃描槍
+                            <i class="fa-solid fa-check text-emerald-600"></i> 支援 USB / 藍牙條碼掃描槍
                         </span>
                         <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check text-indigo-500"></i> Firebase 雲端自動同步
+                            <i class="fa-solid fa-check text-emerald-600"></i> 四端雲端即時同步
                         </span>
                         <span class="flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-check text-amber-500"></i> 本地實體檔案直寫相容
+                            <i class="fa-solid fa-check text-emerald-600"></i> 本地實體檔案直寫備份
                         </span>
                     </div>
                 </div>
 
-                <!-- 右側產品介面預覽卡片 (Interactive/Realistic Showcase Card) -->
+                <!-- 右側產品介面預覽卡片 (Clean Precision Window Preview) -->
                 <div class="lg:col-span-5 relative">
-                    <!-- 背景柔和光暈 -->
-                    <div class="absolute -inset-2 bg-gradient-to-r from-indigo-500/20 to-purple-500/20 rounded-[2.5rem] blur-xl opacity-70"></div>
-                    
-                    <div class="relative bg-white/95 backdrop-blur-md rounded-[2.25rem] border border-stone-200/90 p-6 sm:p-7 shadow-2xl shadow-stone-900/10 space-y-5">
+                    <div class="relative bg-white rounded-2xl border border-slate-200/90 p-6 sm:p-7 shadow-lg shadow-slate-900/5 space-y-5">
                         <!-- 視窗控制點與目前作業標題 -->
-                        <div class="flex items-center justify-between pb-3 border-b border-stone-100">
+                        <div class="flex items-center justify-between pb-3.5 border-b border-slate-100">
                             <div class="flex items-center gap-1.5">
-                                <span class="w-3 h-3 rounded-full bg-rose-400"></span>
-                                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
-                                <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-slate-200"></span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs font-extrabold text-stone-800">三年二班 • 國語生字簿</span>
-                                <span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-bold border border-indigo-200/60">點收中</span>
+                                <span class="text-xs font-bold text-slate-800">七年二班 • 國語習作第三課</span>
+                                <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-[11px] font-semibold border border-emerald-200/70">點收中</span>
                             </div>
                         </div>
 
                         <!-- 繳交進度條 -->
-                        <div class="bg-stone-50 rounded-2xl p-4 border border-stone-100 space-y-2">
-                            <div class="flex justify-between items-center text-xs font-bold">
-                                <span class="text-stone-600">已收 28 / 30 本</span>
-                                <span class="text-emerald-600 font-black">93.3% 達成率</span>
+                        <div class="bg-slate-50/80 rounded-xl p-4 border border-slate-200/60 space-y-2">
+                            <div class="flex justify-between items-center text-xs font-semibold tabular-nums">
+                                <span class="text-slate-600">已收齊 <strong class="text-slate-900">28 / 30</strong> 本</span>
+                                <span class="text-emerald-700 font-bold">93% 完成</span>
                             </div>
-                            <div class="w-full bg-stone-200/80 rounded-full h-2.5 overflow-hidden">
-                                <div class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full rounded-full w-[93.3%]"></div>
+                            <div class="w-full bg-slate-200/70 rounded-full h-2 overflow-hidden">
+                                <div class="bg-emerald-600 h-full rounded-full w-[93%]"></div>
                             </div>
-                            <div class="flex justify-between items-center text-[11px] text-stone-500 pt-1">
-                                <span>未繳交座號：<strong class="text-rose-500">7號、19號</strong></span>
-                                <span class="text-indigo-600 font-bold">即時統計</span>
+                            <div class="flex justify-between items-center text-[11px] text-slate-500 pt-0.5 tabular-nums">
+                                <span>待交座號：<strong class="text-rose-600 font-semibold">7 號、19 號</strong></span>
+                                <span class="text-slate-400 font-medium">即時雲端同步</span>
                             </div>
                         </div>
 
                         <!-- 模擬座號按鈕矩陣 (Mini Grid Preview) -->
                         <div>
                             <div class="flex justify-between items-center mb-2">
-                                <span class="text-xs font-bold text-stone-500">全班座號點收狀態預覽</span>
-                                <span class="text-[10px] font-bold text-indigo-600">支援快速點選切換</span>
+                                <span class="text-xs font-semibold text-slate-500">全班座號狀態矩陣</span>
+                                <span class="text-[11px] font-medium text-slate-400">點擊或掃描即刻切換</span>
                             </div>
-                            <div class="grid grid-cols-6 gap-1.5">
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">1</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">2</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">3</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">4</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">5</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">6</div>
-                                <div class="h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center text-xs font-black shadow-xs animate-pulse">7</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">8</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">9</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">10</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">11</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">12</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">13</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">14</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">15</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">16</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">17</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">18</div>
-                                <div class="h-8 rounded-lg bg-rose-500 text-white flex items-center justify-center text-xs font-black shadow-xs animate-pulse">19</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">20</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">21</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">22</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">23</div>
-                                <div class="h-8 rounded-lg bg-emerald-500 text-white flex items-center justify-center text-xs font-black shadow-xs">24</div>
+                            <div class="grid grid-cols-6 gap-1.5 tabular-nums">
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">1</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">2</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">3</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">4</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">5</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">6</div>
+                                <div class="h-8 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center text-xs font-bold">7</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">8</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">9</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">10</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">11</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">12</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">13</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">14</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">15</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">16</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">17</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">18</div>
+                                <div class="h-8 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 flex items-center justify-center text-xs font-bold">19</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">20</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">21</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">22</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">23</div>
+                                <div class="h-8 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">24</div>
                             </div>
                         </div>
 
                         <!-- 條碼槍就緒狀態與聯絡簿同步 -->
-                        <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-xs">
-                            <span class="flex items-center gap-1.5 text-stone-600 font-bold">
-                                <i class="fa-solid fa-barcode text-indigo-600"></i> 實體條碼掃描槍就緒
+                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                            <span class="flex items-center gap-1.5 text-slate-600 font-semibold">
+                                <i class="fa-solid fa-barcode text-slate-400"></i> 條碼掃描槍與觸控雙模就緒
                             </span>
-                            <span class="text-indigo-600 font-bold bg-indigo-50 px-2.5 py-1 rounded-lg border border-indigo-100">
-                                聯絡簿同步中
+                            <span class="text-slate-600 font-semibold bg-slate-100 px-2.5 py-1 rounded-md">
+                                聯絡簿已連動
                             </span>
                         </div>
                     </div>
@@ -362,179 +339,181 @@
             </section>
 
             <!-- 全方位智慧校園 · 四端入口中樞 (Multi-Portal Entrance Hub) -->
-            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-10 sm:py-14 border-t border-stone-200/70 space-y-8">
-                <div class="text-center max-w-3xl mx-auto space-y-2.5">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-black shadow-2xs">
-                        <i class="fa-solid fa-network-wired text-indigo-600"></i>
-                        <span class="whitespace-nowrap">全方位智慧校園 · 四端入口中樞</span>
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-16 border-t border-slate-200/80 space-y-8">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                    <div class="space-y-1.5">
+                        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 block">Multi-Portal Architecture</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                            校園四端一體化服務入口
+                        </h2>
                     </div>
-                    <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight whitespace-nowrap">
-                        校園多端一體化服務入口
-                    </h2>
-                    <p class="text-xs sm:text-sm text-stone-500 font-medium leading-relaxed">
-                        從系統管理、學校行政、現場點收到親師互聯，全校園四端獨立運行並即時雲端連動。請點選下方入口直達專屬系統：
+                    <p class="text-xs sm:text-sm text-slate-500 font-normal max-w-md leading-relaxed">
+                        從系統授權、學校行政、班級教學到親師互聯，四端獨立運作並透過雲端即時同步。
                     </p>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     <!-- 1. 系統管理員 -->
-                    <div class="bg-white rounded-3xl p-6 border border-stone-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-5 group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between space-y-6 group">
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between">
-                                <span class="w-12 h-12 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl border border-amber-200 group-hover:scale-105 transition-transform">
-                                    <i class="fa-solid fa-crown text-amber-500"></i>
+                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-base border border-slate-200/80">
+                                    <i class="fa-solid fa-sliders"></i>
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-[11px] font-black border border-amber-200 whitespace-nowrap">系統管理員</span>
+                                <span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">平台中樞</span>
                             </div>
                             <div>
-                                <h3 class="text-lg font-black text-stone-900 group-hover:text-amber-700 transition-colors whitespace-nowrap">系統管理員</h3>
-                                <span class="text-xs text-amber-700 font-mono font-bold block mt-0.5 whitespace-nowrap">System Admin Portal</span>
+                                <h3 class="text-lg font-extrabold text-slate-900">系統管理員</h3>
+                                <span class="text-xs text-slate-400 font-mono block mt-0.5">System Admin Portal</span>
                             </div>
-                            <p class="text-xs text-stone-600 leading-relaxed font-medium">
-                                專為系統管理員設計。統籌各校授權租戶、學校管理員帳密統一派發與多校授權設定。
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                統籌各校授權租戶、學校管理員帳密統一派發與跨校系統配置。
                             </p>
                         </div>
-                        <a href="https://ian1021228.github.io/super_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-amber-600/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
-                            <span>進入系統管理員</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        <a href="https://ian1021228.github.io/super_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-between cursor-pointer">
+                            <span>進入系統管理端</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
                         </a>
                     </div>
 
                     <!-- 2. 學校行政管理端 -->
-                    <div class="bg-white rounded-3xl p-6 border border-stone-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-5 group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between space-y-6 group">
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between">
-                                <span class="w-12 h-12 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center text-xl border border-sky-200 group-hover:scale-105 transition-transform">
-                                    <i class="fa-solid fa-school text-sky-600"></i>
+                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-base border border-slate-200/80">
+                                    <i class="fa-solid fa-building-columns"></i>
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full bg-sky-50 text-sky-800 text-[11px] font-black border border-sky-200 whitespace-nowrap">行政處室專用</span>
+                                <span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[11px] font-semibold">教務與學務</span>
                             </div>
                             <div>
-                                <h3 class="text-lg font-black text-stone-900 group-hover:text-sky-700 transition-colors whitespace-nowrap">學校行政管理端</h3>
-                                <span class="text-xs text-sky-700 font-mono font-bold block mt-0.5 whitespace-nowrap">School Admin Hub</span>
+                                <h3 class="text-lg font-extrabold text-slate-900">學校行政管理端</h3>
+                                <span class="text-xs text-slate-400 font-mono block mt-0.5">School Admin Hub</span>
                             </div>
-                            <p class="text-xs text-stone-600 leading-relaxed font-medium">
-                                教務與學務處專用。08:00 晨間出缺席大看板、線上行政抽查核章、全校廣播發布、統一派發全校班級與學生學籍帳密。
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                全校晨間出缺席即時看板、線上聯絡簿抽查核章、全校廣播與學籍認證碼派發。
                             </p>
                         </div>
-                        <a href="https://ian1021228.github.io/school_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-sky-600/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                        <a href="https://ian1021228.github.io/school_admin_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-between cursor-pointer">
                             <span>進入學校管理端</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
                         </a>
                     </div>
 
-                    <!-- 3. 教師端作業點收系統 -->
-                    <div class="bg-white rounded-3xl p-6 border border-indigo-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-5 group ring-2 ring-indigo-500/20">
+                    <!-- 3. 教師端作業點收系統 (本站主焦點) -->
+                    <div class="bg-white rounded-2xl p-6 border-2 border-slate-900 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col justify-between space-y-6 group relative">
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between">
-                                <span class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl border border-indigo-200 group-hover:scale-105 transition-transform">
-                                    <i class="fa-solid fa-chalkboard-user text-indigo-600"></i>
+                                <span class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base border border-indigo-200/80">
+                                    <i class="fa-solid fa-chalkboard-user"></i>
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-[11px] font-black border border-indigo-200 whitespace-nowrap">本站 · 現場點收</span>
+                                <span class="px-2.5 py-0.5 rounded-md bg-slate-900 text-white text-[11px] font-semibold">本站 · 教師工作台</span>
                             </div>
                             <div>
-                                <h3 class="text-lg font-black text-stone-900 group-hover:text-indigo-600 transition-colors whitespace-nowrap">教師端作業點收</h3>
-                                <span class="text-xs text-indigo-600 font-mono font-bold block mt-0.5 whitespace-nowrap">Teacher App & Checker</span>
+                                <h3 class="text-lg font-extrabold text-slate-900">教師端作業點收</h3>
+                                <span class="text-xs text-indigo-600 font-mono font-medium block mt-0.5">Teacher Workspace</span>
                             </div>
-                            <p class="text-xs text-stone-600 leading-relaxed font-medium">
-                                使用學校派發之帳密登入。多元作業點收、條碼槍極速登記、缺繳統計、聯絡簿派發、雙螢幕教學投影與全螢幕班級管理。
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                導師與科任老師專屬工作台。支援作業矩陣點收、條碼掃描、聯絡簿黑板、小考成績與班級事務。
                             </p>
                         </div>
-                        <button type="button" id="portal-hub-teacher-login-btn" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-indigo-600/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
-                            <span>立即登入教師端</span>
+                        <button type="button" id="portal-hub-teacher-login-btn" class="w-full py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm rounded-xl shadow-2xs transition-colors flex items-center justify-between cursor-pointer">
+                            <span>立即進入教師端</span>
                             <i class="fa-solid fa-arrow-right text-xs"></i>
                         </button>
                     </div>
 
                     <!-- 4. 家長端即時查核看板 -->
-                    <div class="bg-white rounded-3xl p-6 border border-stone-200/90 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between space-y-5 group">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-2xs hover:shadow-md hover:border-slate-300 transition-all duration-200 flex flex-col justify-between space-y-6 group">
                         <div class="space-y-3.5">
                             <div class="flex items-center justify-between">
-                                <span class="w-12 h-12 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl border border-rose-200 group-hover:scale-105 transition-transform">
-                                    <i class="fa-solid fa-house-chimney-user text-rose-600"></i>
+                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center text-base border border-slate-200/80">
+                                    <i class="fa-solid fa-house-chimney-user"></i>
                                 </span>
-                                <span class="px-2.5 py-1 rounded-full bg-rose-50 text-rose-800 text-[11px] font-black border border-rose-200 whitespace-nowrap">親師即時互聯</span>
+                                <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200/70 text-[11px] font-semibold">免密碼直達</span>
                             </div>
                             <div>
-                                <h3 class="text-lg font-black text-stone-900 group-hover:text-rose-600 transition-colors whitespace-nowrap">家長端即時查核</h3>
-                                <span class="text-xs text-rose-700 font-mono font-bold block mt-0.5 whitespace-nowrap">Parent Dashboard</span>
+                                <h3 class="text-lg font-extrabold text-slate-900">家長端即時查核</h3>
+                                <span class="text-xs text-slate-400 font-mono block mt-0.5">Parent Dashboard</span>
                             </div>
-                            <p class="text-xs text-stone-600 leading-relaxed font-medium">
-                                免密碼即時掌握孩子每日作業繳交進度、每日聯絡簿查閱與電子簽章、108 課綱領域小考成績獨立 6 位數 PIN 碼安全防護。
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                免登入密碼即可查看孩子每日作業進度與聯絡簿，並透過座號專屬 PIN 碼進行電子簽閱與查分。
                             </p>
                         </div>
-                        <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-rose-600/20 transition-all flex items-center justify-center gap-2 whitespace-nowrap cursor-pointer">
+                        <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-between cursor-pointer">
                             <span>前往家長端看板</span>
-                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
                         </a>
                     </div>
                 </div>
             </section>
 
             <!-- 系統最新更新日誌 (Changelog) & 完整使用教學專區 -->
-            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-8 border-t border-stone-200/70 space-y-6">
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-10 border-t border-slate-200/80 space-y-6">
                 <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                     <!-- 最新更新紀錄卡片 -->
-                    <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-7 border border-stone-200/90 shadow-sm hover:shadow-md transition-all space-y-4">
+                    <div class="lg:col-span-6 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs hover:shadow-sm transition-all space-y-4">
                         <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center text-lg border border-amber-200">
+                            <div class="flex items-center gap-3">
+                                <span class="w-10 h-10 rounded-xl bg-slate-100 text-slate-800 flex items-center justify-center text-base border border-slate-200/80">
                                     <i class="fa-solid fa-clock-rotate-left"></i>
                                 </span>
                                 <div>
-                                    <h3 class="font-black text-stone-900 text-lg">系統更新紀錄 (Changelog)</h3>
-                                    <span class="text-xs text-stone-400 font-bold">最新版本 v4.5.3 • 2026/10/13</span>
+                                    <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">系統更新紀錄 (Changelog)</h3>
+                                    <span class="text-xs text-slate-500 font-medium">最新版本 v4.6.0 • 2026/10/17</span>
                                 </div>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-black border border-emerald-200">最新版本</span>
+                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-200/80">最新版本</span>
                         </div>
 
-                        <div class="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-100/80 space-y-2 text-xs sm:text-sm text-stone-700 font-medium">
-                            <div class="font-bold text-emerald-950 flex items-center gap-1.5">
-                                <i class="fa-solid fa-bullhorn text-emerald-600"></i>
-                                <span>v4.5.5 核心更新亮點：</span>
+                        <div class="p-4 bg-slate-50/90 rounded-xl border border-slate-200/70 space-y-2 text-xs sm:text-sm text-slate-700">
+                            <div class="font-bold text-slate-900 flex items-center gap-1.5">
+                                <i class="fa-solid fa-check-double text-indigo-600"></i>
+                                <span>v4.6.0 自然極簡視覺重構與操作進化：</span>
                             </div>
-                            <ul class="space-y-1.5 text-xs text-stone-600 pl-2">
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-camera text-indigo-600 mt-0.5"></i> <span><b>快速授權相機畫面全黑修復</b>：清除全螢幕未定義函式調用錯誤，加入多層鏡頭自動適配（後置/前置/可用鏡頭降級容錯）與重啟相機提示。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-key text-amber-600 mt-0.5"></i> <span><b>一次性認證碼按鈕動態切換</b>：進入頁面預設呈現「產生代碼」按鈕與待命狀態，點擊後生成安全碼並動態切換為「重新產生新代碼」。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-rotate text-emerald-600 mt-0.5"></i> <span><b>學校與教師端 PIN 碼全雙向即時同步</b>：解決多端認證碼不一致，老師修改學校端即刻同步，學校端調整教師端秒級響應。</span></li>
-                                <li class="flex items-start gap-1.5"><i class="fa-solid fa-house-chimney-user text-teal-600 mt-0.5"></i> <span><b>家長端全面免密碼直達</b>：徹底移除家長登入密碼，改為專屬直達連結與座號個人 PIN 碼簽章/查分。</span></li>
+                            <ul class="space-y-1.5 text-xs text-slate-600 pl-1">
+                                <li class="flex items-start gap-2"><span class="text-slate-400">•</span><span><b>自然極簡配色與排版</b>：全面導入 Inter + Noto Sans TC 字型階層、柔和紙感白底與精準邊框，視覺更舒適耐看。</span></li>
+                                <li class="flex items-start gap-2"><span class="text-slate-400">•</span><span><b>今日班級工作台快覽列 & 聯絡簿一鍵帶入作業</b>：首頁即時總覽待收作業、出席、聯絡簿與全勤榮譽，聯絡簿支援一鍵帶入今日作業。</span></li>
+                                <li class="flex items-start gap-2"><span class="text-slate-400">•</span><span><b>360° 學生檔案卡與單一學生 PIN 碼獨立檢視/行內修改</b>：班級管理、成績認證碼彈窗與 360° 學生卡全面支援單一學生 PIN 碼眼睛獨立檢視與免彈窗行內即時修改同步。</span></li>
+                                <li class="flex items-start gap-2"><span class="text-slate-400">•</span><span><b>手機端全螢幕視圖零遮擋 & 行政端未通報快篩</b>：智慧收合底部導航欄與懸浮鈕，家長端支援常用座號秒切換，學校行政端新增「僅顯示未通報班級」一鍵過濾。</span></li>
                             </ul>
                         </div>
 
                         <div class="flex items-center justify-between pt-1">
-                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-emerald-100/80 hover:bg-emerald-200/80 text-emerald-950 font-bold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-clock-rotate-left text-emerald-700"></i>
-                                <span>查看完整版本演進日誌 (v3.0 ~ v4.5.5)</span>
+                            <button type="button" id="portal-card-changelog-btn" class="w-full py-2.5 px-4 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-list-check text-xs opacity-80"></i>
+                                <span>查看完整版本演進日誌 (v3.0 ~ v4.6.0)</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- 完整使用教學影片卡片 (籌備中・敬請期待) -->
-                    <div class="lg:col-span-6 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-900 text-white rounded-3xl p-6 sm:p-7 shadow-xl shadow-indigo-950/20 space-y-4 relative overflow-hidden flex flex-col justify-between">
-                        <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-indigo-500/20 blur-2xl pointer-events-none"></div>
-
-                        <div class="flex items-center justify-between relative z-10">
-                            <div class="flex items-center gap-2.5">
-                                <span class="w-10 h-10 rounded-2xl bg-white/10 text-indigo-300 flex items-center justify-center text-lg border border-white/10">
-                                    <i class="fa-solid fa-film"></i>
-                                </span>
-                                <div>
-                                    <h3 class="font-black text-white text-lg">完整使用教學影片</h3>
-                                    <span class="text-xs text-indigo-200 font-medium">全新範例示範 • 重新製作中</span>
+                    <!-- 完整使用教學影片卡片 -->
+                    <div class="lg:col-span-6 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/90 shadow-2xs hover:shadow-sm transition-all flex flex-col justify-between space-y-4">
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <span class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base border border-indigo-200/70">
+                                        <i class="fa-solid fa-circle-play"></i>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">完整使用教學與實機導覽</h3>
+                                        <span class="text-xs text-slate-500 font-medium">ステップ步進式圖文與影片指南</span>
+                                    </div>
                                 </div>
+                                <span class="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-xs font-semibold">教學專區</span>
                             </div>
-                            <span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold border border-amber-500/30">敬請期待......</span>
+
+                            <div class="p-4 bg-slate-50/90 rounded-xl border border-slate-200/70 space-y-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                <p class="font-semibold text-slate-800">第一次使用班級經營系統嗎？</p>
+                                <p class="text-xs text-slate-600 leading-relaxed">
+                                    我們整理了從「建立班級與座號」、「設定條碼槍等差推算」、「日常作業點收與聯絡簿派發」到「分享家長端專屬連結」的完整實機操作指南，幫助您在 3 分鐘內輕鬆上手。
+                                </p>
+                            </div>
                         </div>
 
-                        <p class="text-xs sm:text-sm text-indigo-100/90 leading-relaxed relative z-10">
-                            我們正在重新製作更詳盡、更清晰的高畫質實機教學影片，將包含完整的真實範例示範、班級改名、權限碼分享及作業點收全流程！
-                        </p>
-
-                        <div class="pt-2 relative z-10">
-                            <button type="button" id="portal-card-tutorial-btn" class="w-full py-3 px-4 bg-white hover:bg-indigo-50 text-indigo-900 font-black text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer">
-                                <i class="fa-solid fa-sparkles text-amber-500"></i>
-                                <span>點選查看詳情（敬請期待......）</span>
+                        <div class="pt-1">
+                            <button type="button" id="portal-card-tutorial-btn" class="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-900 text-slate-800 hover:text-white font-semibold text-xs sm:text-sm rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-regular fa-circle-play"></i>
+                                <span>開啟教學導覽說明</span>
                             </button>
                         </div>
                     </div>
@@ -542,17 +521,14 @@
             </section>
 
             <!-- 2. 特色介紹區塊 (Overview & 8 大核心功能特色展示) -->
-            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-16 sm:py-20 border-t border-stone-200/70">
-                <div class="text-center max-w-3xl mx-auto mb-14">
-                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-100/80 border border-amber-300/80 text-amber-900 text-xs font-bold mb-4 shadow-2xs">
-                        <i class="fa-solid fa-wand-magic-sparkles text-amber-600"></i>
-                        <span>實戰現場驗證 • 歷經多版本反覆迭代</span>
-                    </div>
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4">
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-14 sm:py-20 border-t border-slate-200/80">
+                <div class="max-w-2xl mb-12 space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-widest text-indigo-600 block">Core Capabilities</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                         8 大核心功能全景導覽
                     </h2>
-                    <p class="text-stone-600 text-sm sm:text-base leading-relaxed">
-                        由國中一年級學生獨立編程設計，從條碼秒速辨識、多元作業自訂、科任多班支援到家長端即時查核，全方位解決班級點收的所有難題。點擊任一圖片即可放大檢視介面細節。
+                    <p class="text-slate-500 text-sm sm:text-base leading-relaxed">
+                        從條碼秒速辨識、多元作業狀態、科任多班切換到家長端即時查核，點擊任一預覽圖即可放大檢視細節。
                     </p>
                 </div>
 
@@ -1002,36 +978,36 @@
                 </div>
             </section>
 
-            <!-- 3. 系統公告與動態區塊 (Screenshot 3 底部) -->
-            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-16 border-t border-stone-200/70">
+            <!-- 3. 系統公告與動態區塊 -->
+            <section class="max-w-7xl mx-auto px-6 sm:px-10 py-12 sm:py-16 border-t border-slate-200/80">
                 <div class="mb-8">
-                    <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight mb-2">系統公告與動態</h2>
-                    <p class="text-stone-500 text-sm sm:text-base">
-                        隨時掌握班級經營系統 3.0 (v3.5) 最新功能與重要訊息。
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">系統公告與動態</h2>
+                    <p class="text-slate-500 text-sm sm:text-base">
+                        隨時掌握班級經營系統 3.0 (v4.6.0) 最新功能與重要訊息。
                     </p>
                 </div>
 
-                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-stone-200/80 shadow-sm divide-y divide-stone-100">
+                <div class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/90 shadow-2xs divide-y divide-slate-100">
                     <!-- 公告條目 1 -->
                     <div class="pb-5 space-y-2">
                         <div class="flex items-center gap-3">
-                            <span class="px-2.5 py-0.5 rounded-lg bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">最新版本</span>
-                            <span class="text-xs text-stone-400 font-medium">2026 年最新發布</span>
+                            <span class="px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold border border-indigo-200/70">最新版本</span>
+                            <span class="text-xs text-slate-400 font-medium">2026 年最新發布</span>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-stone-900">班級經營系統 3.0 (v3.5) 正式上線！全新首頁導覽與親師生三端全面升級</h3>
-                        <p class="text-stone-500 text-sm leading-relaxed">
-                            重構全站視覺與首頁入口，引進實體條碼槍秒速辨識、雲端帳號備份、親師聯絡簿整合等多項強大功能。
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900">班級經營系統 3.0 (v4.6.0) 正式上線！自然極簡視覺與親師生四端全面升級</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">
+                            全新導入 Swiss Editorial 設計系統、今日班級工作台快覽列、聯絡簿一鍵帶入今日作業、360° 學生全息檔案卡與跨裝置雲端同步。
                         </p>
                     </div>
 
                     <!-- 公告條目 2 -->
                     <div class="py-5 space-y-2">
                         <div class="flex items-center gap-3">
-                            <span class="px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100">功能更新</span>
-                            <span class="text-xs text-stone-400 font-medium">近期優化</span>
+                            <span class="px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-700 text-xs font-semibold border border-emerald-200/70">功能更新</span>
+                            <span class="text-xs text-slate-400 font-medium">近期優化</span>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-stone-900">強化聯絡簿一鍵複製與智慧缺繳名單統計</h3>
-                        <p class="text-stone-500 text-sm leading-relaxed">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900">強化聯絡簿一鍵複製與智慧缺繳名單統計</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">
                             支援自訂作業種類、多段座號快速產生與排除缺號學生，大幅節省課堂與班級點收時間。
                         </p>
                     </div>
@@ -1039,68 +1015,64 @@
                     <!-- 公告條目 3 -->
                     <div class="pt-5 space-y-2">
                         <div class="flex items-center gap-3">
-                            <span class="px-2.5 py-0.5 rounded-lg bg-amber-50 text-amber-800 text-xs font-bold border border-amber-100">安全性</span>
-                            <span class="text-xs text-stone-400 font-medium">安全公告</span>
+                            <span class="px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200/70">安全性</span>
+                            <span class="text-xs text-slate-400 font-medium">安全公告</span>
                         </div>
-                        <h3 class="text-base sm:text-lg font-black text-stone-900">支援 SMTP 電子郵件密碼重設與本機硬碟安全儲存協定</h3>
-                        <p class="text-stone-500 text-sm leading-relaxed">
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900">支援學校管理端雙向 PIN 碼同步與本機硬碟安全儲存協定</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">
                             提供高規格帳號防護，免伺服器亦可將資料儲存在使用者專屬檔案中，保障班級隱私。
                         </p>
                     </div>
                 </div>
             </section>
 
-            <!-- 4. 深色醒目行動號召卡片 (Screenshot 1: 準備好提升點收效率了嗎？) -->
+            <!-- 4. 深色醒目行動號召卡片 -->
             <section class="max-w-7xl mx-auto px-6 sm:px-10 py-10 sm:py-16">
-                <div class="bg-[#111827] text-white rounded-[2.5rem] p-10 sm:p-14 lg:p-16 text-center max-w-4xl mx-auto shadow-2xl relative overflow-hidden">
-                    <!-- 氛圍裝飾光暈 -->
-                    <div class="absolute -top-24 -left-24 w-60 h-60 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                    <div class="absolute -bottom-24 -right-24 w-60 h-60 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
-                    
-                    <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4 relative z-10">
+                <div class="bg-slate-900 text-white rounded-3xl p-10 sm:p-14 lg:p-16 text-center max-w-4xl mx-auto shadow-xl relative overflow-hidden">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold tracking-tight mb-4 relative z-10">
                         準備好提升班級經營效率了嗎？
                     </h2>
                     <p class="text-slate-300 text-sm sm:text-base max-w-xl mx-auto mb-8 relative z-10 leading-relaxed">
                         加入 班級經營系統 3.0，立即體驗無縫銜接的數位化作業管理與班級經營環境。只需一分鐘即可完成設定並開始使用。
                     </p>
-                    <button id="portal-cta-start-btn" class="inline-flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-white hover:bg-slate-100 active:bg-slate-200 text-slate-900 font-black text-base shadow-lg hover:shadow-xl active:shadow-inner active:scale-[0.96] active:translate-y-1 transition-all duration-150 transform relative z-20 cursor-pointer select-none focus:outline-none focus:ring-4 focus:ring-white/40">
+                    <button id="portal-cta-start-btn" class="inline-flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm sm:text-base shadow-sm transition-all relative z-20 cursor-pointer select-none">
                         <span class="pointer-events-none select-none inline-block">免費建立帳號 / 立即開始使用</span>
-                        <i class="fa-solid fa-chevron-right text-xs pointer-events-none select-none"></i>
+                        <i class="fa-solid fa-arrow-right text-xs pointer-events-none select-none"></i>
                     </button>
                 </div>
             </section>
         </main>
 
-        <!-- 頁尾 (強調由國一生獨自打造，提供意見 / 聯絡作者) -->
-        <footer class="border-t border-stone-200/80 bg-[#f6f1e8] py-10 px-6 sm:px-10 relative z-10">
-            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-stone-600 text-xs sm:text-sm">
+        <!-- 頁尾 -->
+        <footer class="border-t border-slate-200/80 bg-white py-10 px-6 sm:px-10 relative z-10">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-slate-600 text-xs sm:text-sm">
                 <!-- 左側 Logo 與作者聲明 -->
                 <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
                     <button id="portal-footer-logo-btn" class="flex items-center gap-2 cursor-pointer group" title="返回首頁頂端">
-                        <img src="icon.svg" class="w-8 h-8 rounded-xl shadow-xs group-hover:scale-105 transition-transform" alt="Logo">
-                        <span class="font-black text-stone-900 text-base">班級經營系統 3.0</span>
+                        <img src="icon.svg" class="w-7 h-7 rounded-lg shadow-2xs" alt="Logo">
+                        <span class="font-bold text-slate-900 text-sm sm:text-base">班級經營系統 3.0</span>
                     </button>
-                    <span class="hidden sm:inline text-stone-300">|</span>
-                    <p class="font-semibold text-stone-700">
-                        經過多版本持續更新，由<span class="text-amber-800 font-black px-1.5 py-0.5 rounded bg-amber-100/80 mx-1">國一生獨自精心打造</span>
+                    <span class="hidden sm:inline text-slate-300">|</span>
+                    <p class="font-medium text-slate-600">
+                        經過多版本持續更新，由<span class="text-indigo-700 font-semibold px-2 py-0.5 rounded-md bg-indigo-50 border border-indigo-100 mx-1">國一生獨自精心打造</span>
                     </p>
                 </div>
 
                 <!-- 右側：提供意見 / 聯絡作者按鈕與信箱 -->
-                <div class="flex flex-wrap items-center justify-center gap-3">
-                    <button id="portal-footer-letter-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-amber-50 hover:bg-amber-100 text-amber-950 font-bold border border-amber-300 shadow-xs hover:shadow transition-all cursor-pointer">
-                        <i class="fa-solid fa-envelope-open-text text-amber-700"></i>
+                <div class="flex flex-wrap items-center justify-center gap-2.5">
+                    <button id="portal-footer-letter-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold border border-slate-200/90 transition-all cursor-pointer text-xs">
+                        <i class="fa-solid fa-envelope-open-text text-indigo-600"></i>
                         <span>給老師的話</span>
                     </button>
-                    <button id="portal-footer-feedback-btn" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-amber-50 text-amber-900 font-bold border border-amber-300 shadow-xs hover:shadow transition-all cursor-pointer">
-                        <i class="fa-solid fa-envelope text-amber-600"></i>
+                    <button id="portal-footer-feedback-btn" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 font-semibold border border-slate-200/90 transition-all cursor-pointer text-xs">
+                        <i class="fa-solid fa-envelope text-slate-500"></i>
                         <span>提供意見 / 聯絡作者</span>
                     </button>
-                    <button id="portal-footer-copy-email-btn" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold border border-stone-300 transition-all cursor-pointer" title="複製作者信箱">
-                        <i class="fa-solid fa-copy text-stone-500"></i>
+                    <button id="portal-footer-copy-email-btn" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold border border-slate-200/80 transition-all cursor-pointer text-xs" title="複製作者信箱">
+                        <i class="fa-solid fa-copy text-slate-400"></i>
                         <span class="font-mono text-xs">ianw.solar@gmail.com</span>
                     </button>
-                    <p class="text-stone-400 text-xs w-full text-center md:w-auto">Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>） • © 2026 班級經營系統 3.0 (v3.5)</p>
+                    <p class="text-slate-400 text-xs w-full text-center md:w-auto">Created by 七賢國中107 王禹硯（<a href="mailto:ianw.solar@gmail.com" class="hover:underline">ianw.solar@gmail.com</a>） • © 2026 班級經營系統 3.0 (v4.6.0)</p>
                 </div>
             </div>
         </footer>
@@ -1492,158 +1464,162 @@
     <!-- ========================================== -->
     <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-xs z-[140] hidden transition-opacity duration-300"></div>
 
-    <aside id="app-sidebar" class="fixed top-0 left-0 bottom-0 w-72 sm:w-80 bg-white/95 backdrop-blur-md border-r border-slate-200/90 shadow-2xl z-[150] -translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-hidden">
+    <aside id="app-sidebar" class="fixed top-0 left-0 bottom-0 w-72 sm:w-80 bg-white border-r border-slate-200/90 shadow-xl z-[150] -translate-x-full transition-transform duration-300 flex flex-col justify-between overflow-hidden">
         <!-- 頂部：標題與關閉按鈕 -->
-        <div class="p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
+        <div class="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-3">
-                <img src="icon.svg" class="w-9 h-9 rounded-xl shadow-xs" alt="系統圖標">
+                <img src="icon.svg" class="w-8 h-8 rounded-xl border border-slate-200/70 shadow-2xs" alt="系統圖標">
                 <div>
                     <div class="flex items-center gap-1.5">
-                        <span class="font-black text-slate-900 text-lg tracking-tight">班級經營系統</span>
-                        <span class="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-amber-500 text-white">DEV</span>
+                        <span class="font-extrabold text-slate-900 text-base tracking-tight">班級經營系統</span>
+                        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">v4.6</span>
                     </div>
-                    <p id="sidebar-current-class-name" class="text-xs font-bold text-indigo-600 truncate max-w-[170px] mt-0.5">未選擇班級</p>
+                    <p id="sidebar-current-class-name" class="text-xs font-semibold text-indigo-600 truncate max-w-[170px] mt-0.5">未選擇班級</p>
                 </div>
             </div>
-            <button id="sidebar-close-btn" class="w-9 h-9 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer" title="關閉選單">
-                <i class="fa-solid fa-xmark text-lg"></i>
+            <button id="sidebar-close-btn" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer" title="關閉選單">
+                <i class="fa-solid fa-xmark text-base"></i>
             </button>
         </div>
 
-        <!-- 選單項目 (10大核心功能) -->
-        <nav class="p-3 space-y-1.5 flex-1 overflow-y-auto custom-scrollbar">
+        <!-- 選單項目 (結構化分組導覽) -->
+        <nav class="p-3 space-y-1 flex-1 overflow-y-auto custom-scrollbar">
+            <div class="px-3 pt-1 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">日常教學與點收</div>
 
             <!-- 1. 總覽 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="overview">
-                <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-gauge-high text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="overview">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-gauge-high text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">總覽</div>
-                    <div class="text-[11px] text-slate-400 font-medium">大螢幕一目了然 · 作業聯絡簿值日生</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">今日班級總覽</div>
+                    <div class="text-[11px] text-slate-400 truncate">大螢幕看板 · 作業與值日生</div>
                 </div>
             </button>
 
             <!-- 2. 作業點收 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="main">
-                <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-clipboard-check text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="main">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-clipboard-check text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">作業點收</div>
-                    <div class="text-[11px] text-slate-400 font-medium">矩陣/條碼點收 · 免對名單一鍵通報</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">作業點收</div>
+                    <div class="text-[11px] text-slate-400 truncate">矩陣與條碼點收 · 缺交統計</div>
                 </div>
             </button>
 
             <!-- 3. 聯絡簿 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="contact-book">
-                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-chalkboard-user text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="contact-book">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-book-open text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">聯絡簿</div>
-                    <div class="text-[11px] text-slate-400 font-medium">黑板投影 · 家長每日電子簽閱</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">聯絡簿</div>
+                    <div class="text-[11px] text-slate-400 truncate">黑板投影 · 一鍵帶入今日作業</div>
                 </div>
             </button>
 
+            <div class="px-3 pt-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">班務與成績管理</div>
+
             <!-- 4. 成績 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="scores">
-                <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-chart-line text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="scores">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">成績</div>
-                    <div class="text-[11px] text-slate-400 font-medium">21 科小考登記 · 分佈統計匯出</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">成績系統</div>
+                    <div class="text-[11px] text-slate-400 truncate">小考成績登記 · 組距分佈匯出</div>
                 </div>
             </button>
 
             <!-- 5. 幹部及值日生 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="officers">
-                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-user-shield text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="officers">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-user-shield text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">幹部及值日生</div>
-                    <div class="text-[11px] text-slate-400 font-medium">班級幹部 · 每日自動輪值排程</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">幹部及值日生</div>
+                    <div class="text-[11px] text-slate-400 truncate">班級幹部 · 每日自動輪值排程</div>
                 </div>
             </button>
 
             <!-- 6. 簽到及遲到 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="attendance">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-user-check text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="attendance">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-user-check text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">簽到及遲到</div>
-                    <div class="text-[11px] text-slate-400 font-medium">一鍵點名出席 · 遲到請假同步家長</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">簽到及遲到</div>
+                    <div class="text-[11px] text-slate-400 truncate">晨間點名出席 · 遲到請假同步</div>
                 </div>
             </button>
 
             <!-- 7. 班級事務 -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="affairs">
-                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-folder-open text-lg"></i>
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="affairs">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-folder-open text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">班級事務</div>
-                    <div class="text-[11px] text-slate-400 font-medium">問卷回條 · 家長線上簽名統計</div>
-                </div>
-            </button>
-
-            <!-- 8. 快速登入授權 (自首頁移入側邊欄) -->
-            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="quickAuth">
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-bolt text-lg text-amber-500"></i>
-                </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">快速登入授權</div>
-                    <div class="text-[11px] text-slate-400 font-medium">手機相機掃碼 · 6 位數認證碼</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">班級事務</div>
+                    <div class="text-[11px] text-slate-400 truncate">問卷回條 · 家長線上簽名統計</div>
                 </div>
             </button>
 
-            <!-- 9. 管理班級 (自首頁移入側邊欄) -->
-            <button type="button" id="sidebar-manage-classes-nav-btn" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-slate-700 hover:text-indigo-600 hover:bg-indigo-50/70 border border-transparent transition-all active:scale-[0.98] cursor-pointer group" data-view="manage-classes">
-                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform shrink-0">
-                    <i class="fa-solid fa-chalkboard-user text-lg"></i>
+            <div class="px-3 pt-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400">系統與安全授權</div>
+
+            <!-- 8. 快速登入授權 -->
+            <button type="button" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="quickAuth">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-qrcode text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-slate-900 group-hover:text-indigo-600">管理班級</div>
-                    <div class="text-[11px] text-slate-400 font-medium">新增、切換、重新命名班級與座號</div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">快速登入授權</div>
+                    <div class="text-[11px] text-slate-400 truncate">手機相機掃碼 · 6 位數認證碼</div>
+                </div>
+            </button>
+
+            <!-- 9. 管理班級 -->
+            <button type="button" id="sidebar-manage-classes-nav-btn" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 border border-transparent transition-all cursor-pointer group" data-view="manage-classes">
+                <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-600 group-hover:bg-white group-hover:text-indigo-600 border border-slate-200/60 flex items-center justify-center transition-colors shrink-0">
+                    <i class="fa-solid fa-sliders text-sm"></i>
+                </div>
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900">管理班級</div>
+                    <div class="text-[11px] text-slate-400 truncate">班級設定、學生座號與認證碼</div>
                 </div>
             </button>
 
             <!-- 10. 管理人員行政專區 (Admin Only) -->
-            <button type="button" id="sidebar-admin-portal-btn" class="sidebar-nav-item w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl font-bold text-base text-amber-900 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-300 transition-all active:scale-[0.98] cursor-pointer group hidden" data-view="admin-dashboard">
-                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center group-hover:scale-105 transition-transform shrink-0 shadow-xs">
-                    <i class="fa-solid fa-shield-halved text-lg"></i>
+            <button type="button" id="sidebar-admin-portal-btn" class="sidebar-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-800 bg-slate-100 hover:bg-slate-200/70 border border-slate-200 transition-all cursor-pointer group hidden" data-view="admin-dashboard">
+                <div class="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-shield-halved text-sm"></i>
                 </div>
-                <div class="text-left flex-1">
-                    <div class="font-black text-amber-950 flex items-center gap-1.5">
+                <div class="text-left flex-1 min-w-0">
+                    <div class="font-bold text-slate-900 flex items-center gap-1.5">
                         <span>管理人員專區</span>
-                        <span class="px-1.5 py-0.2 rounded-full bg-amber-600 text-white text-[10px] font-black uppercase">Admin</span>
+                        <span class="px-1.5 py-0.2 rounded bg-slate-900 text-white text-[10px] font-bold uppercase">Admin</span>
                     </div>
-                    <div class="text-[11px] text-amber-800 font-medium">全校總覽 · 晨間點名 · 抽查核章 · 批量帳號</div>
+                    <div class="text-[11px] text-slate-500 truncate">全校總覽 · 晨間點名 · 抽查核章</div>
                 </div>
             </button>
         </nav>
 
         <!-- 底部：快捷連結、系統設定與登出 -->
-        <div class="p-4 border-t border-slate-100 bg-slate-50/80 space-y-2.5">
-            <!-- 前往家長端 (DEV) -->
-            <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl bg-white border border-slate-200 text-slate-700 hover:text-indigo-600 font-bold text-xs transition-all shadow-2xs hover:shadow-xs">
-                <i class="fa-solid fa-house-chimney-user text-indigo-500"></i>
-                <span>前往家長端 (DEV)</span>
+        <div class="p-3.5 border-t border-slate-100 bg-slate-50/70 space-y-2">
+            <!-- 前往家長端 -->
+            <a href="https://ian1021228.github.io/parent_dashboard_dev/" target="_blank" rel="noopener noreferrer" class="w-full flex items-center justify-between py-2 px-3 rounded-lg bg-white border border-slate-200/90 text-slate-700 hover:text-slate-900 hover:border-slate-300 font-semibold text-xs transition-all shadow-2xs">
+                <span class="flex items-center gap-2"><i class="fa-solid fa-house-chimney-user text-slate-400"></i> 前往家長端看板</span>
                 <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
             </a>
             
-            <div class="flex items-center justify-between pt-1 text-xs">
-                <!-- 選單最下方設定按鈕 (依指示新增) -->
-                <button type="button" id="sidebar-settings-btn" class="py-2 px-3 rounded-xl bg-slate-200/70 hover:bg-slate-200 text-slate-800 hover:text-indigo-600 font-black cursor-pointer flex items-center gap-1.5 transition-all active:scale-95" title="開啟系統設定">
-                    <i class="fa-solid fa-gear text-indigo-600"></i>
+            <div class="flex items-center justify-between pt-0.5 text-xs gap-2">
+                <!-- 選單最下方設定按鈕 -->
+                <button type="button" id="sidebar-settings-btn" class="flex-1 py-2 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/90 font-semibold cursor-pointer flex items-center justify-center gap-1.5 transition-all" title="開啟系統設定">
+                    <i class="fa-solid fa-gear text-slate-400"></i>
                     <span>系統設定</span>
                 </button>
-                <button type="button" id="sidebar-logout-btn" class="py-2 px-3 rounded-xl hover:bg-rose-50 text-slate-600 hover:text-rose-600 font-bold cursor-pointer flex items-center gap-1.5 transition-all active:scale-95" title="登出系統">
-                    <i class="fa-solid fa-arrow-right-from-bracket text-rose-500"></i>
+                <button type="button" id="sidebar-logout-btn" class="py-2 px-3 rounded-lg bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200/90 hover:border-rose-200 font-semibold cursor-pointer flex items-center justify-center gap-1.5 transition-all" title="登出系統">
+                    <i class="fa-solid fa-arrow-right-from-bracket text-slate-400"></i>
                     <span>登出</span>
                 </button>
             </div>
@@ -1652,104 +1628,108 @@
 
     <!-- 首頁 Main Page (作業點收) -->
     <div id="main-page" class="w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 hidden page-section">
-        <header class="flex flex-col gap-6 mb-10 relative z-10 p-6 glass-card rounded-3xl">
-            <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-5 2xl:gap-8 w-full">
-                <!-- 左側：標題與班級選單 (依圈選位置最左側內嵌三條線按鈕) -->
-                <div class="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-                     <!-- 內嵌三條線選單按鈕 (圈選處) -->
-                     <button type="button" class="sidebar-toggle-btn w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
+        <header class="flex flex-col gap-5 mb-6 relative z-10 p-5 sm:p-6 glass-card rounded-2xl">
+            <div class="flex flex-col 2xl:flex-row justify-between items-start 2xl:items-center gap-4 2xl:gap-6 w-full">
+                <!-- 左側：標題與班級選單 -->
+                <div class="flex items-center gap-2.5 sm:gap-3.5 flex-shrink-0 flex-wrap">
+                     <!-- 內嵌三條線選單按鈕 -->
+                     <button type="button" class="sidebar-toggle-btn w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/80 flex items-center justify-center text-base active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
                          <i class="fa-solid fa-bars"></i>
                      </button>
-                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 sm:gap-3 select-none text-left shrink-0" title="班級經營系統 (測試版)">
-                         <img src="icon.svg" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl drop-shadow-sm inline-block group-hover:scale-105 transition-transform" alt="班級經營系統">
-                         <span class="text-xl sm:text-2xl xl:text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm group-hover:opacity-90 transition-opacity whitespace-nowrap">班級經營系統</span>
-                         <span class="px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-black bg-amber-500 text-white shadow-xs uppercase tracking-wider">測試版 DEV</span>
+                     <button id="main-logo-btn" class="cursor-pointer group flex items-center gap-2.5 select-none text-left shrink-0" title="班級經營系統">
+                         <img src="icon.svg" class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl border border-slate-200/60 shadow-2xs inline-block group-hover:scale-105 transition-transform" alt="班級經營系統">
+                         <span class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight whitespace-nowrap">班級經營系統</span>
+                         <span class="px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200/90 uppercase tracking-wider">v4.6</span>
                      </button>
-                     <div id="cloud-sync-status-indicator" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 transition-all shrink-0">
-                         <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                     <div id="cloud-sync-status-indicator" class="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50/80 text-emerald-800 border border-emerald-200/80 transition-all shrink-0">
+                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                          <span id="cloud-sync-status-text">已自動儲存並同步至雲端</span>
                      </div>
-                     <select id="class-selector" class="rounded-xl border-slate-200/80 shadow-sm shadow-slate-100/50 focus:border-indigo-500 focus:ring-indigo-500 py-2.5 px-4 text-base sm:text-lg bg-white font-extrabold text-indigo-600 cursor-pointer transition-all"></select>
+                     <select id="class-selector" class="rounded-xl border border-slate-200 shadow-2xs focus:border-indigo-600 focus:ring-indigo-600 py-2 px-3.5 text-sm sm:text-base bg-white font-bold text-slate-900 cursor-pointer transition-all"></select>
                 </div>
                 
-                <!-- 右側：功能按鈕列 (水平單排平行排列，放大按鈕，絕不換行至第二行) -->
-                <div class="w-full 2xl:w-auto overflow-x-auto no-scrollbar py-1 shrink-0">
-                    <div class="flex flex-nowrap items-center gap-2 sm:gap-2.5 2xl:gap-3 shrink-0 min-w-max justify-start 2xl:justify-end">
+                <!-- 右側：專業極簡工具列 (中性白底微邊框 + 語意化圖標 + 單一主視覺 CTA) -->
+                <div class="w-full 2xl:w-auto overflow-x-auto no-scrollbar py-0.5 shrink-0">
+                    <div class="flex flex-nowrap items-center gap-2 shrink-0 min-w-max justify-start 2xl:justify-end">
                          <!-- 1. 作業種類 -->
-                         <button id="show-types-modal-btn" class="glass-card border border-orange-200/80 bg-orange-50/40 text-orange-600 hover:text-orange-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-orange-50 hover:border-orange-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
+                         <button id="show-types-modal-btn" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
+                             <i class="fa-solid fa-sliders text-slate-400 text-xs"></i>
                              <span>作業種類</span>
                          </button>
                          
                          <!-- 2. 聯絡簿 -->
-                         <button id="contact-book-btn" class="glass-card border border-purple-200/80 bg-purple-50/40 text-purple-600 hover:text-purple-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-purple-50 hover:border-purple-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                         <button id="contact-book-btn" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                             <i class="fa-solid fa-book-open text-indigo-600 text-xs"></i>
                              <span>聯絡簿</span>
                          </button>
                          
                          <!-- 3. 學生詳情 -->
-                         <button id="student-details-btn" class="glass-card border border-emerald-200/80 bg-emerald-50/40 text-emerald-600 hover:text-emerald-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-emerald-50 hover:border-emerald-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                         <button id="student-details-btn" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                             <i class="fa-solid fa-user-check text-emerald-600 text-xs"></i>
                              <span>學生詳情</span>
                          </button>
                          
-                                                  <!-- 3.5 成績系統 (已整合至側邊欄，此處隱藏) -->
-                         <button id="exam-scores-system-btn" class="hidden glass-card border border-teal-200/80 bg-teal-50/50 text-teal-700 hover:text-teal-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-teal-100/60 hover:border-teal-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 items-center gap-1.5 cursor-pointer" title="進入全螢幕成績系統（統一發布考試、全班成績、多元格式匯出）">
-                             <i class="fa-solid fa-chart-line text-teal-600"></i>
+                         <!-- 3.5 成績系統 (已整合至側邊欄，此處隱藏) -->
+                         <button id="exam-scores-system-btn" class="hidden bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 items-center gap-1.5 cursor-pointer" title="進入全螢幕成績系統">
+                             <i class="fa-solid fa-chart-line text-teal-600 text-xs"></i>
                              <span>成績系統</span>
                          </button>
+
                          <!-- 4. 條碼設定 -->
-                         <button id="set-barcodes-btn" class="glass-card border border-blue-200/80 bg-blue-50/40 text-blue-600 hover:text-blue-700 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-blue-50 hover:border-blue-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
+                         <button id="set-barcodes-btn" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer">
+                             <i class="fa-solid fa-barcode text-slate-400 text-xs"></i>
                              <span>條碼設定</span>
                          </button>
                          
                          <!-- 5. 管理班級 (已整合至側邊欄抽屜選單，作業列表此處隱藏) -->
-                         <button id="manage-classes-btn" class="hidden glass-card border border-stone-200/90 text-stone-600 hover:text-stone-800 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-stone-50 hover:border-stone-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 hide-on-admin-view items-center gap-1.5 cursor-pointer">
+                         <button id="manage-classes-btn" class="hidden bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 hide-on-admin-view items-center gap-1.5 cursor-pointer">
                              <span>管理班級</span>
                          </button>
 
                          <!-- 6. 快速登入授權 (已整合至側邊欄抽屜選單，作業列表此處隱藏) -->
-                         <button id="main-qr-scan-btn" class="hidden glass-card border border-emerald-300/80 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-800 font-black py-2.5 sm:py-3 px-3.5 sm:px-4 text-sm sm:text-base rounded-2xl shadow-xs transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他電腦快速登入">
+                         <button id="main-qr-scan-btn" class="hidden bg-white hover:bg-slate-50 text-slate-700 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer" title="使用手機相機掃碼或認證碼授權其他電腦快速登入">
                              <i class="fa-solid fa-bolt text-amber-500"></i>
                              <span>快速授權</span>
                          </button>
                          
                          <!-- 7. 設定 -->
-                         <button id="settings-btn" class="glass-card border border-stone-200/90 text-stone-700 hover:text-stone-900 font-black py-2.5 sm:py-3 px-4 sm:px-5 text-sm sm:text-base rounded-2xl shadow-xs hover:bg-stone-50 hover:border-stone-300 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 flex items-center gap-2 cursor-pointer">
-                             <svg class="w-4 h-4 sm:w-5 sm:h-5 text-stone-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                         <button id="settings-btn" class="bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200/90 font-semibold py-2 sm:py-2.5 px-3.5 sm:px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer">
+                             <i class="fa-solid fa-gear text-slate-400 text-xs"></i>
                              <span>設定</span>
                          </button>
                          
-                         <!-- 8. 新增作業 -->
-                         <button id="show-add-modal-btn" class="btn-glow bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 hover:from-indigo-600 hover:via-purple-600 hover:to-indigo-600 animated-gradient-text text-white font-black py-2.5 sm:py-3 px-5 sm:px-6 text-sm sm:text-base rounded-2xl shadow-md shadow-indigo-500/30 hover:shadow-indigo-500/50 transition-all transform hover:-translate-y-0.5 whitespace-nowrap shrink-0 tracking-wide hide-on-admin-view flex items-center gap-2 cursor-pointer">
-                             <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path></svg>
+                         <!-- 8. 新增作業 (唯一主視覺焦點 Solid CTA) -->
+                         <button id="show-add-modal-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 sm:py-2.5 px-4 sm:px-5 text-xs sm:text-sm rounded-xl shadow-xs transition-all whitespace-nowrap shrink-0 hide-on-admin-view flex items-center gap-1.5 cursor-pointer active:scale-95">
+                             <i class="fa-solid fa-plus text-xs"></i>
                              <span>新增作業</span>
                          </button>
                     </div>
                 </div>
             </div>
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mt-2 xl:mt-0 bg-white/50 p-4 rounded-2xl border border-slate-100">
-                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto flex-1">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 pt-4 border-t border-slate-100">
+                <div class="flex flex-wrap items-center gap-2.5 w-full md:w-auto flex-1">
                     <div class="relative flex-1 min-w-[200px]">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
+                            <svg class="h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" /></svg>
                         </div>
-                        <input type="text" id="search-homework" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-medium" placeholder="搜尋作業名稱...">
+                        <input type="text" id="search-homework" class="block w-full pl-9 pr-3 py-1.5 border border-slate-200 rounded-lg leading-5 bg-slate-50/70 focus:bg-white placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-600 focus:border-indigo-600 text-sm font-medium transition-colors" placeholder="搜尋作業名稱...">
                     </div>
-                    <select id="filter-type" class="text-sm rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-3 cursor-pointer">
+                    <select id="filter-type" class="text-xs sm:text-sm rounded-lg border-slate-200 bg-slate-50/70 hover:bg-white font-semibold text-slate-700 py-1.5 px-3 cursor-pointer transition-colors">
                         <option value="all">所有種類</option>
                     </select>
-                    <div class="flex items-center gap-2">
-                        <input type="date" id="filter-date-start" class="text-sm rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-3 cursor-pointer">
-                        <span class="text-slate-400">-</span>
-                        <input type="date" id="filter-date-end" class="text-sm rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-3 cursor-pointer">
+                    <div class="flex items-center gap-1.5">
+                        <input type="date" id="filter-date-start" class="text-xs sm:text-sm rounded-lg border-slate-200 bg-slate-50/70 font-semibold text-slate-700 py-1.5 px-2.5 cursor-pointer">
+                        <span class="text-slate-400 text-xs">-</span>
+                        <input type="date" id="filter-date-end" class="text-xs sm:text-sm rounded-lg border-slate-200 bg-slate-50/70 font-semibold text-slate-700 py-1.5 px-2.5 cursor-pointer">
                     </div>
-                    <button id="hw-list-scores-btn" type="button" class="hidden bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-extrabold text-xs sm:text-sm py-2 px-3 sm:px-4 rounded-xl shadow-xs hover:shadow transition-all items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0" title="進入全螢幕成績系統">
+                    <button id="hw-list-scores-btn" type="button" class="hidden bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-1.5 px-3 rounded-lg transition-all items-center gap-1.5 cursor-pointer whitespace-nowrap shrink-0" title="進入全螢幕成績系統">
                         <i class="fa-solid fa-chart-line"></i>
                         <span>成績系統</span>
                     </button>
-
                 </div>
                 <div class="flex justify-end items-center gap-2 flex-shrink-0">
-                    <label for="sort-homework" class="text-sm font-bold uppercase tracking-wider text-slate-400 hidden lg:block">排序方式：</label>
-                    <select id="sort-homework" class="text-base rounded-xl border-slate-200 shadow-sm bg-white font-semibold text-slate-600 py-2 px-4 cursor-pointer">
+                    <label for="sort-homework" class="text-xs font-semibold text-slate-400 hidden lg:block">排序：</label>
+                    <select id="sort-homework" class="text-xs sm:text-sm rounded-lg border-slate-200 bg-slate-50/70 hover:bg-white font-semibold text-slate-700 py-1.5 px-3 cursor-pointer transition-colors">
                         <option value="time">建立時間 (新→舊)</option>
                         <option value="missing">缺交人數 (多→少)</option>
                         <option value="name">名稱 (A→Z)</option>
@@ -1758,27 +1738,32 @@
             </div>
         </header>
 
+        <!-- 今日班級工作台快覽列 (Daily Command Bar) -->
+        <section id="daily-command-bar" aria-label="今日班級工作台快覽" class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+            <!-- 由 renderDailyCommandBar() 動態注入 -->
+        </section>
+
         <!-- 作業列表與雙螢幕模式當日聯絡簿側邊欄 -->
         <div id="main-homework-container" class="relative flex flex-col xl:flex-row items-start gap-5 w-full transition-all duration-300">
             <!-- 主要作業卡片清單 (自適應 2/3 或全寬，兩邊排版不擠壓) -->
             <div id="homework-list-wrapper" class="flex-1 min-w-0 w-full transition-all duration-300">
-                <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse-once relative z-10 transition-all"></div>
+                <div id="homework-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 relative z-10 transition-all"></div>
             </div>
 
-            <!-- ️ 雙螢幕模式 (Beta版)：當日聯絡簿側邊欄 (佔畫面右側三分之一，由設定開啟) -->
+            <!-- 雙螢幕模式 (Beta版)：當日聯絡簿側邊欄 (佔畫面右側三分之一，由設定開啟) -->
             <div id="dual-screen-sidebar-container" class="hidden shrink-0 relative transition-all duration-300 w-full xl:w-1/3 min-w-0 xl:min-w-[320px]">
-                <!-- 收合 / 展開按鈕 (展開時箭頭朝向右邊以向右收合，收合時朝向左邊以向左展開) -->
-                <button id="dual-screen-toggle-btn" type="button" class="absolute -left-7 top-6 z-20 w-7 h-12 bg-purple-600 hover:bg-purple-700 text-white rounded-l-xl shadow-md flex items-center justify-center cursor-pointer transition-all active:scale-95" title="收合當日聯絡簿">
+                <!-- 收合 / 展開按鈕 -->
+                <button id="dual-screen-toggle-btn" type="button" class="absolute -left-7 top-6 z-20 w-7 h-12 bg-slate-800 hover:bg-slate-900 text-white rounded-l-xl shadow-md flex items-center justify-center cursor-pointer transition-all active:scale-95" title="收合當日聯絡簿">
                     <svg class="w-4 h-4 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
                     </svg>
                 </button>
 
                 <!-- 側邊欄主體：當日黑板聯絡簿卡片 (佔滿 1/3 側邊欄) -->
-                <div id="dual-screen-sidebar-content" class="w-full rounded-2xl bg-[#1e3a2f] border-4 border-[#8B5A2B] shadow-2xl p-4 sm:p-5 text-white custom-scrollbar overflow-y-auto max-h-[82vh] transition-all duration-300">
+                <div id="dual-screen-sidebar-content" class="w-full rounded-2xl bg-[#1e3a2f] border-4 border-[#8B5A2B] shadow-xl p-4 sm:p-5 text-white custom-scrollbar overflow-y-auto max-h-[82vh] transition-all duration-300">
                     <div class="flex items-center justify-between pb-2.5 mb-3 border-b border-emerald-800/80">
                         <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-clipboard-list text-xl text-indigo-600"></i>
+                            <i class="fa-solid fa-clipboard-list text-xl text-emerald-300"></i>
                             <div>
                                 <div class="flex items-center gap-1.5">
                                     <h4 class="text-sm font-black tracking-wide text-amber-200">當日聯絡簿</h4>
@@ -1803,83 +1788,82 @@
     
     <!-- 載入動畫 -->
     <div id="loading-page" class="flex flex-col items-center justify-center h-screen space-y-4 page-section">
-        <div class="relative w-12 h-12">
-            <div class="absolute inset-0 rounded-full border-4 border-indigo-100"></div>
-            <div class="absolute inset-0 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin"></div>
+        <div class="relative w-10 h-10">
+            <div class="absolute inset-0 rounded-full border-3 border-slate-200"></div>
+            <div class="absolute inset-0 rounded-full border-3 border-indigo-600 border-t-transparent animate-spin"></div>
         </div>
         <p class="text-xs font-bold text-slate-400 tracking-widest uppercase">Loading System...</p>
     </div>
 
     <!-- 作業詳細座號頁 -->
     <div id="detail-page" class="hidden w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 page-section flex flex-col">
-        <header class="mb-6 flex-shrink-0 relative z-10 p-6 glass-card rounded-3xl">
-            <div class="flex items-center justify-between mb-4">
-                <button id="back-to-main-btn" class="text-slate-500 hover:text-indigo-600 font-bold inline-flex items-center gap-2 cursor-pointer transition-all transform hover:-translate-x-1 text-sm tracking-wide bg-white/50 px-3 py-1.5 rounded-full border border-slate-200/50">
+        <header class="mb-6 flex-shrink-0 relative z-10 p-5 sm:p-6 glass-card rounded-2xl">
+            <div class="flex items-center justify-between mb-3">
+                <button id="back-to-main-btn" class="text-slate-600 hover:text-slate-900 font-semibold inline-flex items-center gap-2 cursor-pointer transition-all text-xs sm:text-sm bg-slate-100/80 hover:bg-slate-200/70 px-3 py-1.5 rounded-lg border border-slate-200/80">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回作業列表
                 </button>
             </div>
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <h1 id="detail-homework-name" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm truncate mr-4"></h1>
+                <h1 id="detail-homework-name" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight truncate mr-4"></h1>
                 <div class="flex gap-2 flex-shrink-0 items-center flex-wrap">
                     <!-- 一鍵複製未交名單 -->
-                    <button id="copy-defaulters-detail-btn" class="bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200/80 font-bold py-2.5 px-4 text-sm rounded-2xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer" title="一鍵複製未交座號純文字">
-                        <i class="fa-solid fa-bullhorn text-amber-600"></i>
+                    <button id="copy-defaulters-detail-btn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold py-2 px-3.5 text-xs sm:text-sm rounded-xl shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer" title="一鍵複製未交座號純文字">
+                        <i class="fa-solid fa-copy text-slate-400"></i>
                         <span>複製未交名單</span>
                     </button>
                     <!-- 檢視完成名單 -->
-                    <button id="show-all-done-btn" class="bg-emerald-50 text-emerald-600 border border-emerald-200/60 font-bold py-2.5 px-5 text-sm sm:text-base font-black rounded-2xl shadow-sm hover:bg-emerald-500 hover:text-white transition-all transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer">檢視完成名單</button>
+                    <button id="show-all-done-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap cursor-pointer">檢視完成名單</button>
                 </div>
             </div>
             
-            <div class="mt-5 p-4 glass-card rounded-3xl border border-slate-200/60 flex flex-wrap items-center gap-3 shadow-sm">
-                <span class="text-sm font-bold text-slate-700 flex items-center gap-1.5">
-                    <svg class="w-4 h-4 text-indigo-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" /></svg>
+            <div class="mt-4 p-3.5 bg-slate-50/80 rounded-xl border border-slate-200/80 flex flex-wrap items-center gap-3">
+                <span class="text-xs sm:text-sm font-semibold text-slate-700 flex items-center gap-1.5">
+                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 text-xs"></i>
                     全班狀態套用：
                 </span>
-                <select id="batch-status-select" class="text-base font-bold rounded-2xl border-slate-200 p-2 focus:ring-indigo-500 focus:border-indigo-500 font-bold bg-slate-50"></select>
-                <button id="batch-status-btn" class="bg-indigo-600 text-white text-sm px-5 py-2 rounded-xl shadow-md hover:bg-indigo-700 transition-colors font-bold tracking-wide">全部套用</button>
+                <select id="batch-status-select" class="text-sm font-bold rounded-lg border-slate-200 py-1.5 px-3 focus:ring-indigo-600 focus:border-indigo-600 bg-white"></select>
+                <button id="batch-status-btn" class="bg-slate-900 text-white text-xs sm:text-sm px-4 py-1.5 rounded-lg hover:bg-slate-800 transition-colors font-semibold">全部套用</button>
                 <span class="text-xs text-slate-400 ml-auto hidden sm:block font-medium">※ 將一鍵改變全班所有座號的作業狀態</span>
             </div>
 
             <!-- 點收模式切換與掃描區塊 -->
-            <div id="check-mode-section" class="mt-4 glass-card rounded-3xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col w-full transition-all">
+            <div id="check-mode-section" class="mt-3.5 bg-white rounded-xl border border-slate-200/80 overflow-hidden flex flex-col w-full transition-all">
                 <!-- 模式切換按鈕 -->
-                <div class="flex bg-slate-100/80 p-1.5 gap-1.5 items-center">
-                    <span class="text-xs font-bold text-slate-500 pl-2 hidden sm:inline whitespace-nowrap">點收方式：</span>
-                    <button id="mode-manual-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm glass-card shadow-sm border border-white/60 text-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-duotone fa-light fa-hand-back-point-up"></i> 手動點收</button>
-                    <button id="mode-scan-btn" class="flex-1 py-2 px-4 rounded-xl font-bold text-sm text-slate-500 hover:text-slate-700 hover:bg-slate-200/50 border border-transparent transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-sharp-duotone fa-regular fa-scanner-gun"></i> 掃描點收</button>
+                <div class="flex bg-slate-100/80 p-1 gap-1 items-center">
+                    <span class="text-xs font-semibold text-slate-500 pl-2.5 hidden sm:inline whitespace-nowrap">點收方式：</span>
+                    <button id="mode-manual-btn" class="flex-1 py-1.5 px-4 rounded-lg font-semibold text-xs sm:text-sm bg-white shadow-2xs border border-slate-200/60 text-indigo-600 transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-hand-pointer"></i> 手動點收</button>
+                    <button id="mode-scan-btn" class="flex-1 py-1.5 px-4 rounded-lg font-semibold text-xs sm:text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border border-transparent transition-all flex items-center justify-center gap-1.5 cursor-pointer"><i class="fa-solid fa-barcode"></i> 掃描點收</button>
                 </div>
                 <!-- 掃描專屬設定區 (預設隱藏) -->
-                <div id="scan-mode-container" class="disable-on-admin-view hidden p-4 bg-indigo-50/30 flex-wrap items-center gap-3 border-t border-slate-100">
+                <div id="scan-mode-container" class="disable-on-admin-view hidden p-3.5 bg-slate-50 flex-wrap items-center gap-3 border-t border-slate-200/70">
                     <div class="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
                         <!-- 方式一：指定狀態 -->
-                        <div id="scan-mode-assign-box" class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-2xl border border-indigo-400 ring-2 ring-indigo-100 bg-indigo-50/30 shadow-xs transition-all">
+                        <div id="scan-mode-assign-box" class="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-xl border border-indigo-400 ring-2 ring-indigo-100 shadow-2xs transition-all">
                             <label for="scan-mode-assign-checkbox" class="inline-flex items-center gap-1.5 cursor-pointer select-none">
                                 <input type="checkbox" id="scan-mode-assign-checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer" checked>
-                                <span class="text-sm font-bold text-indigo-700 flex items-center gap-1 whitespace-nowrap">
-                                    <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm14 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"></path></svg>
+                                <span class="text-xs sm:text-sm font-bold text-indigo-700 flex items-center gap-1 whitespace-nowrap">
                                     掃描後變更為：
                                 </span>
                             </label>
-                            <select id="scan-target-status-select" class="text-sm font-bold rounded-xl border-slate-200 py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white shadow-xs cursor-pointer transition-all"></select>
+                            <select id="scan-target-status-select" class="text-xs sm:text-sm font-bold rounded-lg border-slate-200 py-1 px-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white cursor-pointer transition-all"></select>
                         </div>
 
                         <!-- 方式二：變更為下一個狀態 -->
-                        <div id="scan-mode-next-box" class="flex items-center bg-white px-3 py-1.5 rounded-2xl border border-slate-200/80 shadow-xs transition-all">
+                        <div id="scan-mode-next-box" class="flex items-center bg-white px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-2xs transition-all">
                             <label for="scan-mode-next-checkbox" class="inline-flex items-center gap-1.5 cursor-pointer select-none">
                                 <input type="checkbox" id="scan-mode-next-checkbox" class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500 cursor-pointer">
-                                <span class="text-sm font-bold text-slate-700 whitespace-nowrap flex items-center gap-1">
-                                    <i class="fa-solid fa-rotate text-indigo-600 text-sm"></i>
+                                <span class="text-xs sm:text-sm font-bold text-slate-700 whitespace-nowrap flex items-center gap-1">
+                                    <i class="fa-solid fa-rotate text-indigo-600 text-xs"></i>
                                     變更為下一個狀態
                                 </span>
                             </label>
                         </div>
                     </div>
-                    <input type="text" id="barcode-scan-input" class="text-base font-bold rounded-2xl border-slate-200 p-2.5 focus:ring-indigo-500 focus:border-indigo-500 font-mono bg-white shadow-inner flex-grow transition-colors min-w-[200px]" placeholder="請將游標停在此處並掃描條碼..." autocomplete="off">
+                    <input type="text" id="barcode-scan-input" class="text-sm font-bold rounded-xl border-slate-200 p-2 focus:ring-indigo-600 focus:border-indigo-600 font-mono bg-white flex-grow transition-colors min-w-[200px]" placeholder="請將游標停在此處並掃描條碼..." autocomplete="off">
                 </div>
             </div>
 
-            <div id="status-summary" class="flex flex-wrap gap-2.5 mt-5 text-sm font-bold transition-all"></div>
+            <div id="status-summary" class="flex flex-wrap gap-2 mt-4 text-xs sm:text-sm font-semibold transition-all"></div>
         </header>
         
         <div class="flex-grow flex items-center justify-center w-full overflow-visible py-2 px-2">
@@ -1889,89 +1873,98 @@
 
     <!-- 學生詳情統計頁 -->
     <div id="student-details-page" class="hidden w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 page-section">
-        <header class="mb-8 flex flex-col gap-4 relative z-10 p-6 glass-card rounded-3xl">
+        <header class="mb-6 flex flex-col gap-4 relative z-10 p-5 sm:p-6 glass-card rounded-2xl">
             <div>
                  <div class="flex items-center justify-between mb-3">
-                     <button id="back-from-student-details-btn" class="text-slate-400 hover:text-indigo-600 font-bold cursor-pointer flex items-center gap-1 text-sm tracking-wide bg-white/50 px-3 py-1.5 rounded-full border border-slate-200/50">
+                     <button id="back-from-student-details-btn" class="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm bg-slate-100/80 hover:bg-slate-200/70 px-3 py-1.5 rounded-lg border border-slate-200/80">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回作業列表
                      </button>
                  </div>
-                <div class="flex justify-between items-center flex-wrap gap-4 mt-2">
-                    <h1 id="student-details-title" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm">學生詳情統計</h1>
-                    <button id="show-overall-all-done-btn" class="bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-bold py-3.5 px-7 text-lg font-black rounded-3xl shadow-md shadow-indigo-500/10 hover:shadow-xl transition-all transform hover:-translate-y-0.5 whitespace-nowrap cursor-pointer">
-                        <i class="fa-solid fa-trophy mr-1 text-amber-500"></i> 檢視全勤學生名單
+                <div class="flex justify-between items-center flex-wrap gap-4 mt-1">
+                    <div>
+                        <h1 id="student-details-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">學生詳情與 360° 檔案</h1>
+                        <p class="text-xs sm:text-sm text-slate-500 font-medium mt-0.5">整合每位學生的幹部職務、今日出缺席狀態、待交作業與家長通知摘要</p>
+                    </div>
+                    <button id="show-overall-all-done-btn" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-5 text-sm rounded-xl shadow-xs transition-all whitespace-nowrap cursor-pointer flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-400"></i> 檢視全勤學生名單
                     </button>
                 </div>
             </div>
-             <div class="flex justify-end items-center gap-2">
-                <label for="sort-student-detail" class="text-xs font-bold text-slate-400 uppercase tracking-wider">排序方式：</label>
-                <select id="sort-student-detail" class="text-base font-bold rounded-2xl border-slate-200 bg-white font-semibold text-slate-600 py-1.5 px-3">
+             <div class="flex justify-end items-center gap-2 pt-3 border-t border-slate-100">
+                <label for="sort-student-detail" class="text-xs font-semibold text-slate-400 uppercase tracking-wider">排序方式：</label>
+                <select id="sort-student-detail" class="text-xs sm:text-sm font-semibold rounded-lg border-slate-200 bg-slate-50/80 text-slate-700 py-1.5 px-3 cursor-pointer">
                     <option value="number">座號 (小→大)</option>
                     <option value="missing">缺交數量 (多→少)</option>
                 </select>
             </div>
         </header>
-        <div id="student-details-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8"></div>
+        <div id="student-details-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"></div>
     </div>
 
     <!-- 作業種類管理頁 -->
     <div id="homework-types-page" class="hidden w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 page-section hide-on-admin-view">
-        <header class="mb-8 relative z-10 p-6 glass-card rounded-3xl">
+        <header class="mb-6 relative z-10 p-5 sm:p-6 glass-card rounded-2xl">
             <div class="flex items-center justify-between mb-3">
-                <button id="back-from-types-btn" class="text-slate-400 hover:text-indigo-600 font-bold cursor-pointer flex items-center gap-1 text-sm tracking-wide bg-white/50 px-3 py-1.5 rounded-full border border-slate-200/50">
+                <button id="back-from-types-btn" class="text-slate-600 hover:text-slate-900 font-semibold cursor-pointer flex items-center gap-1.5 text-xs sm:text-sm bg-slate-100/80 hover:bg-slate-200/70 px-3 py-1.5 rounded-lg border border-slate-200/80">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg> 返回作業列表
                 </button>
             </div>
-            <div class="flex justify-between items-center mt-2">
-                <h1 class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm">作業種類管理</h1>
-                <button id="add-new-type-btn" class="bg-slate-900 text-white font-bold py-3.5 px-7 text-lg font-black rounded-3xl shadow-md hover:bg-black transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex-shrink-0">
+            <div class="flex justify-between items-center mt-1 flex-wrap gap-3">
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">作業種類管理</h1>
+                <button id="add-new-type-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 px-5 text-sm rounded-xl shadow-xs transition-all whitespace-nowrap flex-shrink-0 cursor-pointer">
                     + 新增自訂種類
                 </button>
             </div>
-            <p class="text-slate-400 mt-1.5 text-sm font-medium">配置適用於不同學科的作業狀態。每個種類最多支援 4 個核心狀態切換。</p>
+            <p class="text-slate-500 mt-1 text-xs sm:text-sm font-medium">配置適用於不同學科的作業狀態。每個種類最多支援 4 個核心狀態切換。</p>
         </header>
-        <div id="types-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-8"></div>
+        <div id="types-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-5"></div>
     </div>
 
     <!-- 聯絡簿頁面 -->
     <div id="contact-book-page" class="hidden w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 page-section">
-         <header class="mb-6 relative z-10 p-6 glass-card rounded-3xl">
-            <div class="flex items-center justify-between mb-2">
+         <header class="mb-6 relative z-10 p-5 sm:p-6 glass-card rounded-2xl">
+            <div class="flex items-center justify-between mb-1">
                 <button id="back-from-contact-book-btn" class="hidden"></button>
             </div>
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mt-2">
-                <div class="flex items-center gap-3.5 flex-shrink-0">
-                    <!-- 內嵌三條線選單按鈕 (依圈選位置) -->
-                    <button type="button" class="sidebar-toggle-btn w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <!-- 內嵌三條線選單按鈕 -->
+                    <button type="button" class="sidebar-toggle-btn w-10 h-10 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 border border-slate-200/80 flex items-center justify-center text-base active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                     <div>
-                        <h1 id="contact-book-title" class="text-3xl sm:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-500 to-indigo-600 animated-gradient-text tracking-tight drop-shadow-sm">聯絡簿</h1>
-                        <p id="contact-book-date" class="text-slate-400 mt-1 font-bold text-sm tracking-wide"></p>
+                        <h1 id="contact-book-title" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">聯絡簿</h1>
+                        <p id="contact-book-date" class="text-slate-500 mt-0.5 font-semibold text-xs sm:text-sm tracking-wide"></p>
                     </div>
                 </div>
-                <div class="flex gap-2.5 flex-wrap items-center justify-end w-full lg:w-auto">
-                    <div class="flex bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                        <button id="font-decrease-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 border-r border-slate-200 font-bold transition-colors" title="縮小字體">A-</button>
-                        <button id="font-increase-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 font-bold transition-colors" title="放大字體">A+</button>
+                <div class="flex gap-2 flex-wrap items-center justify-start lg:justify-end w-full lg:w-auto">
+                    <div class="flex bg-white rounded-lg border border-slate-200 overflow-hidden">
+                        <button id="font-decrease-btn" class="px-3 py-1.5 text-xs sm:text-sm text-slate-600 hover:bg-slate-50 border-r border-slate-200 font-bold transition-colors cursor-pointer" title="縮小字體">A-</button>
+                        <button id="font-increase-btn" class="px-3 py-1.5 text-xs sm:text-sm text-slate-600 hover:bg-slate-50 font-bold transition-colors cursor-pointer" title="放大字體">A+</button>
                     </div>
-                    <div class="flex bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mr-1 sm:mr-2">
-                        <button id="lineheight-decrease-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 border-r border-slate-200 font-bold transition-colors" title="縮小行距"><i class="fa-solid fa-arrows-up-down text-xs"></i>-</button>
-                        <button id="lineheight-increase-btn" class="px-3.5 py-2 text-sm text-slate-500 hover:bg-slate-50 font-bold transition-colors" title="加大行距"><i class="fa-solid fa-arrows-up-down text-xs"></i>+</button>
+                    <div class="flex bg-white rounded-lg border border-slate-200 overflow-hidden mr-1">
+                        <button id="lineheight-decrease-btn" class="px-3 py-1.5 text-xs sm:text-sm text-slate-600 hover:bg-slate-50 border-r border-slate-200 font-bold transition-colors cursor-pointer" title="縮小行距"><i class="fa-solid fa-arrows-up-down text-xs"></i>-</button>
+                        <button id="lineheight-increase-btn" class="px-3 py-1.5 text-xs sm:text-sm text-slate-600 hover:bg-slate-50 font-bold transition-colors cursor-pointer" title="加大行距"><i class="fa-solid fa-arrows-up-down text-xs"></i>+</button>
                     </div>
 
+                    <!-- 一鍵帶入今日已派作業 -->
+                    <button id="import-today-hw-btn" type="button" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer active:scale-95 hide-on-admin-view" title="將今日新增或進行中的作業項目一鍵帶入聯絡簿黑板">
+                        <i class="fa-solid fa-file-import text-xs"></i>
+                        <span>帶入今日作業</span>
+                    </button>
+
                     <!-- 一鍵生成 LINE 家長群通報文案 -->
-                    <button id="copy-line-report-btn" type="button" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black py-3 px-5 sm:px-6 text-base sm:text-lg rounded-3xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2 cursor-pointer active:scale-95" title="一鍵複製今日作業與聯絡簿 LINE 家長群通報文案">
-                        <i class="fa-solid fa-clipboard-list text-lg"></i>
+                    <button id="copy-line-report-btn" type="button" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 px-4 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer active:scale-95" title="一鍵複製今日作業與聯絡簿 LINE 家長群通報文案">
+                        <i class="fa-solid fa-clipboard-list text-xs"></i>
                         <span>複製 LINE 通報</span>
                     </button>
 
-                    <button id="apply-yesterday-btn" class="bg-gradient-to-r from-blue-500 to-cyan-500 text-white font-bold py-3 px-6 text-lg font-black rounded-3xl shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5 whitespace-nowrap hide-on-admin-view">套用昨日</button>
-                    <button id="open-date-picker-btn" class="bg-slate-800 text-white font-bold py-3 px-6 text-lg font-black rounded-3xl shadow-md hover:bg-slate-900 transition-all transform hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-1.5">
-                        <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> 選擇日期
+                    <button id="apply-yesterday-btn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold py-2 px-3.5 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap hide-on-admin-view cursor-pointer">套用昨日</button>
+                    <button id="open-date-picker-btn" class="bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold py-2 px-3.5 text-xs sm:text-sm rounded-xl shadow-2xs transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-regular fa-calendar text-slate-400"></i> 選擇日期
                     </button>
-                    <button id="clear-contact-book-btn" class="bg-white text-rose-500 border border-rose-200 font-bold py-3 px-6 text-lg font-black rounded-3xl hover:bg-rose-50/50 transition-colors whitespace-nowrap hide-on-admin-view">清空本日</button>
-                    <button id="clear-all-contact-book-btn" class="bg-rose-50 text-rose-600 border border-rose-200 font-bold py-3 px-6 text-lg font-black rounded-3xl hover:bg-rose-600 hover:text-white transition-all whitespace-nowrap hide-on-admin-view">清空全部記錄</button>
+                    <button id="clear-contact-book-btn" class="bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-semibold py-2 px-3.5 text-xs sm:text-sm rounded-xl transition-colors whitespace-nowrap hide-on-admin-view cursor-pointer">清空本日</button>
+                    <button id="clear-all-contact-book-btn" class="bg-rose-50/70 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 font-semibold py-2 px-3.5 text-xs sm:text-sm rounded-xl transition-all whitespace-nowrap hide-on-admin-view cursor-pointer">清空全部記錄</button>
                 </div>
             </div>
         </header>
@@ -3273,22 +3266,22 @@
                         <span class="whitespace-nowrap">最後座號：<strong id="cred-max-seat" class="text-indigo-600 font-black font-mono">30</strong> 號</span>
                         <span class="whitespace-nowrap">缺號設定：<strong id="cred-skipped-seats" class="text-amber-600 font-black font-mono">無</strong></span>
                     </div>
-                    <span class="text-[11px] text-slate-400 whitespace-nowrap">※ 班級人數與缺號由學校管理端統一管理，老師亦可於下方班級卡片隨時微調</span>
+                    <span class="text-[11px] text-slate-400 leading-relaxed">※ 班級人數與缺號由學校管理端統一管理，老師亦可於下方班級卡片隨時微調</span>
                 </div>
 
                 <!-- 學生成績查詢 6 位數專屬 PIN 碼專區 (淺色系) -->
                 <div class="pt-5 mt-5 border-t border-slate-100 space-y-4">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                        <div class="flex items-center gap-2.5">
-                            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm border border-amber-200">
+                        <div class="flex items-start sm:items-center gap-2.5">
+                            <span class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm border border-amber-200 shrink-0">
                                 <i class="fa-solid fa-key"></i>
                             </span>
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <h3 class="text-base sm:text-lg font-black text-slate-900 whitespace-nowrap">學生成績查詢 6 位數專屬 PIN 碼</h3>
+                            <div class="min-w-0">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-base sm:text-lg font-black text-slate-900">學生成績查詢 6 位數專屬 PIN 碼</h3>
                                     <span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-800 text-[10px] font-black border border-amber-200 whitespace-nowrap">學校統一設定</span>
                                 </div>
-                                <p class="text-xs text-slate-500 mt-0.5">預設依學校規則統一設定（100000 + 座號），導師可直接檢視、個別修改或一鍵重設</p>
+                                <p class="text-xs text-slate-500 mt-0.5">預設依學校規則統一設定（100000 + 座號），導師可直接單獨檢視、行內修改或一鍵重設</p>
                             </div>
                         </div>
 
@@ -3386,26 +3379,26 @@
     <!-- ============================================================== -->
     <div id="qr-auth-fullscreen-view" class="w-full min-h-screen px-4 sm:px-8 lg:px-12 py-6 hidden page-section flex-col">
         <!-- 頂部功能列 (Header 內嵌最左側三條線選單按鈕，位置與其他頁面完全一致) -->
-        <header class="flex flex-wrap items-center justify-between gap-4 p-5 sm:p-6 glass-card rounded-3xl mb-8 shadow-sm">
-            <div class="flex items-center gap-3.5">
+        <header class="flex flex-wrap items-center justify-between gap-4 p-4 sm:p-6 bg-white border border-slate-200/90 rounded-2xl mb-6 shadow-xs">
+            <div class="flex items-center gap-3 min-w-0">
                 <!-- 內嵌三條線選單按鈕 (位置與其他頁面完全一致) -->
-                <button type="button" class="sidebar-toggle-btn w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-lg active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
+                <button type="button" class="sidebar-toggle-btn w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-slate-700 flex items-center justify-center text-base active:scale-95 transition-all cursor-pointer shrink-0" title="開啟選單">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <span class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0 border border-amber-200">
+                <span class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0 border border-amber-200/80">
                     <i class="fa-solid fa-qrcode"></i>
                 </span>
-                <div>
-                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-2 whitespace-nowrap">
+                <div class="min-w-0">
+                    <h1 class="text-lg sm:text-2xl font-bold text-slate-900 tracking-tight truncate">
                         快速登入與裝置授權
                     </h1>
-                    <p class="text-xs sm:text-sm font-bold text-slate-500 mt-0.5 whitespace-nowrap">
+                    <p class="text-xs text-slate-500 mt-0.5 leading-snug">
                         公用電腦掃描授權 · 產生 6 位數一次性認證碼 · 零密碼秒速登入
                     </p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <span class="px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 font-black text-xs border border-emerald-200 flex items-center gap-1.5 whitespace-nowrap shadow-2xs">
+                <span class="px-3 py-1 rounded-lg bg-emerald-50 text-emerald-700 font-semibold text-xs border border-emerald-200/80 flex items-center gap-1.5 whitespace-nowrap">
                     <i class="fa-solid fa-shield-halved text-emerald-600"></i>
                     <span>256 位元端到端安全配對</span>
                 </span>
@@ -3413,37 +3406,37 @@
         </header>
 
         <!-- 主體內容區塊：雙欄排版 -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
             <!-- 左欄：相機掃描授權 (佔 6 欄) -->
-            <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base">
+            <div class="lg:col-span-6 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-xs space-y-5">
+                <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 border border-indigo-100 flex items-center justify-center text-base shrink-0">
                             <i class="fa-solid fa-camera"></i>
                         </span>
-                        <div>
-                            <h2 class="text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap">相機鏡頭掃描授權</h2>
-                            <p class="text-xs text-slate-500 font-medium whitespace-nowrap">使用手機鏡頭對準公用電腦螢幕上的 QR Code</p>
+                        <div class="min-w-0">
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900 truncate">相機鏡頭掃描授權</h2>
+                            <p class="text-xs text-slate-500 leading-snug">使用手機鏡頭對準公用電腦螢幕上的 QR Code</p>
                         </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-black border border-indigo-200 whitespace-nowrap">即時取景</span>
+                    <span class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-700 text-xs font-semibold border border-indigo-200/80 whitespace-nowrap shrink-0">即時取景</span>
                 </div>
 
                 <!-- 取景框 -->
-                <div class="relative w-full aspect-square max-w-[320px] mx-auto rounded-3xl overflow-hidden bg-slate-950 border-4 border-indigo-500 shadow-2xl flex items-center justify-center">
+                <div class="relative w-full aspect-square max-w-[300px] mx-auto rounded-2xl overflow-hidden bg-slate-950 border-2 border-slate-800 shadow-lg flex items-center justify-center">
                     <div id="qr-scanner-viewport" class="w-full h-full"></div>
                 </div>
 
                 <!-- 手動配對碼輔助區 -->
-                <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2.5">
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200/90 space-y-2.5">
                     <div class="flex items-center justify-between">
-                        <span class="text-xs font-black text-slate-700 whitespace-nowrap">
+                        <span class="text-xs font-semibold text-slate-700 leading-snug">
                             <i class="fa-solid fa-keyboard mr-1 text-slate-500"></i> 或手動輸入公用電腦上的 6 位數配對碼：
                         </span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <input type="text" id="qr-pair-code-input" maxlength="6" inputmode="numeric" placeholder="例如 832194" class="flex-1 text-center font-mono font-black text-base py-2.5 px-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white">
-                        <button type="button" id="qr-pair-code-submit-btn" class="py-2.5 px-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-sm shadow-indigo-500/20 active:scale-95">
+                        <input type="text" id="qr-pair-code-input" maxlength="6" inputmode="numeric" placeholder="例如 832194" class="min-w-0 flex-1 text-center font-mono font-bold text-base py-2.5 px-3 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 bg-white tabular-nums">
+                        <button type="button" id="qr-pair-code-submit-btn" class="py-2.5 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-xl transition-all cursor-pointer whitespace-nowrap shadow-xs active:scale-95 shrink-0">
                             配對授權
                         </button>
                     </div>
@@ -3451,49 +3444,49 @@
             </div>
 
             <!-- 右欄：產生一次性認證碼 (佔 6 欄) -->
-            <div class="lg:col-span-6 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm space-y-6">
-                <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-                    <div class="flex items-center gap-2.5">
-                        <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base">
+            <div class="lg:col-span-6 bg-white rounded-2xl p-5 sm:p-7 border border-slate-200/90 shadow-xs space-y-5">
+                <div class="flex items-center justify-between gap-2 pb-4 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center text-base shrink-0">
                             <i class="fa-solid fa-key"></i>
                         </span>
-                        <div>
-                            <h2 class="text-lg sm:text-xl font-black text-slate-900 whitespace-nowrap">產生一次性登入認證碼</h2>
-                            <p class="text-xs text-slate-500 font-medium whitespace-nowrap">公用電腦輸入此碼，自動秒速登入此帳號</p>
+                        <div class="min-w-0">
+                            <h2 class="text-base sm:text-lg font-bold text-slate-900 truncate">產生一次性登入認證碼</h2>
+                            <p class="text-xs text-slate-500 leading-snug">公用電腦輸入此碼，自動秒速登入此帳號</p>
                         </div>
                     </div>
-                    <span class="px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-black border border-amber-200 whitespace-nowrap">反向授權</span>
+                    <span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200/80 whitespace-nowrap shrink-0">反向授權</span>
                 </div>
 
-                <div class="p-6 bg-gradient-to-br from-indigo-50/90 via-purple-50/50 to-pink-50/50 rounded-3xl border-2 border-dashed border-indigo-300 text-center space-y-4">
-                    <span class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-xs font-black tracking-wider uppercase whitespace-nowrap">6 位數一次性安全碼</span>
+                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-200/90 text-center space-y-3.5">
+                    <span class="inline-block px-3 py-1 rounded-md bg-white border border-slate-200 text-slate-700 text-xs font-semibold tracking-wider uppercase">6 位數一次性安全碼</span>
                     
-                    <div id="otp-phone-display-code" class="text-4xl sm:text-5xl font-black font-mono tracking-[0.25em] text-indigo-900 select-all py-2">
+                    <div id="otp-phone-display-code" class="text-3xl sm:text-5xl font-bold font-mono tracking-[0.22em] text-slate-900 select-all py-2 tabular-nums">
                         ------
                     </div>
 
-                    <div class="flex items-center justify-center gap-2 text-xs font-bold text-slate-500" id="otp-phone-countdown">
-                        <i class="fa-regular fa-clock text-indigo-500"></i>
+                    <div class="flex items-center justify-center gap-2 text-xs font-semibold text-slate-500 tabular-nums" id="otp-phone-countdown">
+                        <i class="fa-regular fa-clock text-indigo-600"></i>
                         <span>有效倒數時間：05:00</span>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-center gap-3">
-                    <button type="button" id="otp-phone-refresh-btn" class="py-3 px-6 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-black transition-all flex items-center gap-2 cursor-pointer shadow-sm shadow-indigo-500/20 active:scale-95 whitespace-nowrap">
+                    <button type="button" id="otp-phone-refresh-btn" class="py-2.5 px-6 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-xs active:scale-95 whitespace-nowrap">
                         <i class="fa-solid fa-key"></i>
                         <span>產生代碼</span>
                     </button>
                 </div>
 
-                <div id="otp-phone-status-notice" class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs sm:text-sm font-bold text-slate-600 flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-circle-info text-indigo-500"></i>
-                    <span class="whitespace-nowrap">點擊下方「產生代碼」即可建立 6 位數一次性登入碼</span>
+                <div id="otp-phone-status-notice" class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs sm:text-sm font-medium text-slate-600 flex items-center justify-center gap-2 text-center">
+                    <i class="fa-solid fa-circle-info text-indigo-600 shrink-0"></i>
+                    <span>點擊上方「產生代碼」即可建立 6 位數一次性登入碼</span>
                 </div>
 
                 <!-- 安全說明須知 -->
-                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs text-slate-500 space-y-1.5 font-medium">
-                    <div class="font-black text-slate-700 flex items-center gap-1.5 whitespace-nowrap">
-                        <i class="fa-solid fa-circle-info text-indigo-500"></i> 使用說明與安全防護
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80 text-xs text-slate-500 space-y-1.5 leading-relaxed">
+                    <div class="font-bold text-slate-700 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-info text-indigo-600"></i> 使用說明與安全防護
                     </div>
                     <p>1. 在學校電腦教室或大螢幕點選「快速登入」，輸入上方代碼即可立即登入。</p>
                     <p>2. 每組代碼僅供單次使用，5 分鐘後自動失效，保障您的帳號安全。</p>
@@ -3502,9 +3495,9 @@
         </div>
 
         <!-- 頁面底部導航提示 (無關閉按鈕，提醒使用者透過選單切換) -->
-        <div class="mt-12 p-4 rounded-2xl bg-slate-100/80 border border-slate-200/60 text-center">
-            <p class="text-xs sm:text-sm text-slate-500 font-bold flex items-center justify-center gap-2 whitespace-nowrap">
-                <i class="fa-solid fa-compass text-indigo-600 text-base"></i>
+        <div class="mt-8 p-4 rounded-xl bg-slate-100/80 border border-slate-200/60 text-center">
+            <p class="text-xs sm:text-sm text-slate-500 font-medium flex flex-wrap items-center justify-center gap-1.5 leading-relaxed">
+                <i class="fa-solid fa-compass text-indigo-600 text-sm"></i>
                 <span>頁面切換導航：請點擊頁面左上角的三條線選單按鈕（<i class="fa-solid fa-bars mx-1 text-slate-700"></i>），即可自由切換至班級管理、作業點收或聯絡簿。</span>
             </p>
         </div>
@@ -4186,11 +4179,40 @@
 
                 <!-- 版本歷程時間軸 -->
                 <div class="space-y-6">
-                    <!-- v4.5.5 快速授權相機視窗修復與一次性認證碼按鈕動態切換 -->
-                    <div class="p-5 rounded-2xl bg-gradient-to-br from-indigo-50/95 via-sky-50/70 to-emerald-50/50 border-2 border-indigo-600 shadow-lg relative">
+                    <!-- v4.6.0 專業設計師級去 AI 化視覺重構與四端操作進化 -->
+                    <div class="p-5 rounded-2xl bg-slate-50 border-2 border-slate-900 shadow-md relative">
                         <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                             <div class="flex items-center gap-2">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs animate-pulse">v4.5.5 快速授權相機畫面全黑修復與認證碼按鈕優化</span>
+                                <span class="px-3 py-1 rounded-full bg-slate-900 text-white text-xs font-extrabold uppercase tracking-wider">v4.6.0 專業設計師級視覺重構與操作進化</span>
+                                <span class="text-xs font-bold text-slate-800">Swiss Editorial 去 AI 化設計、今日工作台快覽、聯絡簿一鍵帶入作業、360° 學生檔案、手機視圖零遮擋</span>
+                            </div>
+                            <span class="text-xs font-mono font-bold text-slate-500">2026-10-17</span>
+                        </div>
+                        <ul class="space-y-2 text-xs sm:text-sm text-slate-700 font-medium">
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>專業設計師級去 AI 化視覺系統 (Swiss Editorial & Precision SaaS)</b>：全面汰換卡通圓體字、泛黃暗沉底色與流動霓虹漸層字，改採 Inter + Noto Sans TC 專業排版、1px 精準極細邊框、等寬數據字型 (`tabular-nums`) 與單一主視覺按鈕階層。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>今日班級工作台快覽列 (Daily Command Bar) 與作業完成率進度條</b>：作業首頁上方即時呈現「進行中作業與未交人次」、「今日出席簽到」、「今日聯絡簿事項」與「全勤榮譽人數」四合一快覽列，點擊即可直達對應功能；每張作業卡片新增直覺完成率進度條。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>聯絡簿「一鍵帶入今日作業」、360° 學生檔案卡與單一學生 PIN 碼獨立檢視/行內修改</b>：聯絡簿新增「帶入今日作業」按鈕；班級管理 PIN 碼網格、成績認證碼彈窗與 360° 學生檔案卡全面支援單一學生 PIN 碼眼睛圖示獨立顯示/隱藏，並改用行內輸入框直接修改與平行雲端同步（免除原生 prompt 阻擋與覆蓋問題）。</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fa-solid fa-check text-indigo-600 shrink-0 mt-0.5"></i>
+                                <span><b>手機操作零遮擋、家長端常用座號秒切換與行政端未通報快篩</b>：全螢幕視圖（快速授權、成績系統、管理班級）自動收合手機底部導航欄與懸浮鈕；家長端新增多子弟常用座號記憶切換列；學校行政端新增「僅顯示未通報班級」一鍵快篩。</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- v4.5.5 快速授權相機視窗修復與一次性認證碼按鈕動態切換 -->
+                    <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm relative">
+                        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                            <div class="flex items-center gap-2">
+                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-xs font-black uppercase tracking-wider shadow-xs">v4.5.5 快速授權相機畫面全黑修復與認證碼按鈕優化</span>
                                 <span class="text-xs font-bold text-indigo-950">排除未定義函式調用、相機多層鏡頭自動適配與容錯、重啟提示、認證碼按鈕動態切換（產生代碼 ➔ 重新產生新代碼）</span>
                             </div>
                             <span class="text-xs font-mono font-bold text-slate-400">2026-10-14</span>
@@ -5401,70 +5423,70 @@
     </nav>
 
     <!-- 手機端懸浮新增作業按鈕 (FAB) -->
-    <button id="mobile-fab-add" class="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 w-13 h-13 rounded-full bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 text-white shadow-xl shadow-indigo-500/40 flex items-center justify-center text-xl sm:hidden active:scale-90 transition-transform cursor-pointer hidden" title="新增作業">
+    <button id="mobile-fab-add" class="fixed right-4 bottom-[calc(4.75rem+env(safe-area-inset-bottom,0px))] z-30 w-14 h-14 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/30 flex items-center justify-center text-xl sm:hidden active:scale-90 transition-transform cursor-pointer hidden" title="新增作業">
         <i class="fa-solid fa-plus"></i>
     </button>
 
     <!-- 手機端更多功能底部抽屜 (Mobile More Bottom Sheet) -->
-    <div id="mobile-more-sheet" class="fixed inset-0 z-[105] bg-stone-900/60 backdrop-blur-xs hidden transition-all duration-300 flex items-end justify-center">
-        <div class="w-full max-w-lg bg-white rounded-t-[2.25rem] border-t border-slate-200 shadow-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom,0px))] space-y-3.5 max-h-[85vh] overflow-y-auto custom-scrollbar">
-            <div class="w-12 h-1.5 bg-stone-300 rounded-full mx-auto -mt-1 mb-1"></div>
-            <div class="flex items-center justify-between pb-2 border-b border-stone-100">
-                <h3 class="text-base font-black text-stone-900 flex items-center gap-2">
-                    <i class="fa-solid fa-grid-2 text-indigo-600"></i>
+    <div id="mobile-more-sheet" class="fixed inset-0 z-[105] bg-slate-900/50 backdrop-blur-xs hidden transition-all duration-300 flex items-end justify-center">
+        <div class="w-full max-w-lg bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-5 pb-[calc(1.75rem+env(safe-area-inset-bottom,0px))] space-y-3.5 max-h-[85vh] overflow-y-auto custom-scrollbar">
+            <div class="w-10 h-1 bg-slate-300 rounded-full mx-auto -mt-1 mb-1"></div>
+            <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
+                <h3 class="text-base font-bold text-slate-900 flex items-center gap-2 tracking-tight">
+                    <i class="fa-solid fa-table-cells-large text-indigo-600"></i>
                     <span>快捷功能選單</span>
                 </h3>
-                <button id="mobile-more-sheet-close-btn" class="text-stone-400 hover:text-stone-700 text-xl font-bold w-8 h-8 rounded-full flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                <button id="mobile-more-sheet-close-btn" class="text-slate-400 hover:text-slate-700 text-lg font-bold w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
             </div>
             
             <div class="grid grid-cols-2 gap-2.5">
-                <button id="mobile-sheet-overview-btn" class="p-3 bg-indigo-50/70 hover:bg-indigo-100 border border-indigo-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-indigo-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-gauge"></i></div>
-                    <div class="text-left"><span class="block text-indigo-950 font-extrabold">班級總覽</span><span class="text-[10px] text-indigo-500 font-medium">晨間儀表板</span></div>
+                <button id="mobile-sheet-overview-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-indigo-600 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-gauge"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">班級總覽</span><span class="text-[10px] text-slate-400 font-normal">晨間儀表板</span></div>
                 </button>
-                <button id="mobile-sheet-attendance-btn" class="p-3 bg-amber-50/70 hover:bg-amber-100 border border-amber-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-amber-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-check"></i></div>
-                    <div class="text-left"><span class="block text-amber-950 font-extrabold">今日出席</span><span class="text-[10px] text-amber-600 font-medium">到校與請假</span></div>
+                <button id="mobile-sheet-attendance-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-indigo-600 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">今日出席</span><span class="text-[10px] text-slate-400 font-normal">到校與請假</span></div>
                 </button>
-                <button id="mobile-sheet-officers-btn" class="p-3 bg-blue-50/70 hover:bg-blue-100 border border-blue-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-blue-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-shield"></i></div>
-                    <div class="text-left"><span class="block text-blue-950 font-extrabold">值日幹部</span><span class="text-[10px] text-blue-500 font-medium">每日輪值表</span></div>
+                <button id="mobile-sheet-officers-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-user-shield"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">值日幹部</span><span class="text-[10px] text-slate-400 font-normal">每日輪值表</span></div>
                 </button>
-                <button id="mobile-sheet-affairs-btn" class="p-3 bg-teal-50/70 hover:bg-teal-100 border border-teal-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-teal-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-receipt"></i></div>
-                    <div class="text-left"><span class="block text-teal-950 font-extrabold">班級事務</span><span class="text-[10px] text-teal-600 font-medium">回條與收費</span></div>
+                <button id="mobile-sheet-affairs-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-receipt"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">班級事務</span><span class="text-[10px] text-slate-400 font-normal">回條與收費</span></div>
                 </button>
-                <button id="mobile-sheet-scores-btn" class="p-3 bg-purple-50/70 hover:bg-purple-100 border border-purple-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-purple-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-graduation-cap"></i></div>
-                    <div class="text-left"><span class="block text-purple-950 font-extrabold">段考成績</span><span class="text-[10px] text-purple-600 font-medium">登記與統計</span></div>
+                <button id="mobile-sheet-scores-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-indigo-600 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">段考成績</span><span class="text-[10px] text-slate-400 font-normal">登記與統計</span></div>
                 </button>
-                <button id="mobile-sheet-line-report-btn" class="p-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-emerald-800 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0"><i class="fa-solid fa-clipboard-list"></i></div>
-                    <div class="text-left"><span class="block text-emerald-950 font-extrabold">LINE 通報</span><span class="text-[10px] text-emerald-600 font-medium">一鍵產生文案</span></div>
+                <button id="mobile-sheet-line-report-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 border border-emerald-200/70 flex items-center justify-center shrink-0"><i class="fa-solid fa-clipboard-list"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">LINE 通報</span><span class="text-[10px] text-slate-400 font-normal">一鍵產生文案</span></div>
                 </button>
-                <button id="mobile-sheet-manage-classes-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-chalkboard-user"></i></div>
-                    <div class="text-left"><span class="block text-stone-900 font-extrabold">管理班級</span><span class="text-[10px] text-stone-400 font-medium">改名/權限碼</span></div>
+                <button id="mobile-sheet-manage-classes-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-chalkboard-user"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">管理班級</span><span class="text-[10px] text-slate-400 font-normal">改名/權限碼</span></div>
                 </button>
-                <button id="mobile-sheet-student-details-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-users"></i></div>
-                    <div class="text-left"><span class="block text-stone-900 font-extrabold">學生名冊</span><span class="text-[10px] text-stone-400 font-medium">座號與缺交</span></div>
+                <button id="mobile-sheet-student-details-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-emerald-600 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-users"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">學生名冊</span><span class="text-[10px] text-slate-400 font-normal">座號與缺交</span></div>
                 </button>
-                <button id="mobile-sheet-types-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-tags"></i></div>
-                    <div class="text-left"><span class="block text-stone-900 font-extrabold">作業種類</span><span class="text-[10px] text-stone-400 font-medium">彩色標籤</span></div>
+                <button id="mobile-sheet-types-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-tags"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">作業種類</span><span class="text-[10px] text-slate-400 font-normal">狀態標籤</span></div>
                 </button>
-                <button id="mobile-sheet-set-barcodes-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-barcode"></i></div>
-                    <div class="text-left"><span class="block text-stone-900 font-extrabold">條碼設定</span><span class="text-[10px] text-stone-400 font-medium">掃碼機設定</span></div>
+                <button id="mobile-sheet-set-barcodes-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-barcode"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">條碼設定</span><span class="text-[10px] text-slate-400 font-normal">掃碼機設定</span></div>
                 </button>
-                <button id="mobile-sheet-settings-btn" class="p-3 bg-stone-50 hover:bg-stone-100 border border-stone-200 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-stone-700 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center shrink-0"><i class="fa-solid fa-gear"></i></div>
-                    <div class="text-left"><span class="block text-stone-900 font-extrabold">系統設定</span><span class="text-[10px] text-stone-400 font-medium">雲端與外觀</span></div>
+                <button id="mobile-sheet-settings-btn" class="p-3 bg-white hover:bg-slate-50 border border-slate-200/90 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-100 text-slate-700 border border-slate-200/80 flex items-center justify-center shrink-0"><i class="fa-solid fa-gear"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">系統設定</span><span class="text-[10px] text-slate-400 font-normal">雲端與外觀</span></div>
                 </button>
-                <button id="mobile-sheet-admin-btn" class="p-3 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border border-amber-300 rounded-2xl flex items-center gap-2.5 font-bold text-xs text-amber-900 active:scale-98 transition-all cursor-pointer">
-                    <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-xs"><i class="fa-solid fa-shield-halved"></i></div>
-                    <div class="text-left"><span class="block text-amber-950 font-extrabold">管理中樞</span><span class="text-[10px] text-amber-700 font-medium">行政與全校</span></div>
+                <button id="mobile-sheet-admin-btn" class="p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl flex items-center gap-2.5 font-semibold text-xs text-slate-800 active:scale-98 transition-all cursor-pointer">
+                    <div class="w-9 h-9 rounded-lg bg-slate-900 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="text-left"><span class="block text-slate-900 font-bold">管理中樞</span><span class="text-[10px] text-slate-500 font-normal">行政與全校</span></div>
                 </button>
             </div>
         </div>
